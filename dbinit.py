@@ -5,10 +5,10 @@ import psycopg2 as dbapi2
 
 
 INIT_STATEMENTS = [
-    "CREATE TABLE IF NOT EXISTS DUMMY (NUM INTEGER)",
-    "INSERT INTO DUMMY VALUES (42)",
+    "DROP SCHEMA public CASCADE;CREATE SCHEMA public;",
 ]
 
+# db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb')
 
 def initialize(url):
     with dbapi2.connect(url) as connection:
