@@ -1,0 +1,27 @@
+.sandik-title {
+  color: #e9601a;
+}
+
+.sandik-title-form {
+  color: #e9601a;
+  text-align: center;
+}
+
+.sandik-form {
+  max-width: 400px;
+}
+
+form.sandik-form {
+  text-align: center;
+  max-width: 250px;
+  margin: auto;
+}
+
+.sandik-footer {
+  text-align: center;
+  height: 100px;
+}
+
+.sandik-alert-list {
+  padding-left: 0px;
+}
