@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from views import webuser, others
+from views import webuser, others, sandik
 from views.webuser import FlaskUser
 
 
@@ -21,6 +21,9 @@ def create_sandik_app():
     app.add_url_rule("/login", view_func=webuser.login_page, methods=["GET", "POST"])
     app.add_url_rule("/logout", view_func=webuser.logout_page)
     app.add_url_rule("/", view_func=others.home_page)
+
+    app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_panel)
 
     lm.init_app(app)
     lm.login_view = "webuser.login_page"

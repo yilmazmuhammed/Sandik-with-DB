@@ -8,11 +8,11 @@ db = Database()
 class Sandik(db.Entity):
     sandik_id = PrimaryKey(int, auto=True)
     name = Required(str, 40)
-    date_of_opening = Required(date)
-    is_active = Required(bool)
+    date_of_opening = Required(date, default=lambda: date.today())
+    is_active = Required(bool, default=True)
     explanation = Optional(str, 200)
     members_index = Set('Member')
-    member_authority_type_index = Optional('MemberAuthorityType')
+    member_authority_types_index = Set('MemberAuthorityType')
     debt_types_index = Set('DebtType')
 
 
@@ -21,7 +21,7 @@ class WebUser(db.Entity):
     password_hash = Required(str, 87)
     name = Optional(str, 40)
     surname = Optional(str, 40)
-    date_of_registration = Required(date)
+    date_of_registration = Required(date, default=lambda: date.today())
     is_admin = Required(bool, default=False)
     is_active = Required(bool, default=True)
     members_index = Set('Member')
@@ -33,8 +33,8 @@ class Member(db.Entity):
     member_id = PrimaryKey(int, auto=True)
     webuser_ref = Required(WebUser)
     sandik_ref = Required(Sandik)
-    date_of_membership = Required(date)
-    is_active = Required(bool)
+    date_of_membership = Required(date, default=lambda: date.today())
+    is_active = Required(bool, default=True)
     member_authority_type_ref = Required('MemberAuthorityType')
     shares_index = Set('Share')
 
@@ -80,9 +80,9 @@ class DebtType(db.Entity):
     sandik_ref = Required(Sandik)
     name = Required(str, 20)
     explanation = Optional(str, 200)
-    max_number_of_installment = Optional(str)
-    max_amount = Optional(str)
-    max_installment_amount = Optional(str)
+    max_number_of_installments = Optional(int, unsigned=True)
+    max_amount = Optional(int, unsigned=True)
+    min_installment_amount = Optional(int, unsigned=True)
     debts_index = Set(Debt)
 
 
@@ -95,10 +95,14 @@ class Payment(Transaction):
     remaining_installment_so_far = Required(int, size=8)
 
 
+# TODO yetkileri ayarla (üye ekle/çıkar, tüm işlemleri görüntüle, tüm işlemleri düzenle gibi...)
 class MemberAuthorityType(db.Entity):
     id = PrimaryKey(int, auto=True)
+    name = Required(str)
+    max_number_of_members = Required(int, default="-1")
     sandik_ref = Required(Sandik)
     members_index = Set(Member)
+    is_admin = Required(bool, default=False)
 
 
 # PostgreSQL
@@ -107,3 +111,9 @@ db.bind(provider='postgres', user='auykhzkqcbtuek', password='dea61b13d38a6b893a
 
 
 db.generate_mapping(create_tables=True)
+
+if __name__ == "__main__":
+    with db_session:
+        WebUser(username='admin', password_hash='$pbkdf2-sha256$29000$PIdwDqH03hvjXAuhlLL2Pg$B1K8TX6Efq3GzvKlxDKIk4T7yJzIIzsuSegjZ6hAKLk', name='adminName', surname='adminSurname', is_admin=True)
+        WebUser(username='tty', password_hash='$pbkdf2-sha256$29000$Umotxdhbq9UaI2TsnTMmZA$uVtN2jo0I/de/Kz9/seebkM0n0MG./KGBc1EPw5X.f0', name='userName', surname='userSurname')
+
