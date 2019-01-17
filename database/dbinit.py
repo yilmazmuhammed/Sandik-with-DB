@@ -102,7 +102,7 @@ class MemberAuthorityType(db.Entity):
 
 
 # PostgreSQL
-db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb')
+db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb', port='5432')
 
 
 db.generate_mapping(create_tables=True)
