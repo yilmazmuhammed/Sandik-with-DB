@@ -101,8 +101,8 @@ class MemberAuthorityType(db.Entity):
     members_index = Set(Member)
 
 
-# # PostgreSQL
-# db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb')
+# PostgreSQL
+db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb')
 
 
 db.generate_mapping(create_tables=True)
