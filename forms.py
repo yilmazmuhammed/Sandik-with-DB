@@ -5,10 +5,13 @@ from wtforms.fields.html5 import DateField
 
 
 class FormPageInfo:
-    def __init__(self, form, title, errors):
+    def __init__(self, form, title, form_name):
         self.form = form
         self.title = title
-        self.errors = errors
+        self.errors = ()
+        self.form_name = form_name
+        for field in form:
+            self.errors += field.errors
 
 
 class SingUpForm(FlaskForm):
@@ -37,3 +40,9 @@ class SingUpForm(FlaskForm):
                           id='surname')
 
     submit = SubmitField("Sign Up")
+
+
+class LoginForm(FlaskForm):
+    username = StringField("Username:", validators=[InputRequired("Please enter your username")], id='username')
+    password = PasswordField("Password:", validators=[InputRequired("Please enter your password")], id='password')
+    submit = SubmitField("Login")

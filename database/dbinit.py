@@ -9,7 +9,7 @@ class Sandik(db.Entity):
     sandik_id = PrimaryKey(int, auto=True)
     name = Required(str, 40)
     date_of_opening = Required(date)
-    status = Required(bool)
+    is_active = Required(bool)
     explanation = Optional(str, 200)
     members_index = Set('Member')
     member_authority_type_index = Optional('MemberAuthorityType')
@@ -22,8 +22,8 @@ class WebUser(db.Entity):
     name = Optional(str, 40)
     surname = Optional(str, 40)
     date_of_registration = Required(date)
-    is_admin = Required(bool)
-    status = Required(bool, default=True)
+    is_admin = Required(bool, default=False)
+    is_active = Required(bool, default=True)
     members_index = Set('Member')
 
 
@@ -34,7 +34,7 @@ class Member(db.Entity):
     webuser_ref = Required(WebUser)
     sandik_ref = Required(Sandik)
     date_of_membership = Required(date)
-    account_status = Required(bool)
+    is_active = Required(bool)
     member_authority_type_ref = Required('MemberAuthorityType')
     shares_index = Set('Share')
 
@@ -44,7 +44,7 @@ class Share(db.Entity):
     member_ref = Required(Member)
     share_order_of_member = Required(int, size=8)
     date_of_opening = Required(date)
-    account_status = Required(bool)
+    is_active = Required(bool)
     transactions_index = Set('Transaction')
 
 
@@ -101,8 +101,8 @@ class MemberAuthorityType(db.Entity):
     members_index = Set(Member)
 
 
-# PostgreSQL
-db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb')
+# # PostgreSQL
+# db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb')
 
 
 db.generate_mapping(create_tables=True)

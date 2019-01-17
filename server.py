@@ -1,15 +1,16 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from views import webuser
-from database.dbinit import WebUser
+from views import webuser, others
+from views.webuser import FlaskUser
+
 
 lm = LoginManager()
 
 
 @lm.user_loader
 def load_user(username):
-    return WebUser.get(username=username)
+    return FlaskUser(username)
 
 
 def create_sandik_app():
@@ -17,12 +18,12 @@ def create_sandik_app():
     app.config.from_object("settings")
 
     app.add_url_rule("/signup", view_func=webuser.signup_page, methods=["GET", "POST"])
-    # app.add_url_rule("/login", view_func=webuser.login_page, methods=["GET", "POST"])
-    # app.add_url_rule("/logout", view_func=webuser.logout_page)
+    app.add_url_rule("/login", view_func=webuser.login_page, methods=["GET", "POST"])
+    app.add_url_rule("/logout", view_func=webuser.logout_page)
+    app.add_url_rule("/", view_func=others.home_page)
 
     lm.init_app(app)
-    lm.login_view = "login_page"
-
+    lm.login_view = "webuser.login_page"
 
     return app
 

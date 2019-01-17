@@ -12,7 +12,6 @@
 }
 
 form.sandik-form {
-  text-align: center;
   max-width: 250px;
   margin: auto;
 }
@@ -24,4 +23,8 @@ form.sandik-form {
 
 .sandik-alert-list {
   padding-left: 0px;
+}
+
+.sandik-form-btn-group {
+  text-align: center;
 }
