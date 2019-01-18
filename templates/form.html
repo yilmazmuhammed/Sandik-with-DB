@@ -14,19 +14,26 @@
   </div>
   {% endif %}
 
-  <form action="" method="post" name="{{ info.form_name }}" class="sandik-form">
+  <form action="" method="post" name="{{ info.form.form_name }}" class="sandik-form">
     {{ info.form.csrf_token }}
     {% for field in info.form %}
-    {% if field.type != "SubmitField" %}
+    {% if field.type in ["SubmitField"] %}
+    <div class="form-group sandik-form-btn-group">
+      {{ info.form.submit(class="btn btn-primary sandik-btn-form") }}
+    </div>
+    {% elif field.type in ['StringField', 'PasswordField', 'TextAreaField'] %}
     <div class="form-group sandik-form-group">
       {{ field.label }}
       {{ field(class='form-control', placeholder=field.label.text.split(":")[0]) }}
     </div>
+    {% else %}
+    <div class="form-group sandik-form-group">
+      {{ field.label }}
+      {{ field(class='form-control') }}
+    </div>
     {% endif %}
     {% endfor %}
-    <div class="form-group sandik-form-btn-group">
-      {{ info.form.submit(class="btn btn-primary sandik-btn-form") }}
-    </div>
+
   </form>
 </div>
 {% endblock %}

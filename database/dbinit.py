@@ -43,8 +43,8 @@ class Share(db.Entity):
     share_id = PrimaryKey(int, auto=True)
     member_ref = Required(Member)
     share_order_of_member = Required(int, size=8)
-    date_of_opening = Required(date)
-    is_active = Required(bool)
+    date_of_opening = Required(date, default=lambda: date.today())
+    is_active = Required(bool, default=True)
     transactions_index = Set('Transaction')
 
 
@@ -96,6 +96,7 @@ class Payment(Transaction):
 
 
 # TODO yetkileri ayarla (üye ekle/çıkar, tüm işlemleri görüntüle, tüm işlemleri düzenle gibi...)
+# TODO max_number_of_members'e göre sınır koy
 class MemberAuthorityType(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str)
@@ -112,6 +113,7 @@ db.bind(provider='postgres', user='auykhzkqcbtuek', password='dea61b13d38a6b893a
 
 db.generate_mapping(create_tables=True)
 
+# TODO Bir sandıktan aynı webuser'ın sadece 1 tane üyeliği olabilir
 if __name__ == "__main__":
     with db_session:
         WebUser(username='admin', password_hash='$pbkdf2-sha256$29000$PIdwDqH03hvjXAuhlLL2Pg$B1K8TX6Efq3GzvKlxDKIk4T7yJzIIzsuSegjZ6hAKLk', name='adminName', surname='adminSurname', is_admin=True)

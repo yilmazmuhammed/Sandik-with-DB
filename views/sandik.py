@@ -10,10 +10,8 @@ from forms import SandikForm, FormPageInfo
 @login_required
 def new_sandik_page():
     form = SandikForm()
-    info = FormPageInfo(form=form, title='Add new sandık', form_name='new-sandik-form')
 
     if form.validate_on_submit():
-    # try:
         with db_session:
             # Formdan alınan bilgilere göre sandık oluştur
             new_sandik = Sandik(name=form.data['name'], explanation=form.data['explanation'])
@@ -27,15 +25,14 @@ def new_sandik_page():
                    member_authority_type_ref=admin_user)
 
             # TODO yeni sandık oluşturulunca sandıklarım/(yeni sandık ayarları) gibi bir sayfaya yönlendir
-            return redirect(url_for('sandik_management_panel', sandik_id=new_sandik.sandik_id))
-    # except Exception as e:
-    #     info.errors += (type(e), e,)
+            return redirect(url_for('sandik_management_page', sandik_id=new_sandik.sandik_id))
 
+    info = FormPageInfo(form=form, title='Add new sandık')
     return render_template('form.html', info=info)
 
 
 @login_required
-def sandik_management_panel(sandik_id):
+def sandik_management_page(sandik_id):
     try:
         with db_session:
             sandik = Sandik[sandik_id]
