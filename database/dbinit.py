@@ -119,3 +119,10 @@ if __name__ == "__main__":
         WebUser(username='admin', password_hash='$pbkdf2-sha256$29000$PIdwDqH03hvjXAuhlLL2Pg$B1K8TX6Efq3GzvKlxDKIk4T7yJzIIzsuSegjZ6hAKLk', name='adminName', surname='adminSurname', is_admin=True)
         WebUser(username='tty', password_hash='$pbkdf2-sha256$29000$Umotxdhbq9UaI2TsnTMmZA$uVtN2jo0I/de/Kz9/seebkM0n0MG./KGBc1EPw5X.f0', name='userName', surname='userSurname')
 
+
+class DbTypes:
+    Sandik = Sandik
+    WebUser = WebUser
+    Member = Member
+    Share = Share
+    Transaction = Transaction

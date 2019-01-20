@@ -1,0 +1,2 @@
+def asa():
+    return 'asa'

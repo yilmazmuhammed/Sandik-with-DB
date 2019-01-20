@@ -1,12 +1,13 @@
-# TODO sandığa üye ekleme formu oluştur
 # TODO Flash mesajlarını layout dışından değiştir, eğer form sayfası ise form başlığı altında göster
+# TODO Members sayfasında üyelere tıklanınca altta hisseleri açılsın
 
 from flask import Flask
 from flask_login import LoginManager
 
-from views import webuser, others, sandik, member
+from views import webuser, others, sandik
 from views.webuser import FlaskUser
-
+from views.sandik import member
+from views import asa
 
 lm = LoginManager()
 
@@ -28,6 +29,7 @@ def create_sandik_app():
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member", view_func=member.add_member_to_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=member.members_page)
 
     lm.init_app(app)
     lm.login_view = "webuser.login_page"
