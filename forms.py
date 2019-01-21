@@ -77,23 +77,14 @@ class MemberForm(FlaskForm):
 
 class TransactionForm(FlaskForm):
     form_name = 'transaction-form'
-    # TODO boş seçeneği value="0" olmadan ekle
     share = SelectField("Share:", validators=[InputRequired("Please select your share for transactionin list")],
-                        coerce=int, choices=[(0, "Select...")], id='share')
+                        coerce=int, choices=[], id='share')
     transaction_date = DateField("Transaction date:", default=date.today(),
                                  validators=[InputRequired("Please enter transaction date")],
                                  id='transaction_date')
     # TODO max amount borç tipine, içerdeki parasına ve diğer kurallara göre belirlenecek, burada da olabilir,
     #  formu aldıktan sonra da
     amount = IntegerField("Amount:", validators=[InputRequired("Please enter amount of transaction")], id='amount')
-    # # TODO coerce str mi int(ayrı tablo) mi?
-    # transaction_type = SelectField("Transaction type:",
-    #                                validators=[InputRequired("Please select a transaction type in list")], coerce=str,
-    #                                choices=[("Contribution", 'Contribution'),
-    #                                         ("APB", 'APB'), ("PDAY", 'PDAY'),
-    #                                         ("APB-Ö", 'APB-Ö'), ("PDAY-Ö", 'PDAY-Ö'),
-    #                                         ("Other", 'Other')],
-    #                                id='transaction_type')
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
@@ -116,8 +107,36 @@ class ContributionForm(TransactionForm):
     contribution_period = DynamicSelectField(label="Contribution period:",
                                              validators=[InputRequired("Please select contribution period in list")],
                                              coerce=str, choices=[], id='contribution_period')
+    # TODO use super()
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
                                 id='explanation')
     submit = SubmitField("Add Contribution")
+
+
+class DebtForm(TransactionForm):
+    debt_type = SelectField("Debt type:", validators=[InputRequired("Please select debt type from the list")],
+                            coerce=int, choices=[], id='debt_type')
+
+    number_of_installment = SelectField("Number of installment:",
+                                        validators=[InputRequired("Please select number of installment from the list")],
+                                        coerce=int, choices=[], id='number_of_installment')
+    # TODO use super()
+    explanation = TextAreaField("Explanation:",
+                                validators=[Optional(),
+                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
+                                id='explanation')
+    submit = SubmitField("Take Debt")
+
+
+class PaymentForm(TransactionForm):
+    share = None
+    debt = SelectField("Debt:", validators=[InputRequired("Please select the debt from list")], coerce=int, id='debt')
+
+    # TODO use super()
+    explanation = TextAreaField("Explanation:",
+                                validators=[Optional(),
+                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
+                                id='explanation')
+    submit = SubmitField("Pay Debt")

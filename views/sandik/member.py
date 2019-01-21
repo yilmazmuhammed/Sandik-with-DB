@@ -1,4 +1,4 @@
-from pony.orm import db_session, select
+from pony.orm import db_session
 from datetime import date
 from pony.orm.core import ObjectNotFound
 from flask import redirect, render_template, url_for, flash
@@ -12,6 +12,7 @@ def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
         members = sandik.members_index.sort_by(Member.member_id)
+        # TODO bilgileri tek info ile gönder
         return render_template("sandik/members.html", info=MembersPageInfo(title='Members', sandik=sandik, members=members, db_types=DbTypes), sandik_id=sandik_id)
 
 

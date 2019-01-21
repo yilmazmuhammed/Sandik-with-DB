@@ -28,7 +28,12 @@ function SetOnchange() {
   b.setAttribute("onchange", "ChangeList()");
 }
 
-window.onload = SetOnchange;
+function Onload() {
+  SetOnchange()
+  ChangeList()
+}
+
+window.onload = Onload;
 
 </script>
 {% endblock %}

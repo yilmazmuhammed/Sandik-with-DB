@@ -49,14 +49,16 @@ class Share(db.Entity):
 
 
 class Transaction(db.Entity):
-    transaction_id = PrimaryKey(int, auto=True)
+    id = PrimaryKey(int, auto=True)
     share_ref = Required(Share)
     transaction_date = Required(date)
     amount = Required(int)
     type = Required(str, 15)  # Bu işlem tipi diye kendi veri tipim olması gerekiyor. CONTRIBUTION, DEBT, PAYMENT, OTHER
     explanation = Optional(str, 200)
-    contribution_index = Set('Contribution')
     is_confirm = Required(bool, default=False)
+    contribution_index = Set('Contribution')
+    payment_ref = Optional('Payment')
+    debt_ref = Optional('Debt')
 
 
 class Contribution(db.Entity):
@@ -65,7 +67,9 @@ class Contribution(db.Entity):
     contribution_period = Required(str, 10)
 
 
-class Debt(Transaction):
+class Debt(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    transaction_ref = Required(Transaction)
     debt_type_ref = Required('DebtType')
     number_of_installment = Required(int, size=8)
     installment_amount = Required(int)
@@ -73,14 +77,14 @@ class Debt(Transaction):
     paid_installment = Required(int, size=8)
     remaining_debt = Required(int)
     remaining_installment = Required(int, size=8)
-    starting_date = Required(date)
-    due_date = Required(date)
+    starting_period = Required(str, 10)
+    due_period = Required(str, 10)
     payments_index = Set('Payment')
 
 
 class DebtType(db.Entity):
     """Her borç tipi için ayrı kurallar olabilir, max taksit sayısı, max miktar gibi"""
-    debt_type_id = PrimaryKey(int, auto=True)
+    id = PrimaryKey(int, auto=True)
     sandik_ref = Required(Sandik)
     name = Required(str, 20)
     explanation = Optional(str, 200)
@@ -90,13 +94,15 @@ class DebtType(db.Entity):
     debts_index = Set(Debt)
 
 
-class Payment(Transaction):
+class Payment(db.Entity):
+    id = PrimaryKey(int, auto=True)
     debt_ref = Required(Debt)
     payment_number_of_debt = Required(int)
     paid_debt_so_far = Required(int)
     paid_installment_so_far = Required(int, size=8)
     remaining_debt_so_far = Required(int)
     remaining_installment_so_far = Required(int, size=8)
+    transaction_ref = Required(Transaction)
 
 
 # TODO yetkileri ayarla (üye ekle/çıkar, tüm işlemleri görüntüle, tüm işlemleri düzenle gibi...)
@@ -114,6 +120,7 @@ class MemberAuthorityType(db.Entity):
 # db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb', port='5432')
 db.bind(provider='postgres', user='auykhzkqcbtuek', password='dea61b13d38a6b893a353b30e865fedacc805572c9d035975a248f0ef09fbd93', host='ec2-54-247-125-116.eu-west-1.compute.amazonaws.com', database='dfuubeej01nmtv', port='5432')
 
+# set_sql_debug(True)
 
 db.generate_mapping(create_tables=True)
 

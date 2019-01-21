@@ -1,9 +1,7 @@
-# TODO Flash mesajlarını layout dışından değiştir, eğer form sayfası ise form başlığı altında göster
-
 from flask import Flask
 from flask_login import LoginManager
 
-from views import webuser, others, sandik, member
+from views import webuser, others, sandik, transaction
 from views.sandik import member as sandik_member
 from views.webuser import FlaskUser
 
@@ -27,9 +25,14 @@ def create_sandik_app():
 
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
-    app.add_url_rule("/sandik/<int:sandik_id>/add-member", view_func=sandik_member.add_member_to_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-member",
+                     view_func=sandik_member.add_member_to_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=sandik_member.members_page)
-    app.add_url_rule("/sandik/<int:sandik_id>/add-contribution", view_func=member.add_contribution_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-contribution",
+                     view_func=transaction.add_contribution_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-debt", view_func=transaction.add_debt_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-payment",
+                     view_func=transaction.add_payment_page, methods=["GET", "POST"])
 
     lm.init_app(app)
     lm.login_view = "login_page"
