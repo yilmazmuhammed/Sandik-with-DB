@@ -5,7 +5,7 @@ from flask import redirect, render_template, url_for, flash
 
 from database.dbinit import WebUser, Member, Sandik, Share, MemberAuthorityType, DbTypes
 from forms import MemberForm, FormPageInfo
-from views.page_info import PageInfo
+from views import PageInfo
 
 
 def members_page(sandik_id):

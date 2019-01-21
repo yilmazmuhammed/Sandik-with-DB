@@ -1,2 +1,3 @@
-def asa():
-    return 'asa'
+class PageInfo:
+    def __init__(self, title):
+        self.title = title

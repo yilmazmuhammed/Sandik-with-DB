@@ -1,0 +1,35 @@
+{% extends "form.html" %}
+
+{% block extra_head %}
+
+<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+<script>
+var periodsDict = {{periodsDict|safe}};
+
+function ChangeList() {
+  var shareList = document.getElementById("share");
+  var periodList = document.getElementById("contribution_period");
+  var selectedShare = shareList.options[shareList.selectedIndex].value;
+  while (periodList.options.length) {
+    periodList.remove(0);
+  }
+  var periods = periodsDict[selectedShare];
+  if (periods) {
+    var i;
+    for (i = 0; i < periods.length; i++) {
+      var period = new Option(periods[i], periods[i]);
+      periodList.options.add(period);
+    }
+  }
+}
+
+function SetOnchange() {
+  var b = document.getElementById("share")
+  b.setAttribute("onchange", "ChangeList()");
+}
+
+window.onload = SetOnchange;
+
+</script>
+{% endblock %}
+

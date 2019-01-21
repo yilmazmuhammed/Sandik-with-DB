@@ -55,10 +55,14 @@ class Transaction(db.Entity):
     amount = Required(int)
     type = Required(str, 15)  # Bu işlem tipi diye kendi veri tipim olması gerekiyor. CONTRIBUTION, DEBT, PAYMENT, OTHER
     explanation = Optional(str, 200)
+    contribution_index = Set('Contribution')
+    is_confirm = Required(bool, default=False)
 
 
-class Contribution(Transaction):
-    contribution_period = Required(int, size=8)
+class Contribution(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    transaction_ref = Required(Transaction)
+    contribution_period = Required(str, 10)
 
 
 class Debt(Transaction):

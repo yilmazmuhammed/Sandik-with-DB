@@ -1,14 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import InputRequired, Length, Optional
 from wtforms.fields.html5 import DateField
 from datetime import date
 
+from views import PageInfo
 
-class FormPageInfo:
+
+class FormPageInfo(PageInfo):
     def __init__(self, form, title):
+        super().__init__(title)
         self.form = form
-        self.title = title
         self.errors = []
         for field in form:
             self.errors += field.errors
@@ -28,11 +30,6 @@ class SingUpForm(FlaskForm):
                                     validators=[InputRequired("Please enter your password"),
                                                 Length(max=20, message="Password cannot be longer than 20 character")],
                                     id='password')
-    # # TODO kayıt tarihi otomatik alınsın, bunu kaldır
-    # date_of_registration = DateField("Date of registration", default=date.today(),
-    #                                  validators=[InputRequired("Please enter date of registration")],
-    #                                  id='date_of_registration')
-
     name = StringField("Name:", validators=[InputRequired("Please enter your name"),
                                             Length(max=40, message="Name field cannot be longer than 40 character")],
                        id='name')
@@ -72,7 +69,55 @@ class MemberForm(FlaskForm):
                            id='username')
     authority = SelectField(label='Member type:', validators=[InputRequired("Please select a member type in list")],
                             coerce=int, choices=[], id='authority')
-    date_of_membership = DateField("Date of membership", default=date.today(),
+    date_of_membership = DateField("Date of membership:", default=date.today(),
                                    validators=[InputRequired("Please enter date of membership")],
                                    id='date_of_membership')
     submit = SubmitField("Add Member")
+
+
+class TransactionForm(FlaskForm):
+    form_name = 'transaction-form'
+    # TODO boş seçeneği value="0" olmadan ekle
+    share = SelectField("Share:", validators=[InputRequired("Please select your share for transactionin list")],
+                        coerce=int, choices=[(0, "Select...")], id='share')
+    transaction_date = DateField("Transaction date:", default=date.today(),
+                                 validators=[InputRequired("Please enter transaction date")],
+                                 id='transaction_date')
+    # TODO max amount borç tipine, içerdeki parasına ve diğer kurallara göre belirlenecek, burada da olabilir,
+    #  formu aldıktan sonra da
+    amount = IntegerField("Amount:", validators=[InputRequired("Please enter amount of transaction")], id='amount')
+    # # TODO coerce str mi int(ayrı tablo) mi?
+    # transaction_type = SelectField("Transaction type:",
+    #                                validators=[InputRequired("Please select a transaction type in list")], coerce=str,
+    #                                choices=[("Contribution", 'Contribution'),
+    #                                         ("APB", 'APB'), ("PDAY", 'PDAY'),
+    #                                         ("APB-Ö", 'APB-Ö'), ("PDAY-Ö", 'PDAY-Ö'),
+    #                                         ("Other", 'Other')],
+    #                                id='transaction_type')
+    explanation = TextAreaField("Explanation:",
+                                validators=[Optional(),
+                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
+                                id='explanation')
+    submit = SubmitField("Add Transaction")
+
+
+# Normalde seçilen değer, gönderilen değerlerden biri mi? diye kontrol edilit. Ama html kısmında belirlenen/değişen
+# seçeneklerde bu kontrolü yapamadı
+class DynamicSelectField(SelectField):
+    def pre_validate(self, form):
+        pass
+
+
+class ContributionForm(TransactionForm):
+    # TODO Çoklu aidat ödemelerinde getir
+    amount = None
+    # TODO çoklu aidat ödemelerinde multiple yap
+    # value format: yyyy-mm
+    contribution_period = DynamicSelectField(label="Contribution period:",
+                                             validators=[InputRequired("Please select contribution period in list")],
+                                             coerce=str, choices=[], id='contribution_period')
+    explanation = TextAreaField("Explanation:",
+                                validators=[Optional(),
+                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
+                                id='explanation')
+    submit = SubmitField("Add Contribution")
