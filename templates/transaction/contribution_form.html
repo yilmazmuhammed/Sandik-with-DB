@@ -17,7 +17,7 @@ function ChangeList() {
   if (periods) {
     var i;
     for (i = 0; i < periods.length; i++) {
-      var period = new Option(periods[i], periods[i]);
+      var period = new Option(periods[i][1], periods[i][0]);
       periodList.options.add(period);
     }
   }

@@ -33,9 +33,14 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/add-debt", view_func=transaction.add_debt_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-payment",
                      view_func=transaction.add_payment_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-transaction",
+                     view_func=transaction.add_transaction_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-custom-transaction",
+                     view_func=transaction.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
 
     lm.init_app(app)
     lm.login_view = "login_page"
+    lm.login_message_category = 'danger'
 
     return app
 

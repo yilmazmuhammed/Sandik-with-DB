@@ -75,11 +75,13 @@
     </header>
 
 
+    {% if not info or (info and not info.form) %}
     {% for category, message in get_flashed_messages(with_categories=true) %}
     <div class="container alert alert-{{ category }}" role="alert">
         {{ message }}
     </div>
     {% endfor %}
+    {% endif %}
 
     <!-- block content -->
     {% block content %}{% endblock %}

@@ -8,6 +8,12 @@
 <div class="container sandik-form">
   <h2 class="sandik-title-form">{{ info.title }}</h2>
 
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+  <div class="alert alert-{{ category }}" role="alert">
+      {{ message }}
+  </div>
+  {% endfor %}
+
   {% if info.errors %}
   <div class="alert alert-danger sandik-alert-list" role="alert">
     <ul>
@@ -18,26 +24,20 @@
   </div>
   {% endif %}
 
-  <form action="" method="post" name="{{ info.form.form_name }}" class="sandik-form">
+  {{ info.form.open|safe }}
     {{ info.form.csrf_token }}
     {% for field in info.form %}
     {% if field.type in ["SubmitField"] %}
     <div class="form-group sandik-form-btn-group">
-      {{ info.form.submit(class="btn btn-primary sandik-btn-form") }}
-    </div>
-    {% elif field.type in ['StringField', 'PasswordField', 'TextAreaField'] %}
-    <div class="form-group sandik-form-group">
-      {{ field.label }}
-      {{ field(class='form-control', placeholder=field.label.text.split(":")[0]) }}
+      {{ field }}
     </div>
     {% else %}
     <div class="form-group sandik-form-group">
       {{ field.label }}
-      {{ field(class='form-control') }}
+      {{ field }}
     </div>
     {% endif %}
     {% endfor %}
-
-  </form>
+  {{ info.form.close|safe }} <!-- return """</form>""" -->
 </div>
 {% endblock %}

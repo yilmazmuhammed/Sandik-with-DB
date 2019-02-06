@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_head %}
+
+<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+<script>
+var shares_of = {{shares_of|safe}};
+var debts_of = {{debts_of|safe}};
+var periods_of = {{periods_of|safe}};
+
+function ChangeSelectList(formSelect, newList, ifListEmpty){
+  if (!formSelect) {
+    return;
+  }
+
+  while(formSelect.options.length) {
+    formSelect.remove(0);
+  }
+
+  if(newList) {
+    if(newList.length){
+      var i;
+      for(i=0; i<newList.length; i++) {
+        var share = new Option(newList[i][1], newList[i][0]);
+        formSelect.options.add(share);
+      }
+    }
+    else{
+      var share = new Option(ifListEmpty, "");
+      formSelect.options.add(share);
+    }
+  }
+
+}
+
+function ChangeShareSelectList() {
+  var shareSelects = document.getElementsByName("share");
+
+  var memberSelect = document.getElementById("member");
+  var memberId = memberSelect.options[memberSelect.selectedIndex].value;
+  var shareList = shares_of[memberId];
+
+  for (var i = shareSelects.length - 1; i >= 0; i--) {
+    ChangeSelectList(shareSelects[i], shareList, "Hisse yok...");
+  }
+}
+
+function ChangeContPeriodSelectList(){
+  var contSelect = document.getElementById("contribution_period");
+
+  var memberSelect = document.getElementById("member");
+  var selectedMemberId = memberSelect.options[memberSelect.selectedIndex].value;
+  var shareSelect = document.getElementById("share");
+  var selectedShareId = shareSelect.options[shareSelect.selectedIndex].value;
+  var contPeriodList = periods_of[selectedMemberId][selectedShareId];
+
+  ChangeSelectList(contSelect, contPeriodList, "Ödenmemiş aidatınız bulunamadı...");
+}
+
+function ChangeDebtSelectList() {
+  var debtSelect = document.getElementById("debt");
+
+  var memberSelect = document.getElementById("member");
+  var memberId = memberSelect.options[memberSelect.selectedIndex].value;
+  var debtList = debts_of[memberId];
+
+  ChangeSelectList(debtSelect, debtList, "Ödenmemiş borcunuz yok...");
+}
+
+
+function ChangeFormByType(){
+  var typeSelect = document.getElementById("type");
+  var selectedType = typeSelect.options[typeSelect.selectedIndex].value;
+  var selectedForm = document.getElementsByName(selectedType)[0];
+
+  for (i = 0; i < typeSelect.length; i++) {
+    if(i==typeSelect.selectedIndex){
+      document.getElementsByName(typeSelect[i].value+"-form")[0].removeAttribute("hidden","")
+    }
+    else{
+      document.getElementsByName(typeSelect[i].value+"-form")[0].setAttribute("hidden","")
+    }
+  }
+}
+
+
+function SetOnchange(){
+  var a = document.getElementById("member");
+  a.setAttribute("onchange", "ChangeShareSelectList(), ChangeDebtSelectList(), ChangeContPeriodSelectList()");
+
+  var b = document.getElementById("share");
+  b.setAttribute("onchange", "ChangeContPeriodSelectList()");
+
+  var c = document.getElementById("type");
+  c.setAttribute("onchange", "ChangeFormByType()");
+}
+
+
+function Onload() {
+  SetOnchange();
+
+  ChangeShareSelectList();
+  ChangeContPeriodSelectList();
+  ChangeDebtSelectList();
+  ChangeFormByType();
+}
+
+window.onload = Onload;
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div class="container sandik-form">
+  <h2 class="sandik-title-form">{{ title }}</h2>
+
+  {% if errors %}
+  <div class="alert alert-danger sandik-alert-list" role="alert">
+    <ul>
+      {% for error in errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+
+  {% for form in forms %}
+  {{ form.open|safe }}
+    {{ form.csrf_token }}
+    {% for field in form %}
+    {% if field.type in ["SubmitField"] %}
+    <div class="form-group sandik-form-btn-group">
+      {{ field }}
+    </div>
+    {% else %}
+    <div class="form-group sandik-form-group">
+      {{ field.label }}
+      {{ field }}
+    </div>
+    {% endif %}
+    {% endfor %}
+  {{ form.close|safe }} <!-- return """</form>""" -->
+  {% endfor %}
+
+</div>
+
+{% endblock %}

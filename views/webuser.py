@@ -79,6 +79,7 @@ class FlaskUser(UserMixin):
     def __init__(self, username):
         self.username = username
         with db_session:
+            self.username = username
             self.webuser = WebUser[username]
             self.is_admin = self.webuser.is_admin
 
