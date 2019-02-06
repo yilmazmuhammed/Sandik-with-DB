@@ -19,6 +19,7 @@ def create_sandik_app():
     app.config.from_object("settings")
 
     app.add_url_rule("/signup", view_func=webuser.signup_page, methods=["GET", "POST"])
+    app.add_url_rule("/add-webuser", view_func=webuser.add_websuer_page, methods=["GET", "POST"])
     app.add_url_rule("/login", view_func=webuser.login_page, methods=["GET", "POST"])
     app.add_url_rule("/logout", view_func=webuser.logout_page)
     app.add_url_rule("/", view_func=others.home_page)

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField
 from wtforms.validators import InputRequired, Length, Optional
 from wtforms.fields.html5 import DateField
 from datetime import date
@@ -45,8 +45,8 @@ class FormPageInfo(PageInfo):
             self.errors += field.errors
 
 
-class SingUpForm(FlaskForm):
-    open = form_open(form_name='signup-form')
+class WebuserForm(FlaskForm):
+    open = form_open(form_name='webuser-form')
     close = form_close()
 
     username = StringField("Username:",
@@ -68,7 +68,18 @@ class SingUpForm(FlaskForm):
                           validators=[InputRequired("Please enter your name"),
                                       Length(max=40, message="Surname field cannot be longer than 40 character")],
                           id='surname', render_kw={"placeholder": "Surname", "class": "form-control"})
+    is_admin = BooleanField(label="Is admin:", id='is_admin', render_kw={"class": "form-control"})
+    date_of_registration = DateField("Date of registration:", default=date.today(),
+                                     validators=[InputRequired("Please enter date of registration")],
+                                     id='date_of_registration',
+                                     render_kw={"placeholder": "Date of registration", "class": "form-control"})
+    submit = SubmitField("Add New Webuser", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
+
+class SingUpForm(WebuserForm):
+    open = form_open(form_name='signup-form')
+    is_admin = None
+    date_of_registration = None
     submit = SubmitField("Sign Up", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
