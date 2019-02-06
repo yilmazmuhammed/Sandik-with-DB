@@ -1,37 +1,14 @@
-from datetime import date
-from flask import render_template, current_app, redirect, flash, request, url_for, abort
-from flask_login import login_user, logout_user, UserMixin, current_user, login_required
-
-from forms import SingUpForm, FormPageInfo, LoginForm, WebuserForm
-from database.dbinit import WebUser
+from flask import redirect, url_for, flash, render_template, abort, request, current_app
+from flask_login import current_user, login_required, login_user, logout_user
 from passlib.hash import pbkdf2_sha256 as hasher
-from pony.orm import db_session
-from pony.orm.core import TransactionIntegrityError, ObjectNotFound
+from pony.orm import TransactionIntegrityError, ObjectNotFound
+
+from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm
+from views.webuser.auxiliary import FlaskUser
+from views.webuser.db import add_webuser
 
 
-def add_webuser(form: SingUpForm, is_admin=None):
-    if form.date_of_registration:
-        date_of_registration = form.date_of_registration.data
-    else:
-        date_of_registration = date.today()
-
-    if is_admin is None:
-        if form.is_admin:
-            is_admin = form.is_admin.data
-        else:
-            is_admin = False
-
-    with db_session:
-        return WebUser(username=form.data["username"],
-                       password_hash=hasher.hash(form.data["password"]),
-                       date_of_registration=date_of_registration,
-                       name=form.data["name"],
-                       surname=form.data["surname"],
-                       is_admin=is_admin
-                       )
-
-
-def signup_page():
+def signup():
     if current_user.is_authenticated:
         # TODO üye sayfasına gönder
         return redirect(url_for('home_page'))
@@ -56,7 +33,7 @@ def signup_page():
 
 
 @login_required
-def add_websuer_page():
+def add_webuser():
     if not current_user.is_admin:
         abort(404)
 
@@ -79,7 +56,7 @@ def add_websuer_page():
     return render_template("form.html", info=info)
 
 
-def login_page():
+def login():
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -92,14 +69,6 @@ def login_page():
                 return redirect(next_page)
             else:  # If password is incorrect
                 flash(u"Username or password is incorrect.", 'danger')
-            # with db_session:
-            #     if hasher.verify(form.data['password'], WebUser[form.data['username']].password_hash ):
-            #         login_user(WebUser[form.data['username']])
-            #         flash("You have logged in.")
-            #         next_page = request.args.get("next", url_for("home_page"))
-            #         return redirect(next_page)
-            #     else:
-            #         info.errors += ("Username or password is incorrect.",)
         except ObjectNotFound:  # If username already exists in database
             flash(u"Username or password is incorrect.", 'danger')
 
@@ -109,23 +78,7 @@ def login_page():
 
 
 @login_required
-def logout_page():
+def logout():
     logout_user()
     flash(u"You have logged out.", 'success')
     return redirect(url_for("home_page"))
-
-
-class FlaskUser(UserMixin):
-    def __init__(self, username):
-        self.username = username
-        with db_session:
-            self.username = username
-            self.webuser = WebUser[username]
-            self.is_admin = self.webuser.is_admin
-
-    def get_id(self):
-        return self.webuser.username
-
-    @property
-    def is_active(self):
-        return self.webuser.is_active

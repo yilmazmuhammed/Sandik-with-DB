@@ -1,10 +1,9 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from views import webuser, others, sandik, transaction
+from views import others, sandik, transaction, webuser
 from views.sandik import member as sandik_member
-from views.webuser import FlaskUser
-
+from views.webuser.auxiliary import FlaskUser
 
 lm = LoginManager()
 
@@ -18,10 +17,10 @@ def create_sandik_app():
     app = Flask(__name__)
     app.config.from_object("settings")
 
-    app.add_url_rule("/signup", view_func=webuser.signup_page, methods=["GET", "POST"])
-    app.add_url_rule("/add-webuser", view_func=webuser.add_websuer_page, methods=["GET", "POST"])
-    app.add_url_rule("/login", view_func=webuser.login_page, methods=["GET", "POST"])
-    app.add_url_rule("/logout", view_func=webuser.logout_page)
+    app.add_url_rule("/signup", view_func=webuser.signup, methods=["GET", "POST"])
+    app.add_url_rule("/add-webuser", view_func=webuser.add_webuser, methods=["GET", "POST"])
+    app.add_url_rule("/login", view_func=webuser.login, methods=["GET", "POST"])
+    app.add_url_rule("/logout", view_func=webuser.logout)
     app.add_url_rule("/", view_func=others.home_page)
 
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
