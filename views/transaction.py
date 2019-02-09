@@ -46,7 +46,7 @@ def add_contribution(form: ContributionForm):
     Contribution(
         transaction_ref=Transaction(
             share_ref=Share[form.share.data], transaction_date=form.transaction_date.data, amount=25,
-            type='contribution'),
+            type='contribution', explanation=form.explanation.data),
         contribution_period=form.contribution_period.data)
 
 
@@ -86,7 +86,8 @@ def add_debt(form):
     ia = int(ia) if ia % 1 == 0 else int(ia)+1
     Debt(
         transaction_ref=Transaction(
-            share_ref=Share[form.share.data], transaction_date=t_date, amount=t_amount, type='debt'),
+            share_ref=Share[form.share.data], transaction_date=t_date, amount=t_amount, type='debt',
+            explanation=form.explanation.data),
         debt_type_ref=DebtType[form.debt_type.data], number_of_installment=d_inst, installment_amount=ia,
         paid_debt=0, paid_installment=0, remaining_debt=t_amount, remaining_installment=d_inst,
         starting_period=Period.last_period(t_date, 1), due_period=Period.last_period(t_date, d_inst + 1))

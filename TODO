@@ -1,2 +1,7 @@
-TODO Transactions sayfasını basit bir tablo ile hazırla
-TODO Transactions sayfasına filtreleme/sıralama özelliği getir
+TODO 1 Transactions sayfasını basit bir tablo ile hazırla
+TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
+TODO 3 Sandığa işlem eklerken işlemin eklendiği hissenin sandık üyelerinden birinin olup olmadığını kontrol et
+TODO! 4 Kullanıcı kendi webuser bilgilerini değiştirebilsin
+TODO! 5 Çoklu aidat ödeme sistemi oluştur
+TODO 6 Ödemeyi yapan kişi borcun sahibi mi? kontrol et
+TODO! 7 Var olan işlemleri islemler.csv'den ekle
