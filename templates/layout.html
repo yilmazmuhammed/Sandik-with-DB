@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='sandik.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sandik.css') }}"/>
 
     <!-- block extra_head -->
     {% block extra_head %}{% endblock %}
@@ -47,8 +47,8 @@
 
             <ul class="nav navbar-nav navbar-right">
               {% if not current_user.is_authenticated %}
-              <li><a href="{{ url_for('login_page') }}">Login</a></li>
-              <li><a href="{{ url_for('signup_page') }}">Sign Up</a></li>
+              <li><a href="{{ url_for('login') }}">Login</a></li>
+              <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
               {% elif current_user.is_admin %}
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: black;">{{ current_user.username }}<span class="caret"></span></a>
@@ -57,7 +57,7 @@
                   <li><a href="#">xxx</a></li>
                 </ul>
               </li>
-              <li><a href="{{ url_for('logout_page') }}">Log out</a></li>
+              <li><a href="{{ url_for('logout') }}">Log out</a></li>
               {% else %}
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: black;">{{ current_user.username }}<span class="caret"></span></a>
@@ -65,7 +65,7 @@
                   <li><a href="{{ url_for('new_sandik_page') }}">Create New Sandık</a></li>
                   <li><a href="#">xxx</a></li>
                 </ul>
-              </li><li><a href="{{ url_for('logout_page') }}">Log out</a></li>
+              </li><li><a href="{{ url_for('logout') }}">Log out</a></li>
               {% endif %}
             </ul>
 

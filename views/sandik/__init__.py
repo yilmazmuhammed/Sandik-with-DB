@@ -25,7 +25,7 @@ def new_sandik_page():
                    member_authority_type_ref=admin_user)
 
             # TODO yeni sandık oluşturulunca sandıklarım/(yeni sandık ayarları) gibi bir sayfaya yönlendir
-            return redirect(url_for('sandik_management_page', sandik_id=new_sandik.sandik_id))
+            return redirect(url_for('sandik_management_page', sandik_id=new_sandik.id))
 
     info = FormPageInfo(form=form, title='Add new sandık')
     return render_template('form.html', info=info)

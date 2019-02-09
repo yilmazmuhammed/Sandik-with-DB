@@ -6,14 +6,17 @@ from flask import redirect, render_template, url_for, flash
 from database.dbinit import WebUser, Member, Sandik, Share, MemberAuthorityType, DbTypes
 from forms import MemberForm, FormPageInfo
 from views import PageInfo
+from views.webuser import MemberInfo
 
 
 def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
-        members = sandik.members_index.sort_by(Member.member_id)
+        members = []
+        for m in sandik.members_index.sort_by(Member.member_id):
+            members.append(MemberInfo(m))
         # TODO bilgileri tek info ile gönder
-        return render_template("sandik/members.html", info=MembersPageInfo(title='Members', sandik=sandik, members=members, db_types=DbTypes), sandik_id=sandik_id)
+        return render_template("sandik/members.html", members=members, info=MembersPageInfo(title='Members', sandik=sandik, members=members, db_types=DbTypes), sandik_id=sandik_id)
 
 
 def add_member_to_sandik_page(sandik_id):

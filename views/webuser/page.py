@@ -1,10 +1,11 @@
 from flask import redirect, url_for, flash, render_template, abort, request, current_app
 from flask_login import current_user, login_required, login_user, logout_user
 from passlib.hash import pbkdf2_sha256 as hasher
-from pony.orm import TransactionIntegrityError, ObjectNotFound
+from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session
 
+from database.dbinit import WebUser
 from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm
-from views.webuser.auxiliary import FlaskUser
+from views.webuser.auxiliary import FlaskUser, MemberInfo
 from views.webuser.db import add_webuser
 
 
@@ -82,3 +83,13 @@ def logout():
     logout_user()
     flash(u"You have logged out.", 'success')
     return redirect(url_for("home_page"))
+
+
+@login_required
+def profile():
+    with db_session:
+        webuser = WebUser[current_user.username]
+        members = []
+        for member in webuser.members_index:
+            members.append(MemberInfo(member))
+        return render_template("webuser/profile.html", user=webuser, members=members)

@@ -21,6 +21,7 @@ def create_sandik_app():
     app.add_url_rule("/add-webuser", view_func=webuser.add_webuser, methods=["GET", "POST"])
     app.add_url_rule("/login", view_func=webuser.login, methods=["GET", "POST"])
     app.add_url_rule("/logout", view_func=webuser.logout)
+    app.add_url_rule("/profile", view_func=webuser.profile)
     app.add_url_rule("/", view_func=others.home_page)
 
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
@@ -39,7 +40,7 @@ def create_sandik_app():
                      view_func=transaction.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
 
     lm.init_app(app)
-    lm.login_view = "login_page"
+    lm.login_view = "login"
     lm.login_message_category = 'danger'
 
     return app

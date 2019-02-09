@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block extra_head %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
+    <script src="{{ url_for('static', filename='js/webuser/profile.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/webuser/profile.css') }}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="panel panel-default panel-table">
+
+        <!-- Panel başlık satırı -->
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col col-xs-6">
+              <h3 class="panel-title">Hesaplarım</h3>
+            </div>
+            <div class="col col-xs-6 text-right"></div>
+          </div>
+        </div>
+
+        <!-- Panel gövdesi (tablo kısmı)-->
+        <div class="panel-body">
+          <table class="table table-striped table-list table-members">
+            <thead>
+            <tr>
+              <th></th>
+              <th>Sandık ID</th>
+              <th>Sandık İsmi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr></tr>
+            {% for member in members %}
+            <tr class="member-row">
+              <td align="center">
+                <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+              </td>
+              <td>{{member.member.sandik_ref.id}}</td>
+              <td>{{member.member.sandik_ref.name}}</td>
+            </tr>
+            <tr class="share-row">
+              <td colspan="3">
+                <div class="share-table-div">
+                  <table class="table table-bordered table-shares">
+                    <thead class="thead-dark">
+                    <tr>
+                      <th>Share ID</th>
+                      <th>Paid contributions</th>
+                      <th>Debts received</th>
+                      <th>Paid installments</th>
+                      <th>Others</th>
+                      <th>Remaining debts</th>
+                      <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for share in member.shares %}
+                    <tr>
+                      <td>{{ share.share.share_order_of_member }}</td>
+                      <td>{{ share.paid_contributions }}</td>
+                      <td>{{ share.debts_received }}</td>
+                      <td>{{ share.paid_installments }}</td>
+                      <td>{{ share.others }}</td>
+                      <td style="color:red;">{{ share.remaining_debts }}</td>
+                      <td align="center">
+                        <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                      <td>Toplam</td>
+                      <td>{{ member.paid_contributions }}</td>
+                      <td>{{ member.debts_received }}</td>
+                      <td>{{ member.paid_installments }}</td>
+                      <td>{{ member.others }}</td>
+                      <td style="color:red;">{{ member.remaining_debts }}</td>
+                      <td align="center">
+                        <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Panel footer satırı -->
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col col-xs-12">
+              <h5>Footer</h5>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

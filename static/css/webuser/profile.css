@@ -1,0 +1,53 @@
+/* Başlangıçta hisselerin görünmemesi için */
+.share-row{
+  display:none;
+}
+
+.panel-table .panel-body{
+  padding:0;
+}
+
+.panel-table .panel-body .table-members{
+  border-style: none;
+  margin:0;
+}
+
+/* ilk sütun genişliği ve hizalaması */
+.table-members > thead > tr > th:first-of-type{
+  text-align:center;
+  width: 50px;
+}
+
+/* sağ üstteki "Panel Heading" yazısı */
+.panel-table .panel-heading .col h3{
+ line-height: 30px;
+ height: 30px;
+}
+
+/* sol alttaki "Page 1 of 5" yazısı */
+.panel-table .panel-footer .col{
+ line-height: 34px;
+ height: 34px;
+}
+
+/* Members tablosunun -> satır yüksekliği */
+.table-members > tbody > tr > td{
+  line-height: 28px;
+}
+
+/* Shares tablosunda ilk sütun kalın */
+.table-shares > tbody > tr > td:first-of-type {
+  font-weight: bold;
+}
+
+.share-table-div{
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+.table-shares,
+.table-shares > thead > tr > th {
+  text-align: center;
+}

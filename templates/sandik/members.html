@@ -3,8 +3,8 @@
 
 {% block extra_head %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="{{ url_for('static', filename='members.css') }}"/>
-    <script src="{{ url_for('static', filename='members.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sandik/members.css') }}"/>
+    <script src="{{ url_for('static', filename='js/sandik/members.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -14,10 +14,11 @@
 
     <div class="col-md-10 col-md-offset-1">
       <div class="panel panel-default panel-table">
+        <!-- Panel başlık satırı -->
         <div class="panel-heading">
           <div class="row">
             <div class="col col-xs-6">
-              <h3 class="panel-title">Panel Heading</h3>
+              <h3 class="panel-title">Yardımlaşma Sandığı</h3>
             </div>
             <div class="col col-xs-6 text-right">
               <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik_id) }}" class="btn btn-sm btn-primary btn-create">Add New Member</a>
@@ -25,61 +26,81 @@
           </div>
         </div>
 
+        <!-- Panel gövdesi (tablo kısmı)-->
         <div class="panel-body">
-          <table class="table table-striped table-bordered table-list">
+          <table class="table table-striped table-list table-sandik-members">
             <thead>
               <tr>
                 <th></th>
                 <th class="hidden-xs">ID</th>
                 <th>Username</th>
                 <th>Name</th>
+                <!--
                 <th><em class="fa fa-cog"></em></th>
+                -->
               </tr>
             </thead>
             <tbody>
-              {% for member in info.sandik.members_index.sort_by(info.db_types.Member.member_id) %}
+              <tr></tr>
+              {% for member in members %}
               <tr class="member">
                 <td align="center">
                   <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                 </td>
-                <td class="hidden-xs">{{ member.member_id }}</td>
-                <td>{{ member.webuser_ref.username }}</td>
-                <td>{{ member.webuser_ref.name }} {{ member.webuser_ref.surname }}</td>
+                <td class="hidden-xs">{{ member.member.member_id }}</td>
+                <td>{{ member.member.webuser_ref.username }}</td>
+                <td>{{ member.member.webuser_ref.name }} {{ member.member.webuser_ref.surname }}</td>
+                <!--
                 <td align="center">
                   <a class="btn btn-default btn-xs"><em class="fa fa-pencil"></em></a>
                   <a class="btn btn-danger btn-xs"><em class="fa fa-trash"></em></a>
                 </td>
+                -->
               </tr>
               <tr class="share">
                 <td colspan="6">
                   <div class="share-div">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-sandik-shares">
                       <thead class="thead-dark">
                         <tr>
+                          <th>Share ID</th>
+                          <th>Paid contributions</th>
+                          <th>Debts received</th>
+                          <th>Paid installments</th>
+                          <th>Others</th>
+                          <th>Remaining debts</th>
                           <th></th>
-                          <th class="hidden-xs">Share ID</th>
-                          <th>deneme başlık</th>
-                          <th>deneme başlık</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {% for share in member.shares_index.sort_by(info.db_types.Share.share_order_of_member) %}
+                        {% for share in member.shares %}
                         <tr>
+                          <td>{{ share.share.share_order_of_member }}</td>
+                          <td>{{ share.paid_contributions }}</td>
+                          <td>{{ share.debts_received }}</td>
+                          <td>{{ share.paid_installments }}</td>
+                          <td>{{ share.others }}</td>
+                          <td style="color:red;">{{ share.remaining_debts }}</td>
                           <td align="center">
                             <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                           </td>
-                          <td class="hidden-xs">{{ share.share_order_of_member }}</td>
-                          <td>deneme içeril</td>
-                          <td>deneme içeril</td>
                         </tr>
                         {% endfor %}
+                        <tr>
+                          <td>Toplam</td>
+                          <td>{{ member.paid_contributions }}</td>
+                          <td>{{ member.debts_received }}</td>
+                          <td>{{ member.paid_installments }}</td>
+                          <td>{{ member.others }}</td>
+                          <td style="color:red;">{{ member.remaining_debts }}</td>
+                          <td align="center">
+                            <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
                 </td>
-              </tr>
-              <tr class="share">
-                <td colspan="6"></td>
               </tr>
               {% endfor %}
             </tbody>

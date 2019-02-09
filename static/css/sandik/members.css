@@ -1,0 +1,96 @@
+/* members tablosu stilleri */
+
+.panel-table .panel-body{
+  padding:0;
+}
+
+.panel-table .panel-body .table-sandik-members{
+  border-style: none;
+  margin:0;
+}
+
+/* ilk sütun genişliği ve hizalaması */
+.table-sandik-members > thead > tr > th:first-of-type{
+  text-align:center;
+  width: 50px;
+}
+
+
+/* TODO üyeler tablosunda son sütunda düzenleme-silme işlemleri olsun mu?
+/* son sütun genişliği ve hizalaması */
+/*
+.table-sandik-members > thead > tr > th:last-of-type{
+  text-align:center;
+  width: 70px;
+}
+
+.panel-table .panel-body .table-bordered > thead > tr > th:last-of-type,
+.panel-table .panel-body .table-bordered > tbody > tr > td:last-of-type {
+  border-right: 0px;
+}*/
+
+
+
+.panel-table .panel-body .table-bordered > thead > tr > th:first-of-type,
+.panel-table .panel-body .table-bordered > tbody > tr > td:first-of-type {
+  border-left: 0px;
+}
+
+.panel-table .panel-body .table-bordered > tbody > tr:first-of-type > td{
+  border-bottom: 0px;
+}
+
+.panel-table .panel-body .table-bordered > thead > tr:first-of-type > th{
+  border-top: 0px;
+}
+
+.panel-table .panel-footer .pagination{
+  margin:0;
+}
+
+/*used to vertically center elements, may need modification if you're not using default sizes.*/
+/* sol alttaki "Page 1 of 5" yazısı */
+.panel-table .panel-footer .col{
+ line-height: 34px;
+ height: 34px;
+}
+
+/* sağ üstteki "Panel Heading" yazısı */
+.panel-table .panel-heading .col h3{
+ line-height: 30px;
+ height: 30px;
+}
+
+/* Members tablosunun -> satır yüksekliği */
+.table-sandik-members > tbody > tr > td{
+  line-height: 28px;
+}
+
+/* Shares tablosunda ilk sütun kalın */
+.table-sandik-shares > tbody > tr > td:first-of-type {
+  font-weight: bold;
+}
+
+
+
+
+
+
+
+
+/* Başlangıçta hisselerin görünmemesi için */
+.share{
+  display:none;
+}
+
+.share-div{
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+.table-sandik-shares,
+.table-sandik-shares > thead > tr > th {
+  text-align: center;
+}

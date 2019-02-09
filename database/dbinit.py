@@ -6,7 +6,7 @@ db = Database()
 
 
 class Sandik(db.Entity):
-    sandik_id = PrimaryKey(int, auto=True)
+    id = PrimaryKey(int, auto=True)
     name = Required(str, 40)
     date_of_opening = Required(date, default=lambda: date.today())
     is_active = Required(bool, default=True)
@@ -116,9 +116,10 @@ class MemberAuthorityType(db.Entity):
     is_admin = Required(bool, default=False)
 
 
+# TODO get url from old dbinit.py
 # PostgreSQL
-# db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb', port='5432')
-db.bind(provider='postgres', user='auykhzkqcbtuek', password='dea61b13d38a6b893a353b30e865fedacc805572c9d035975a248f0ef09fbd93', host='ec2-54-247-125-116.eu-west-1.compute.amazonaws.com', database='dfuubeej01nmtv', port='5432')
+db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb', port='5432')
+# db.bind(provider='postgres', user='auykhzkqcbtuek', password='dea61b13d38a6b893a353b30e865fedacc805572c9d035975a248f0ef09fbd93', host='ec2-54-247-125-116.eu-west-1.compute.amazonaws.com', database='dfuubeej01nmtv', port='5432')
 
 # set_sql_debug(True)
 
@@ -126,9 +127,51 @@ db.generate_mapping(create_tables=True)
 
 # TODO Bir sandıktan aynı webuser'ın sadece 1 tane üyeliği olabilir
 if __name__ == "__main__":
+    from passlib.hash import pbkdf2_sha256 as hasher
+
     with db_session:
-        WebUser(username='admin', password_hash='$pbkdf2-sha256$29000$PIdwDqH03hvjXAuhlLL2Pg$B1K8TX6Efq3GzvKlxDKIk4T7yJzIIzsuSegjZ6hAKLk', name='adminName', surname='adminSurname', is_admin=True)
-        WebUser(username='tty', password_hash='$pbkdf2-sha256$29000$Umotxdhbq9UaI2TsnTMmZA$uVtN2jo0I/de/Kz9/seebkM0n0MG./KGBc1EPw5X.f0', name='userName', surname='userSurname')
+        WebUser(username='admin', password_hash=hasher.hash('admin'), name='adminName', surname='adminSurname', is_admin=True)
+        WebUser(username='tty', password_hash=hasher.hash('tty'), name='ttyName', surname='ttySurname')
+
+        sandik = Sandik(name='Yardımlaşma Sandığı', date_of_opening=date(2018, 7, 1))
+        admin = MemberAuthorityType(name='Sandık Başkanı', sandik_ref=sandik, is_admin=True)
+        member = MemberAuthorityType(name='Üye', sandik_ref=sandik)
+        DebtType(sandik_ref=sandik, name="type1")
+        DebtType(sandik_ref=sandik, name="type322")
+        DebtType(sandik_ref=sandik, name="type33")
+
+        myilmazWU = WebUser(username='myilmaz', password_hash=hasher.hash('myilmaz'), name='Muhammed', surname='YILMAZ')
+        myilmazM = Member(webuser_ref=myilmazWU, sandik_ref=sandik, date_of_membership=date.today(), member_authority_type_ref=admin)
+        myilmazS1 = Share(member_ref=myilmazM, share_order_of_member=1, date_of_opening=date.today())
+        myilmazS2 = Share(member_ref=myilmazM, share_order_of_member=2, date_of_opening=date.today())
+        Contribution(transaction_ref=Transaction(share_ref=myilmazS1, transaction_date=date.today(), amount=5, type='cont'), contribution_period='2018-9')
+        Contribution(transaction_ref=Transaction(share_ref=myilmazS1, transaction_date=date.today(), amount=5, type='cont'), contribution_period='2018-11')
+
+        user1WU = WebUser(username='user1', password_hash=hasher.hash('user1'), name='Abbas', surname='YILDIRIM')
+        user1M = Member(webuser_ref=user1WU, sandik_ref=sandik, date_of_membership=date.today(), member_authority_type_ref=member)
+        user1S1 = Share(member_ref=user1M, share_order_of_member=1, date_of_opening=date.today())
+        user1S2 = Share(member_ref=user1M, share_order_of_member=2, date_of_opening=date.today())
+
+        user2WU = WebUser(username='user2', password_hash=hasher.hash('user2'), name='Abdullah', surname='YÜKSEK')
+        user2M = Member(webuser_ref=user2WU, sandik_ref=sandik, date_of_membership=date.today(), member_authority_type_ref=member)
+        Share(member_ref=user2M, share_order_of_member=1, date_of_opening=date.today())
+        Share(member_ref=user2M, share_order_of_member=2, date_of_opening=date.today())
+        Share(member_ref=user2M, share_order_of_member=3, date_of_opening=date.today())
+        Share(member_ref=user2M, share_order_of_member=4, date_of_opening=date.today())
+
+        user3WU = WebUser(username='user3', password_hash=hasher.hash('user3'), name='Ahmet Kutsay', surname='DERE')
+        user3M = Member(webuser_ref=user3WU, sandik_ref=sandik, date_of_membership=date.today(), member_authority_type_ref=member)
+        Share(member_ref=user3M, share_order_of_member=1, date_of_opening=date.today())
+
+        user4WU = WebUser(username='user4', password_hash=hasher.hash('user4'), name='Feyzi', surname='GÜNEŞ')
+        user4M = Member(webuser_ref=user4WU, sandik_ref=sandik, date_of_membership=date.today(), member_authority_type_ref=member)
+        Share(member_ref=user4M, share_order_of_member=1, date_of_opening=date.today())
+
+        user = Member[4]
+        print(user.webuser_ref.name)
+        print(select(s.share_order_of_member for s in Share if s.member_ref == user)[:])
+        print(max(s.share_order_of_member for s in Share if s.member_ref == user))
+        print(sandik.date_of_opening)
 
 
 class DbTypes:
