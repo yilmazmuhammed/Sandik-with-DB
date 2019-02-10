@@ -1,9 +1,10 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from views import others, sandik, transaction, webuser
+from views import others, sandik, webuser
 from views.sandik import member as sandik_member
 from views.webuser.auxiliary import FlaskUser
+import views.transaction.page as transaction_page
 
 lm = LoginManager()
 
@@ -32,14 +33,15 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=sandik_member.members_page)
     app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=webuser.transactions_in_sandik)
     app.add_url_rule("/sandik/<int:sandik_id>/add-contribution",
-                     view_func=transaction.add_contribution_page, methods=["GET", "POST"])
-    app.add_url_rule("/sandik/<int:sandik_id>/add-debt", view_func=transaction.add_debt_page, methods=["GET", "POST"])
+                     view_func=transaction_page.add_contribution_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-debt",
+                     view_func=transaction_page.add_debt_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-payment",
-                     view_func=transaction.add_payment_page, methods=["GET", "POST"])
+                     view_func=transaction_page.add_payment_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-transaction",
-                     view_func=transaction.add_transaction_page, methods=["GET", "POST"])
+                     view_func=transaction_page.add_transaction_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-custom-transaction",
-                     view_func=transaction.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
+                     view_func=transaction_page.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
 
     lm.init_app(app)
     lm.login_view = "login"

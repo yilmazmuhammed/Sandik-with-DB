@@ -2,7 +2,7 @@ from flask import flash
 from pony.orm import db_session, count, select
 
 from database.dbinit import Debt, Transaction, Share, DebtType, Payment, Contribution
-from views.transaction import Period
+from views.transaction.auxiliary import Period
 
 
 @db_session
