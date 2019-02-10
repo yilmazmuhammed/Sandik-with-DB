@@ -38,7 +38,7 @@
             {% for member in members %}
             <tr class="member-row">
               <td align="center">
-                <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+                <a href="{{ url_for('transactions_in_sandik', sandik_id=member.dbTable.sandik_ref.id) }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
               </td>
               <td>{{member.dbTable.sandik_ref.id}}</td>
               <td>{{member.dbTable.sandik_ref.name}}</td>

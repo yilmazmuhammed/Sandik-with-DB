@@ -4,11 +4,11 @@ from flask import abort, redirect, url_for, render_template
 from flask_login import login_required, current_user
 from pony.orm import db_session
 
+from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction
 from database.dbinit import Member, Sandik, WebUser
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices
-from views.transaction.db import add_contribution, add_transaction, add_debt, add_payment
 
 
 @login_required
@@ -27,7 +27,7 @@ def add_transaction_page(sandik_id):
         form.share.choices += share_choices(member)
 
         if form.validate_on_submit():
-            add_transaction(form)
+            insert_transaction(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data)
 
             return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
@@ -51,9 +51,13 @@ def add_contribution_page(sandik_id):
         form.share.choices += share_choices(member)
 
         if form.validate_on_submit():
-            add_contribution(form)
+            # TODO kontrolleri yap
+            # TODO Çoklu aidat ödemesi için ayrı bir ekleme yap
+            insert_contribution(form.transaction_date.data, 25, form.share.data, form.explanation.data,
+                                form.contribution_period.data)
 
             return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", info=info,
                                periodsDict=json.dumps(unpaid_dues_choices(member)))
@@ -85,7 +89,10 @@ def add_debt_page(sandik_id):
         form.number_of_installment.choices += [(i, i) for i in range(1, 13)]
 
         if form.validate_on_submit():
-            add_debt(form)
+            # TODO kontrolleri yap, (borcu varsa bir daha alamaz[sayfaya giriş de engellenebilir], en fazla taksit,
+            #  parasına göre en fazla borç)
+            insert_debt(form.transaction_date.data, form.amount.data, form.share.data, form.debt_type.data,
+                        form.explanation.data, form.number_of_installment.data)
 
             return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
@@ -109,9 +116,8 @@ def add_payment_page(sandik_id):
         form.debt.choices = debt_choices(member)
 
         if form.validate_on_submit():
-            if add_payment(form):
-                # TODO return işlemler sayfasına
-                return redirect(url_for('home_page'))
+            if insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data, form.debt.data):
+                return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add payment")
         return render_template('form.html', info=info)
@@ -153,19 +159,23 @@ def add_custom_transaction_for_admin_page(sandik_id):
         d_form.number_of_installment.choices += [(i, i) for i in range(1, 13)]
 
         if c_form.validate_on_submit():
-            add_contribution(c_form)
+            insert_contribution(c_form.transaction_date.data, 25, c_form.share.data, c_form.explanation.data,
+                                c_form.contribution_period.data)
             # TODO return işlemler sayfasına
             return redirect(url_for('home_page'))
         if d_form.validate_on_submit():
-            add_debt(d_form)
+            insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.debt_type.data,
+                        d_form.explanation.data, d_form.number_of_installment.data)
             # TODO return işlemler sayfasına
             return redirect(url_for('home_page'))
         if p_form.validate_on_submit():
-            if add_payment(p_form):
+            if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
+                              p_form.debt.data):
                 # TODO return işlemler sayfasına
                 return redirect(url_for('home_page'))
         if o_form.validate_on_submit():
-            add_transaction(o_form)
+            insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
+                               o_form.explanation.data)
             # TODO return işlemler sayfasına
             return redirect(url_for('home_page'))
 

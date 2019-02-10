@@ -1,8 +1,12 @@
 url = https://dl.dropboxusercontent.com/s/jv5j8v8azljf9h2/islemler.csv?dl=1
-TODO 1 Transactions sayfasını basit bir tablo ile hazırla
+TODO CONTROL 1 Sandığa işlem eklerken işlemin eklendiği hissenin sandık üyelerinden birinin olup olmadığını kontrol et
+TODO CONTROL 3 Yeni üyenin/hissenin kayıt tarihi sandik açılıl tarihinden önce olamaz
+TODO CONTROL 2 Ödemeyi yapan kişi borcun sahibi mi? kontrol et
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
-TODO 3 Sandığa işlem eklerken işlemin eklendiği hissenin sandık üyelerinden birinin olup olmadığını kontrol et
-TODO! 4 Kullanıcı kendi webuser bilgilerini değiştirebilsin
-TODO! 5 Çoklu aidat ödeme sistemi oluştur
-TODO 6 Ödemeyi yapan kişi borcun sahibi mi? kontrol et
-TODO! 7 Var olan işlemleri islemler.csv'den ekle
+TODO! 3 Kullanıcı kendi webuser bilgilerini değiştirebilsin
+TODO! 4 Çoklu aidat ödeme sistemi oluştur
+TODO! 5 Var olan işlemleri islemler.csv'den ekle
+TODO 6 Ödenmeyen aidatlar sandik açılış tarihine göre değil, hisse kayıt tarihine göre olacak
+TODO 7 Aidat ödeme sayfasında eskiye dönük ödeme ve çoklu ödeme için js kodu çalıştıran bir checkbox olacak
+TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?
+TODO 9 @login_required gibi @admin_required oluştur

@@ -3,7 +3,6 @@ from datetime import date
 from pony.orm import select
 
 from database.auxiliary import Contribution, Share, DebtType
-from database.dbinit import Member
 
 
 # Return the dictionary that key is share_id and value is list of unpaid_dueses
@@ -19,32 +18,35 @@ def unpaid_dues(member):
     return ret_list
 
 
-def unpaid_dues_choices(member):
+def unpaid_dues_choices(member, only_active=True):
     # TODO dil seçimine göre ay listesi
-    month_names = ['', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+    month_names = ['', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim',
+                   'Kasım', 'Aralık']
     all_months = Period.all_months_of_sandik(member.sandik_ref)
     ret_list = {}
     for share in member.shares_index:
-        share_list = all_months.copy()
-        # for dues in select(t.contribution_index for t in Transaction if t.contribution_ref and t.share_ref == share):
-        for period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share):
-            share_list.remove(period)
-        ret_list[share.share_id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in share_list]
+        if share.is_active == only_active:
+            share_list = all_months.copy()
+            for period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share):
+                share_list.remove(period)
+            ret_list[share.share_id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in share_list]
     return ret_list
 
 
-def share_choices(member):
+def share_choices(member, only_active=True):
     return [(share.share_id, "Share %s" % (share.share_order_of_member,))
-            for share in member.shares_index.sort_by(Share.share_order_of_member)]
+            for share in member.shares_index.filter(lambda share: share.is_active == only_active).sort_by(
+            Share.share_order_of_member)]
 
 
 def debt_type_choices(sandik):
     return [(debt_type.id, debt_type.name) for debt_type in sandik.debt_types_index.sort_by(DebtType.name)]
 
 
-def member_choices(sandik):
+def member_choices(sandik, only_active=True):
     return [(member.member_id, "%s %s" % (member.webuser_ref.name, member.webuser_ref.surname))
-            for member in sandik.members_index.sort_by(Member.member_id)]
+            for member in sandik.members_index.filter(lambda member: member.is_active == only_active).sort_by(
+            lambda m: m.webuser_ref.name)]
 
 
 def debt_choices(member):
