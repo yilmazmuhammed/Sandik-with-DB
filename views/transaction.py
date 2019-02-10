@@ -4,6 +4,7 @@ from pony.orm import db_session, select, count
 from datetime import date
 import json
 
+from database.auxiliary import insert_debt, insert_payment, insert_contribution, insert_transaction
 from database.dbinit import Sandik, Transaction, Share, Contribution, Member, DebtType, Debt, Payment, WebUser
 from forms import ContributionForm, FormPageInfo, DebtForm, PaymentForm, TransactionForm, CustomTransactionSelectForm
 
@@ -32,8 +33,7 @@ def add_transaction_page(sandik_id):
         if form.validate_on_submit():
             add_transaction(form)
 
-            # TODO url_for ile işlemler sayfasına yönlendir
-            return redirect(url_for('home_page'))
+            return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Transaction")
         return render_template("form.html", info=info)
@@ -68,8 +68,7 @@ def add_contribution_page(sandik_id):
         if form.validate_on_submit():
             add_contribution(form)
 
-            # TODO url_for ile işlemler sayfasına yönlendir
-            return redirect(url_for('home_page'))
+            return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", info=info,
                                periodsDict=json.dumps(unpaid_dues_choices(member)))
@@ -121,8 +120,7 @@ def add_debt_page(sandik_id):
         if form.validate_on_submit():
             add_debt(form)
 
-            # TODO url_for ile işlemler sayfasına yönlendir
-            return redirect(url_for('home_page'))
+            return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Take Debt")
         return render_template('form.html', info=info)

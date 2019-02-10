@@ -1,9 +1,9 @@
 from flask import redirect, url_for, flash, render_template, abort, request, current_app
 from flask_login import current_user, login_required, login_user, logout_user
 from passlib.hash import pbkdf2_sha256 as hasher
-from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session
+from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session, select
 
-from database.dbinit import WebUser
+from database.dbinit import WebUser, Sandik, Transaction
 from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm
 from views.webuser.auxiliary import FlaskUser, MemberInfo
 from views.webuser.db import add_webuser
@@ -93,3 +93,15 @@ def profile():
         for member in webuser.members_index:
             members.append(MemberInfo(member))
         return render_template("webuser/profile.html", user=webuser, members=members)
+
+
+@login_required
+def transactions_in_sandik(sandik_id):
+    with db_session:
+        sandik = Sandik[sandik_id]
+        webuser = current_user.webuser
+
+        transactions = select(transaction for transaction in Transaction
+                              if transaction.share_ref.member_ref.webuser_ref == webuser
+                              and transaction.share_ref.member_ref.sandik_ref == sandik)[:]
+        return render_template("transactions.html", transactions=transactions)

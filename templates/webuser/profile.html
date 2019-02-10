@@ -40,8 +40,8 @@
               <td align="center">
                 <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
               </td>
-              <td>{{member.member.sandik_ref.id}}</td>
-              <td>{{member.member.sandik_ref.name}}</td>
+              <td>{{member.dbTable.sandik_ref.id}}</td>
+              <td>{{member.dbTable.sandik_ref.name}}</td>
             </tr>
             <tr class="share-row">
               <td colspan="3">
@@ -61,7 +61,7 @@
                     <tbody>
                     {% for share in member.shares %}
                     <tr>
-                      <td>{{ share.share.share_order_of_member }}</td>
+                      <td>{{ share.dbTable.share_order_of_member }}</td>
                       <td>{{ share.paid_contributions }}</td>
                       <td>{{ share.debts_received }}</td>
                       <td>{{ share.paid_installments }}</td>

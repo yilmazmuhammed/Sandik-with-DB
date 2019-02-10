@@ -30,6 +30,7 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/add-member",
                      view_func=sandik_member.add_member_to_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=sandik_member.members_page)
+    app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=webuser.transactions_in_sandik)
     app.add_url_rule("/sandik/<int:sandik_id>/add-contribution",
                      view_func=transaction.add_contribution_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-debt", view_func=transaction.add_debt_page, methods=["GET", "POST"])

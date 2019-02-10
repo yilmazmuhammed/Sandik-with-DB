@@ -1,7 +1,7 @@
 from flask_login import UserMixin
-from pony.orm import db_session, select
+from pony.orm import db_session
 
-from database.dbinit import WebUser, Contribution, Share
+from database.dbinit import WebUser, Share, Member
 
 
 class FlaskUser(UserMixin):
@@ -20,12 +20,30 @@ class FlaskUser(UserMixin):
         return self.webuser.is_active
 
 
+class SandikInfo:
+    def __init__(self, sandik):
+        self.dbTable = sandik
+
+        self.members = []
+        for member in sandik.members_index.sort_by(Member.date_of_membership):
+            self.members.append(MemberInfo(member))
+
+        self.paid_contributions = sum(m.paid_contributions for m in self.members)
+        self.debts_received = sum(m.debts_received for m in self.members)
+        self.paid_installments = sum(m.paid_installments for m in self.members)
+        self.others = sum(m.others for m in self.members)
+        self.remaining_debts = self.debts_received - self.paid_installments
+        self.total = self.paid_contributions + self.others - self.remaining_debts
+
+
 class MemberInfo:
     def __init__(self, member):
-        self.member = member
+        self.dbTable = member
+
         self.shares = []
         for share in member.shares_index.sort_by(Share.share_order_of_member):
             self.shares.append(ShareInfo(share))
+
         self.paid_contributions = sum(s.paid_contributions for s in self.shares)
         self.debts_received = sum(s.debts_received for s in self.shares)
         self.paid_installments = sum(s.paid_installments for s in self.shares)
@@ -35,8 +53,10 @@ class MemberInfo:
 
 class ShareInfo:
     def __init__(self, share):
-        self.share = share
+        self.dbTable = share
+
         self.share_order_of_member = share.share_order_of_member
+
         self.paid_contributions = sum(t.amount for t in share.transactions_index if t.contribution_index)
         self.debts_received = sum(t.amount for t in share.transactions_index if t.debt_ref)
         self.paid_installments = sum(t.amount for t in share.transactions_index if t.payment_ref)
