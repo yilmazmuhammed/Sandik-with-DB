@@ -125,6 +125,126 @@ db.bind(provider='postgres', user='auykhzkqcbtuek', password='dea61b13d38a6b893a
 
 db.generate_mapping(create_tables=True)
 
+
+def create_sandik_and_users():
+    sandik = Sandik(name='Yardımlaşma Sandığı', date_of_opening=date(2016, 5, 21))
+
+    admin = MemberAuthorityType(name='Sandık Başkanı', sandik_ref=sandik, is_admin=True)
+    member = MemberAuthorityType(name='Üye', sandik_ref=sandik)
+
+    DebtType(sandik_ref=sandik, name="APB")
+    DebtType(sandik_ref=sandik, name="PDAY")
+
+    myilmaz = WebUser(username='myilmaz', password_hash=hasher.hash('myilmaz'), name='Muhammed', surname='YILMAZ',
+                      date_of_registration=date(2016, 5, 21))
+    myilmaz = Member(webuser_ref=myilmaz, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                     member_authority_type_ref=admin)
+    Share(member_ref=myilmaz, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+    Share(member_ref=myilmaz, share_order_of_member=2, date_of_opening=date(2016, 5, 21))
+
+    yildirim = WebUser(username='yildirim', password_hash=hasher.hash('yildirim1'), name='Abbas',
+                       surname='YILDIRIM', date_of_registration=date(2016, 5, 21))
+    yildirim_m = Member(webuser_ref=yildirim, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                        member_authority_type_ref=member)
+    Share(member_ref=yildirim_m, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+    Share(member_ref=yildirim_m, share_order_of_member=2, date_of_opening=date(2018, 4, 3))
+
+    yuksek = WebUser(username='yuksek', password_hash=hasher.hash('yuksek2'), name='Abdullah', surname='YÜKSEK',
+                     date_of_registration=date(2016, 5, 21))
+    yuksek_m = Member(webuser_ref=yuksek, sandik_ref=sandik, date_of_membership=date.today(),
+                      member_authority_type_ref=member)
+    Share(member_ref=yuksek_m, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+    Share(member_ref=yuksek_m, share_order_of_member=2, date_of_opening=date(2017, 12, 23), is_active=False)
+    Share(member_ref=yuksek_m, share_order_of_member=3, date_of_opening=date(2018, 1, 5), is_active=False)
+    Share(member_ref=yuksek_m, share_order_of_member=4, date_of_opening=date(2018, 1, 5), is_active=False)
+
+    dere = WebUser(username='dere', password_hash=hasher.hash('dere3'), name='Ahmet Kutsay', surname='DERE',
+                   date_of_registration=date(2016, 5, 21))
+    dere = Member(webuser_ref=dere, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                  member_authority_type_ref=member)
+    Share(member_ref=dere, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+
+    gunes = WebUser(username='gunes', password_hash=hasher.hash('user4'), name='Feyzi', surname='GÜNEŞ',
+                    date_of_registration=date(2016, 5, 21))
+    gunes = Member(webuser_ref=gunes, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                   member_authority_type_ref=member)
+    Share(member_ref=gunes, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+
+    tekin = WebUser(username='tekin', password_hash=hasher.hash('tekin5'), name='Furkan Necati', surname='TEKİN',
+                    date_of_registration=date(2018, 12, 19))
+    tekin = Member(webuser_ref=tekin, sandik_ref=sandik, date_of_membership=date(2018, 12, 19),
+                   member_authority_type_ref=member)
+    Share(member_ref=tekin, share_order_of_member=1, date_of_opening=date(2018, 12, 19))
+
+    balci = WebUser(username='balci', password_hash=hasher.hash('balci6'), name='Gökhan', surname='BALCI',
+                    date_of_registration=date(2016, 5, 21), is_active=False)
+    balci = Member(webuser_ref=balci, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                   member_authority_type_ref=member, is_active=False)
+    Share(member_ref=balci, share_order_of_member=1, date_of_opening=date(2016, 5, 21), is_active=False)
+    Share(member_ref=balci, share_order_of_member=2, date_of_opening=date(2016, 5, 21), is_active=False)
+
+    altiok = WebUser(username='altiok', password_hash=hasher.hash('altiok7'), name='Huzeyfe', surname='ALTIOK',
+                     date_of_registration=date(2016, 5, 21))
+    altiok = Member(webuser_ref=altiok, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                    member_authority_type_ref=member)
+    Share(member_ref=altiok, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+
+    tekinm = WebUser(username='tekinm', password_hash=hasher.hash('tekinm8'), name='Mehmet Nazım', surname='TEKİN',
+                     date_of_registration=date(2016, 1, 1))
+    tekinm = Member(webuser_ref=tekinm, sandik_ref=sandik, date_of_membership=date(2016, 1, 1),
+                    member_authority_type_ref=member)
+    Share(member_ref=tekinm, share_order_of_member=1, date_of_opening=date(2016, 1, 1))
+
+    erdem = WebUser(username='erdem', password_hash=hasher.hash('erdem9'), name='Muhammed Hamidullah',
+                    surname='ERDEM', date_of_registration=date(2017, 7, 27))
+    erdem = Member(webuser_ref=erdem, sandik_ref=sandik, date_of_membership=date(2017, 7, 27),
+                   member_authority_type_ref=member)
+    Share(member_ref=erdem, share_order_of_member=1, date_of_opening=date(2017, 7, 27))
+    Share(member_ref=erdem, share_order_of_member=2, date_of_opening=date(2018, 10, 24))
+
+    tekeli = WebUser(username='tekeli', password_hash=hasher.hash('tekeli10'), name='Muhammed Refik',
+                     surname='TEKELİ', date_of_registration=date(2018, 8, 20))
+    tekeli = Member(webuser_ref=tekeli, sandik_ref=sandik, date_of_membership=date(2018, 8, 20),
+                    member_authority_type_ref=member)
+    Share(member_ref=tekeli, share_order_of_member=1, date_of_opening=date(2018, 8, 20))
+    Share(member_ref=tekeli, share_order_of_member=2, date_of_opening=date(2018, 8, 20))
+
+    leventler = WebUser(username='leventler', password_hash=hasher.hash('leventler11'), name='Muhammet Emin',
+                        surname='LEVENTLER', date_of_registration=date(2016, 5, 21))
+    leventler_m = Member(webuser_ref=leventler, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                         member_authority_type_ref=member)
+    Share(member_ref=leventler_m, share_order_of_member=1, date_of_opening=date(2016, 5, 21))
+
+    yilmazmusa = WebUser(username='yilmazmusa', password_hash=hasher.hash('yilmazmusa11'), name='Musa Alperen',
+                         surname='YILMAZ', date_of_registration=date(2017, 12, 14))
+    yilmazmusa = Member(webuser_ref=yilmazmusa, sandik_ref=sandik, date_of_membership=date(2017, 12, 14),
+                        member_authority_type_ref=member)
+    Share(member_ref=yilmazmusa, share_order_of_member=1, date_of_opening=date(2017, 12, 14))
+    Share(member_ref=yilmazmusa, share_order_of_member=2, date_of_opening=date(2018, 9, 13))
+
+    yanik = WebUser(username='yanik', password_hash=hasher.hash('yanik12'), name='Ömer', surname='YANIK',
+                    date_of_registration=date(2018, 10, 26))
+    yanik = Member(webuser_ref=yanik, sandik_ref=sandik, date_of_membership=date(2018, 10, 26),
+                   member_authority_type_ref=member)
+    Share(member_ref=yanik, share_order_of_member=1, date_of_opening=date(2018, 10, 26))
+    Share(member_ref=yanik, share_order_of_member=2, date_of_opening=date(2018, 10, 26))
+    Share(member_ref=yanik, share_order_of_member=3, date_of_opening=date(2018, 10, 26))
+    Share(member_ref=yanik, share_order_of_member=4, date_of_opening=date(2018, 10, 26))
+
+    akcan = WebUser(username='akcan', password_hash=hasher.hash('akcan13'), name='Talha', surname='AKCAN',
+                    date_of_registration=date(2016, 5, 21), is_active=False)
+    akcan = Member(webuser_ref=akcan, sandik_ref=sandik, date_of_membership=date(2016, 5, 21),
+                   member_authority_type_ref=member, is_active=False)
+    Share(member_ref=akcan, share_order_of_member=1, date_of_opening=date(2016, 5, 21), is_active=False)
+
+    isik = WebUser(username='isik', password_hash=hasher.hash('isik14'), name='Yusuf', surname='IŞIK',
+                   date_of_registration=date(2017, 5, 12))
+    isik = Member(webuser_ref=isik, sandik_ref=sandik, date_of_membership=date(2017, 5, 12),
+                  member_authority_type_ref=member)
+    Share(member_ref=isik, share_order_of_member=1, date_of_opening=date(2017, 5, 12))
+    return sandik
+
+
 # TODO Bir sandıktan aynı webuser'ın sadece 1 tane üyeliği olabilir
 if __name__ == "__main__":
     from passlib.hash import pbkdf2_sha256 as hasher
