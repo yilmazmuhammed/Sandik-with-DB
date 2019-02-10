@@ -25,6 +25,7 @@ def create_sandik_app():
     app.add_url_rule("/", view_func=others.home_page)
 
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/import-data", view_func=others.import_data, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member",
                      view_func=sandik_member.add_member_to_sandik_page, methods=["GET", "POST"])

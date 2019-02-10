@@ -211,3 +211,11 @@ class CustomTransactionSelectForm(FlaskForm):
     type_choices = [("contribution", "Contribution"), ("debt", "Debt"), ("payment", "Payment"),
                     ("transaction", "Other")]
     type = SelectField("Type:", choices=type_choices, id='type', render_kw={"class": "form-control"})
+
+
+class ImportDataForm(FlaskForm):
+    open = form_open(form_name='import-data-form')
+    close = form_close()
+
+    url = StringField("Url:", id='url', render_kw={"placeholder": "Url", "class": "form-control"})
+    submit = SubmitField("Import data", render_kw={"class": "btn btn-primary sandik-btn-form"})

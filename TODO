@@ -1,3 +1,4 @@
+url = https://dl.dropboxusercontent.com/s/jv5j8v8azljf9h2/islemler.csv?dl=1
 TODO 1 Transactions sayfasını basit bir tablo ile hazırla
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO 3 Sandığa işlem eklerken işlemin eklendiği hissenin sandık üyelerinden birinin olup olmadığını kontrol et

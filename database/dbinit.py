@@ -54,7 +54,7 @@ class Transaction(db.Entity):
     transaction_date = Required(date)
     amount = Required(int)
     type = Required(str, 15)  # Bu işlem tipi diye kendi veri tipim olması gerekiyor. CONTRIBUTION, DEBT, PAYMENT, OTHER
-    explanation = Optional(str, 200)
+    explanation = Optional(str, 300)
     is_confirm = Required(bool, default=False)
     contribution_index = Set('Contribution')
     payment_ref = Optional('Payment')
