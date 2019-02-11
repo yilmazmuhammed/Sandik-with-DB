@@ -45,6 +45,7 @@
   padding-right: 40px;
   padding-top: 15px;
   padding-bottom: 10px;
+  overflow-x:auto;
 }
 
 .table-shares,
