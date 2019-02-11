@@ -141,7 +141,7 @@ class TransactionForm(FlaskForm):
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Amount", "class": "form-control"})
+                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
     submit = SubmitField("Add Transaction", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
@@ -161,7 +161,7 @@ class ContributionForm(TransactionForm):
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Amount", "class": "form-control"})
+                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
     # TODO use super()
     submit = SubmitField("Add Contribution", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
@@ -181,7 +181,7 @@ class DebtForm(TransactionForm):
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Amount", "class": "form-control"})
+                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
     # TODO use super()
     submit = SubmitField("Take Debt", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
@@ -198,7 +198,7 @@ class PaymentForm(TransactionForm):
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Amount", "class": "form-control"})
+                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
     # TODO use super()
     submit = SubmitField("Pay Debt", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
