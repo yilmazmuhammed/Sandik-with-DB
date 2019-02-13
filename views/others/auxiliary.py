@@ -71,6 +71,6 @@ def add_transactions(trs, sandik):
         elif t.type == 'Payment':
             insert_payment(t.date, t.amount, t.explanation, transaction_id=t.transaction_id)
         elif t.type == 'Contribution':
-            insert_contribution(t.date, t.amount, share_ids[t.share_name], t.explanation, t.period)
+            insert_contribution(t.date, t.amount, share_ids[t.share_name], t.explanation, t.period.split(" "))
         elif t.type == 'Other':
             insert_transaction(t.date, t.amount, share_ids[t.share_name], t.explanation)

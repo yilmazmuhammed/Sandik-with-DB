@@ -52,15 +52,14 @@ def add_contribution_page(sandik_id):
 
         if form.validate_on_submit():
             # TODO kontrolleri yap
-            # TODO Çoklu aidat ödemesi için ayrı bir ekleme yap
-            insert_contribution(form.transaction_date.data, 25, form.share.data, form.explanation.data,
-                                form.contribution_period.data)
-
-            return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+            if insert_contribution(form.transaction_date.data, form.amount.data, form.share.data,
+                                   form.explanation.data, form.contribution_period.data):
+                return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", info=info,
-                               periodsDict=json.dumps(unpaid_dues_choices(member)))
+                               periodsDict=json.dumps(unpaid_dues_choices(member)),
+                               oldPeriodsDict=json.dumps(unpaid_dues_choices(member, is_there_old=True)))
 
 
 @login_required
@@ -146,10 +145,12 @@ def add_custom_transaction_for_admin_page(sandik_id):
         shares_of = {}
         debts_of = {}
         periods_of = {}
+        all_periods_of = {}
         for member in sandik.members_index:
             shares_of[member.member_id] = share_choices(member)
             debts_of[member.member_id] = debt_choices(member)
             periods_of[member.member_id] = unpaid_dues_choices(member)
+            all_periods_of[member.member_id] = unpaid_dues_choices(member, is_there_old=True)
 
         # Add debt types of the sandik to d_form.debt_type
         d_form.debt_type.choices += debt_type_choices(sandik)
@@ -159,21 +160,21 @@ def add_custom_transaction_for_admin_page(sandik_id):
         d_form.number_of_installment.choices += [(i, i) for i in range(1, 13)]
 
         if c_form.validate_on_submit():
-            insert_contribution(c_form.transaction_date.data, 25, c_form.share.data, c_form.explanation.data,
-                                c_form.contribution_period.data)
-            # TODO return işlemler sayfasına
-            return redirect(url_for('home_page'))
-        if d_form.validate_on_submit():
+            if insert_contribution(c_form.transaction_date.data, c_form.amount.data, c_form.share.data,
+                                   c_form.explanation.data, c_form.contribution_period.data):
+                # TODO return işlemler sayfasına
+                return redirect(url_for('home_page'))
+        elif d_form.validate_on_submit():
             insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.debt_type.data,
                         d_form.explanation.data, d_form.number_of_installment.data)
             # TODO return işlemler sayfasına
             return redirect(url_for('home_page'))
-        if p_form.validate_on_submit():
+        elif p_form.validate_on_submit():
             if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
                               p_form.debt.data):
                 # TODO return işlemler sayfasına
                 return redirect(url_for('home_page'))
-        if o_form.validate_on_submit():
+        elif o_form.validate_on_submit():
             insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
                                o_form.explanation.data)
             # TODO return işlemler sayfasına
@@ -189,5 +190,6 @@ def add_custom_transaction_for_admin_page(sandik_id):
         select_form.member.choices += member_choices(sandik)
         forms.insert(0, select_form)
         return render_template("transaction/custom_transaction_form.html", forms=forms, errors=errors,
-                               title="Add Contribution", periods_of=json.dumps(periods_of),
+                               title="Add Contribution",
+                               periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
                                shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of))

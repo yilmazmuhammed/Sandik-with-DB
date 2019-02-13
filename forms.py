@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField, SelectMultipleField
 from wtforms.validators import InputRequired, Length, Optional
 from wtforms.fields.html5 import DateField
 from datetime import date
@@ -21,6 +21,11 @@ class SelectField(SelectField):
 # Normalde seçilen değer, gönderilen değerlerden biri mi? diye kontrol edilir. Ama html kısmında belirlenen/değişen
 #  seçeneklerde bu kontrolü yapamadı, select listesindeki değerler js ile belirlendi
 class DynamicSelectField(SelectField):
+    def pre_validate(self, form):
+        pass
+
+
+class DynamicSelectMultipleField(SelectMultipleField):
     def pre_validate(self, form):
         pass
 
@@ -149,14 +154,15 @@ class ContributionForm(TransactionForm):
     open = form_open(form_name='contribution-form')
     close = form_close()
 
-    # TODO Çoklu aidat ödemelerinde getir
-    amount = None
-    # TODO çoklu aidat ödemelerinde multiple yap
+    amount = IntegerField("Amount:", validators=[InputRequired("Please enter amount of transaction")], id='amount',
+                          render_kw={"placeholder": "Amount", "class": "form-control", "value": 25, "readonly": ""})
+
     # value format: yyyy-mm
-    contribution_period = DynamicSelectField(label="Contribution period:",
-                                             validators=[InputRequired("Please select contribution period in list")],
-                                             coerce=str, choices=[], id='contribution_period',
-                                             render_kw={"class": "form-control"})
+    contribution_period = \
+        DynamicSelectMultipleField(label="Contribution period:",
+                                   validators=[InputRequired("Please select contribution period in list")],
+                                   coerce=str, choices=[], id='contribution_period',
+                                   render_kw={"class": "form-control"})
     # TODO use super()
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),

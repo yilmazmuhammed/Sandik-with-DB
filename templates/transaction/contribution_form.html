@@ -5,6 +5,7 @@
 <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 <script>
 var periodsDict = {{periodsDict|safe}};
+var oldPeriodsDict = {{oldPeriodsDict|safe}};
 
 function ChangeList() {
   var shareList = document.getElementById("share");
@@ -13,7 +14,14 @@ function ChangeList() {
   while (periodList.options.length) {
     periodList.remove(0);
   }
-  var periods = periodsDict[selectedShare];
+
+  var is_there_old = document.getElementById("is_there_old");
+  var periods;
+  if(is_there_old.checked == true) {
+    periods = oldPeriodsDict[selectedShare];
+  } else {
+    periods = periodsDict[selectedShare];
+  }
   if (periods) {
     var i;
     for (i = 0; i < periods.length; i++) {
@@ -28,9 +36,38 @@ function SetOnchange() {
   b.setAttribute("onchange", "ChangeList()");
 }
 
+function createHtmlElement(htmlStr) {
+  var frag = document.createDocumentFragment(),
+      temp = document.createElement('div');
+  temp.innerHTML = htmlStr;
+  while (temp.firstChild) {
+      frag.appendChild(temp.firstChild);
+  }
+  return frag;
+}
+
+function ChangeToMultiplePeriod() {
+  var checkBox = document.getElementById("is_multiple_period");
+  if (checkBox.checked == true){
+    document.getElementById('contribution_period').setAttribute("multiple","");
+  }
+  else {
+    document.getElementById('contribution_period').removeAttribute("multiple","");
+  }
+}
+
+function AddCheckBox() {
+  var check_boxes = createHtmlElement('<p style="text-align: center;">Old contribution: <input type="checkbox" id="is_there_old" onclick="ChangeList()"><br>Multiple contribution: <input type="checkbox" id="is_multiple_period" onclick="ChangeToMultiplePeriod()"></p>');
+
+  var cp_select = document.getElementById('contribution_period');
+  cp_select.parentNode.insertBefore(check_boxes, cp_select.nextSibling);
+}
+
 function Onload() {
-  SetOnchange()
-  ChangeList()
+  document.getElementById('contribution_period').removeAttribute("multiple","");
+  AddCheckBox();
+  SetOnchange();
+  ChangeList();
 }
 
 window.onload = Onload;

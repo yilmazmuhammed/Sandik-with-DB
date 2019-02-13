@@ -1,3 +1,5 @@
+from datetime import date
+
 from flask import flash
 from pony.orm import db_session, count, select
 
@@ -46,13 +48,30 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
         return True
 
 
+# TODO flash yerine exception kullan, fonksiyonun kullanıdığı yerlerde exceptionları yakalayarak flash ile gerekli
+#  mesajı yazdır
 @db_session
-def insert_contribution(in_date, amount, share_id, explanation, periods):
-    transaction_ref = Transaction(share_ref=Share[share_id], transaction_date=in_date,
+def insert_contribution(in_date: date, amount, share_id, explanation, periods: list):
+    if amount % 25:
+        flash(u"Paid amount must be divided by 25.", 'danger')
+        return False
+    elif amount/25 != len(periods):
+        flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
+        return False
+
+    share = Share[share_id]
+
+    # # TODO hata dönüyor, işlemi de eklemiyor, ama bu ayları ödeme listesinden siliyor
+    # for period in periods:
+    #     if period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share)[:]:
+    #         flash(u"Daha önce ödenmiş aidat tekrar ödenemez.", 'danger')
+    #         return False
+
+    transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation)
-    period_list = periods.split(" ")
-    for period in period_list:
+    for period in periods:
         Contribution(transaction_ref=transaction_ref, contribution_period=period)
+    return True
 
 
 @db_session

@@ -10,7 +10,7 @@ $(window).resize(function() {
 
 function ChangeWidth() {
   if($( window ).width() < 750){
-    $(".share-table-div").css({"width": $( window ).width()-100 });
+    $(".share-table-div").css({"width": $( window ).width()-50 });
   }
   else{
     $(".share-table-div").css({"width": "100%" });

@@ -4,9 +4,11 @@ TODO CONTROL 3 Yeni üyenin/hissenin kayıt tarihi sandik açılıl tarihinden �
 TODO CONTROL 2 Ödemeyi yapan kişi borcun sahibi mi? kontrol et
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO! 3 Kullanıcı kendi webuser bilgilerini değiştirebilsin
-TODO! 4 Çoklu aidat ödeme sistemi oluştur
 TODO! 5 Var olan işlemleri islemler.csv'den ekle
 TODO 6 Ödenmeyen aidatlar sandik açılış tarihine göre değil, hisse kayıt tarihine göre olacak
-TODO 7 Aidat ödeme sayfasında eskiye dönük ödeme ve çoklu ödeme için js kodu çalıştıran bir checkbox olacak
 TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?
 TODO 9 @login_required gibi @admin_required oluştur
+TODO 10! custom transaction eklemeye @admin_required
+TODO 11!! Ödenmiş aidat tekrar ödenemez,
+TODO 15!! Ödenmiş işlem tekrar yapılamaz
+TODO 14! Ödenen aidat miktarı seçili ay sayısına göre değişsin (js)
