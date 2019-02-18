@@ -50,7 +50,9 @@
           "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
 
         } );
-        table.search("\""+getQueryVariable("share")+"\"").draw();
+        if(getQueryVariable("share")){
+          table.search("\""+getQueryVariable("share")+"\"").draw();
+        }
       } );
 
     </script>
