@@ -36,9 +36,10 @@
             <tbody>
             <tr></tr>
             {% for member in members %}
+            {% set transaction_page_url = url_for('transactions_in_sandik', sandik_id=member.dbTable.sandik_ref.id) %}
             <tr class="member-row">
               <td align="center">
-                <a href="{{ url_for('transactions_in_sandik', sandik_id=member.dbTable.sandik_ref.id) }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+                <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
               </td>
               <td>{{member.dbTable.sandik_ref.id}}</td>
               <td>{{member.dbTable.sandik_ref.name}}</td>
@@ -60,6 +61,7 @@
                     </thead>
                     <tbody>
                     {% for share in member.shares %}
+                    {% set transaction_page_url = transaction_page_url + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname + " - " + share.dbTable.share_order_of_member|string %}
                     <tr>
                       <td>{{ share.dbTable.share_order_of_member }}</td>
                       <td>{{ share.paid_contributions }}</td>
@@ -68,7 +70,7 @@
                       <td>{{ share.others }}</td>
                       <td style="color:red;">{{ share.remaining_debts }}</td>
                       <td align="center">
-                        <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
+                        <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                       </td>
                     </tr>
                     {% endfor %}
