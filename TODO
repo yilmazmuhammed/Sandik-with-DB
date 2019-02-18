@@ -5,10 +5,10 @@ TODO CONTROL 2 Ödemeyi yapan kişi borcun sahibi mi? kontrol et
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO! 3 Kullanıcı kendi webuser bilgilerini değiştirebilsin
 TODO! 5 Var olan işlemleri islemler.csv'den ekle
-TODO 6 Ödenmeyen aidatlar sandik açılış tarihine göre değil, hisse kayıt tarihine göre olacak
 TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?
 TODO 9 @login_required gibi @admin_required oluştur
 TODO 10! custom transaction eklemeye @admin_required
 TODO 11!! Ödenmiş aidat tekrar ödenemez,
 TODO 15!! Ödenmiş işlem tekrar yapılamaz
 TODO 14! Ödenen aidat miktarı seçili ay sayısına göre değişsin (js)
+TODO 16 views.sandik.members_page sayfasında pasif üyeleri/hisseleri başlangıçta js ile gösterme, butona basıldığında göster

@@ -117,7 +117,6 @@ class MemberAuthorityType(db.Entity):
     is_admin = Required(bool, default=False)
 
 
-# TODO get url from old dbinit.py
 # PostgreSQL
 # db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb',
 #         port='5432')

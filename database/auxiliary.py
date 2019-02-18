@@ -51,13 +51,15 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
 # TODO flash yerine exception kullan, fonksiyonun kullanıdığı yerlerde exceptionları yakalayarak flash ile gerekli
 #  mesajı yazdır
 @db_session
-def insert_contribution(in_date: date, amount, share_id, explanation, periods: list):
-    if amount % 25:
-        flash(u"Paid amount must be divided by 25.", 'danger')
-        return False
-    elif amount/25 != len(periods):
-        flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
-        return False
+def insert_contribution(in_date: date, amount, share_id, explanation, periods: list, is_from_import_data=False):
+    # TODO bu geçici çözümü kaldırıp import-data daki satırları düzenle ya da hatalı veri tablosu için yeni fonksiyon ekle
+    if not is_from_import_data:
+        if amount % 25:
+            flash(u"Paid amount must be divided by 25.", 'danger')
+            return False
+        elif amount/25 != len(periods):
+            flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
+            return False
 
     share = Share[share_id]
 

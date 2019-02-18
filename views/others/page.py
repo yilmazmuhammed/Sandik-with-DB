@@ -22,7 +22,7 @@ def import_data(sandik_id):
         with db_session:
             sandik = Sandik[sandik_id]
             add_transactions(transactions, sandik)
-        return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+        return redirect(url_for('all_transactions_in_sandik', sandik_id=sandik_id))
 
     info = FormPageInfo(form=form, title="Import transactions from url")
     return render_template("transaction/contribution_form.html", info=info)

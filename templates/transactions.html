@@ -12,8 +12,25 @@
 
     <!-- Table-Datatable relation js-->
     <script type="text/javascript">
+      function getQueryVariable(variable)
+      {
+         var query = window.location.search.substring(1);
+         var vars = query.split("&");
+         for (var i=0;i<vars.length;i++) {
+           var pair = vars[i].split("=");
+           if(pair[0] == variable){
+            var ret = pair[1];
+            while(ret.includes("%20")){
+              ret = ret.replace("%20"," ");
+            }
+            return ret;
+           }
+         }
+         return(false);
+      }
+
       $(document).ready(function() {
-        $('#transactions').DataTable( {
+        var table = $('#transactions').DataTable( {
           "language": {
             "url":"https://cdn.datatables.net/plug-ins/1.10.12/i18n/Turkish.json"
           },
@@ -33,7 +50,9 @@
           "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
 
         } );
+        table.search("\""+getQueryVariable("share")+"\"").draw();
       } );
+
     </script>
 {% endblock %}
 
