@@ -197,8 +197,8 @@ class PaymentForm(TransactionForm):
     close = form_close()
 
     share = None
-    debt = SelectField("Debt:", validators=[InputRequired("Please select the debt from list")], coerce=int, choices=[],
-                       id='debt', render_kw={"class": "form-control"})
+    debt = DynamicSelectField("Debt:", validators=[InputRequired("Please select the debt from list")], coerce=int, choices=[],
+                              id='debt', render_kw={"class": "form-control"})
 
     # TODO use super()
     explanation = TextAreaField("Explanation:",
