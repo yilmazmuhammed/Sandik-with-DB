@@ -8,7 +8,8 @@ from views.others.auxiliary import read_data_online, add_transactions
 
 
 def home_page():
-    return render_template("layout.html")
+    # return render_template("layout.html")
+    return redirect(url_for('profile'))
 
 
 @login_required
