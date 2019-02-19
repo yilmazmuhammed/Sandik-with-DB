@@ -37,6 +37,7 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/add-custom-transaction",
                      view_func=transaction_page.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=sandik.transactions_page)
+    app.add_url_rule("/sandik/<int:sandik_id>/export-csv", view_func=transaction_page.csv_raw_transactions_page)
 
     # Üyelerin sandıklarla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions", view_func=webuser.transactions_in_sandik)

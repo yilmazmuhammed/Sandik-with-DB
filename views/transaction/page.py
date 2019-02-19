@@ -2,10 +2,10 @@ import json
 
 from flask import abort, redirect, url_for, render_template
 from flask_login import login_required, current_user
-from pony.orm import db_session
+from pony.orm import db_session, select
 
 from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction
-from database.dbinit import Member, Sandik, WebUser
+from database.dbinit import Member, Sandik, WebUser, Transaction
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices
@@ -193,3 +193,39 @@ def add_custom_transaction_for_admin_page(sandik_id):
                                title="Add Contribution",
                                periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
                                shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of))
+
+
+def csv_raw_transactions_page(sandik_id):
+    with db_session:
+        sandik = Sandik[sandik_id]
+
+        transactions = select(transaction for transaction in Transaction
+                              if transaction.share_ref.member_ref.sandik_ref == sandik).sort_by(lambda tr: tr.id)[:]
+
+        html = ""
+        for t in transactions:
+            html += "%s;%s.%s.%s;%s;%s %s %s;" % (t.id, t.transaction_date.day, t.transaction_date.month, t.transaction_date.year, t.amount, t.share_ref.member_ref.webuser_ref.name, t.share_ref.member_ref.webuser_ref.surname, t.share_ref.share_order_of_member,)
+
+            if t.debt_ref:
+                html += "%s;" % (t.debt_ref.debt_type_ref.name,)
+            elif t.payment_ref:
+                html += "%s-Ö;" % (t.payment_ref.debt_ref.debt_type_ref.name,)
+            elif t.contribution_index:
+                html += "Aidat;"
+            else:
+                # html += "%s;" % (t.type.capitalize(),)
+                html += "Diğer;"
+
+            html += "%s;" % (t.explanation,)
+
+            if t.debt_ref:
+                html += "%s" % t.debt_ref.number_of_installment
+            elif t.payment_ref:
+                html += "%s" % t.payment_ref.debt_ref.transaction_ref.id
+            elif t.contribution_index:
+                for c in t.contribution_index.sort_by(lambda co: co.contribution_period):
+                    html += "%s " % c.contribution_period
+                html = html[:-1]
+
+            html += '<br>'
+        return html

@@ -12,3 +12,9 @@ TODO 11!! Ödenmiş aidat tekrar ödenemez,
 TODO 15!! Ödenmiş işlem tekrar yapılamaz
 TODO 14! Ödenen aidat miktarı seçili ay sayısına göre değişsin (js)
 TODO 16 views.sandik.members_page sayfasında pasif üyeleri/hisseleri başlangıçta js ile gösterme, butona basıldığında göster
+TODO 18! Geçici olarak ana sayfayı profil sayfası yap
+TODO 19! tamamlanmamış kısımlara abort() koy
+TODO 20! Sandıktaki bütün transaction toplamlarını göster
+
+
+DONE 17! işlemleri yedeklemek için csv formatında sayfaya yazdır

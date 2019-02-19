@@ -18,7 +18,7 @@ class LineTransaction:
         year = int(s_date[2])
         self.id = int(t_id)
         self.date = date(year, month, day)
-        self.amount = int(amount)
+        self.amount = abs(int(amount))
         self.share_name = share_name
         self.inner_type = t_type
         self.explanation = explanation
@@ -66,7 +66,7 @@ def add_transactions(trs, sandik):
 
     for t in trs:
         if t.type == 'Debt':
-            insert_debt(t.date, -t.amount, share_ids[t.share_name], DebtType.get(name=t.inner_type).id, t.explanation,
+            insert_debt(t.date, t.amount, share_ids[t.share_name], DebtType.get(name=t.inner_type).id, t.explanation,
                         t.number_of_installment)
         elif t.type == 'Payment':
             insert_payment(t.date, t.amount, t.explanation, transaction_id=t.transaction_id)
