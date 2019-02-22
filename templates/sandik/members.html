@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}{{ info.title }}{% endblock %}
+{% block title %}{{ page_info.title }}{% endblock %}
 
 {% block extra_head %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
@@ -21,7 +21,7 @@
               <h3 class="panel-title">Yardımlaşma Sandığı</h3>
             </div>
             <div class="col col-xs-6 text-right">
-              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik_id) }}" class="btn btn-sm btn-primary btn-create">Add New Member</a>
+              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.sandik_id) }}" class="btn btn-sm btn-primary btn-create">Add New Member</a>
             </div>
           </div>
         </div>
@@ -42,8 +42,8 @@
             </thead>
             <tbody>
               <tr></tr>
-              {% for member in members %}
-              {% set transaction_page_url = url_for('transactions_page', sandik_id=sandik_id) + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname %}
+              {% for member in sandik.members %}
+              {% set transaction_page_url = url_for('transactions_page', sandik_id=sandik.sandik_id) + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname %}
               <tr class="member">
                 <td align="center">
                   <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
@@ -110,7 +110,32 @@
         </div>
 
         <div class="panel-footer">
+          <!--
           <div class="row">
+          -->
+            <table class="table table-sandik-shares">
+              <thead class="thead-dark">
+              <tr>
+                <th class="hidden"></th>
+                <th>Paid contributions</th>
+                <th>Debts received</th>
+                <th>Paid installments</th>
+                <th>Others</th>
+                <th>Final Situation</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td class="hidden"></td>
+                <td>{{ sandik.paid_contributions }}</td>
+                <td>{{ sandik.debts_received }}</td>
+                <td>{{ sandik.paid_installments }}</td>
+                <td>{{ sandik.others }}</td>
+                <td style="color:red;">{{ sandik.total }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <!--
             <div class="col col-xs-4">Page 1 of 5
             </div>
             <div class="col col-xs-8">
@@ -126,7 +151,10 @@
                   <li><a href="#">»</a></li>
               </ul>
             </div>
+            -->
+          <!--
           </div>
+          -->
         </div>
       </div>
     </div>

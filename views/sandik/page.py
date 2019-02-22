@@ -2,12 +2,12 @@ from flask import redirect, url_for, render_template, abort, flash
 from flask_login import login_required, current_user
 from pony.orm import db_session, ObjectNotFound, select
 
-from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser, DbTypes, Transaction
+from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser, Transaction
 from forms import SandikForm, FormPageInfo, MemberForm
 from views import PageInfo
-from views.sandik.auxiliary import MembersPageInfo, SandikManagementPanel
+from views.sandik.auxiliary import SandikManagementPanel
 from views.sandik.db import add_member_to_sandik2
-from views.webuser.auxiliary import MemberInfo
+from views.webuser.auxiliary import MemberInfo, SandikInfo
 
 
 @login_required
@@ -49,12 +49,9 @@ def sandik_management_page(sandik_id):
 def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
-        members = []
-        for m in sandik.members_index.sort_by(Member.member_id):
-            members.append(MemberInfo(m))
-        # TODO bilgileri tek info ile gönder
-        info = MembersPageInfo(title='Members', sandik=sandik, members=members, db_types=DbTypes)
-        return render_template("sandik/members.html", members=members, sandik_id=sandik_id, info=info)
+        sandik_info = SandikInfo(sandik)
+        page_info = PageInfo(title='Members')
+        return render_template("sandik/members.html", page_info=page_info, sandik=sandik_info)
 
 
 def add_member_to_sandik_page(sandik_id):

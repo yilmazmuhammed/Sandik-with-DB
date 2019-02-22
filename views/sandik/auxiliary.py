@@ -1,15 +1,6 @@
 from pony.orm import select, db_session
 
 from database.dbinit import Transaction, Sandik
-from views import PageInfo
-
-
-class MembersPageInfo(PageInfo):
-    def __init__(self, title, sandik, members, db_types):
-        super().__init__(title)
-        self.sandik = sandik
-        self.members = members
-        self.db_types = db_types
 
 
 class SandikManagementPanel:

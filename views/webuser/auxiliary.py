@@ -24,8 +24,10 @@ class SandikInfo:
     def __init__(self, sandik):
         self.dbTable = sandik
 
+        self.sandik_id = sandik.id
+
         self.members = []
-        for member in sandik.members_index.sort_by(Member.date_of_membership):
+        for member in sandik.members_index.sort_by(lambda m: m.webuser_ref.name):
             self.members.append(MemberInfo(member))
 
         self.paid_contributions = sum(m.paid_contributions for m in self.members)
