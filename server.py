@@ -25,7 +25,7 @@ def create_sandik_app():
     app.add_url_rule("/", view_func=others.home_page)
 
     # Site yöneticisinin işlemleri
-    app.add_url_rule("/add-webuser", view_func=webuser.add_webuser, methods=["GET", "POST"])
+    app.add_url_rule("/add-webuser", view_func=webuser.add_webuser_page, methods=["GET", "POST"])
 
     # Sandık yöneticilerin sandıkla ilgili işlemleri
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])

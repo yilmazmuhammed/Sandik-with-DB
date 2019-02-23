@@ -5,9 +5,10 @@ from pony.orm import db_session, ObjectNotFound, select
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser, Transaction
 from forms import SandikForm, FormPageInfo, MemberForm
 from views import PageInfo
+from views.authorizations import authorization_to_the_required
 from views.sandik.auxiliary import SandikManagementPanel
-from views.sandik.db import add_member_to_sandik2
-from views.webuser.auxiliary import MemberInfo, SandikInfo
+from views.sandik.db import add_member_to_sandik
+from views.webuser.auxiliary import SandikInfo
 
 
 @login_required
@@ -54,6 +55,7 @@ def members_page(sandik_id):
         return render_template("sandik/members.html", page_info=page_info, sandik=sandik_info)
 
 
+@authorization_to_the_required(adding_member=True)
 def add_member_to_sandik_page(sandik_id):
     form = MemberForm()
 
@@ -66,13 +68,18 @@ def add_member_to_sandik_page(sandik_id):
     if form.validate_on_submit():
         try:
             with db_session:
-                user = WebUser[form.username.data]  # user = WebUser[form.data['username']]
-                authority = MemberAuthorityType[form.data['authority']]
-                f_date = form.data['date_of_membership']
-                # TODO authory_id mi gelmeli, direk authority mi?
-                add_member_to_sandik2(sandik_id, user.username, authority.id, f_date)
-                # TODO redirect üyeler sayfası ya da yeni eklenen üyenin sayfası
-                return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
+                # user = WebUser[form.username.data]
+                # authority = MemberAuthorityType[form.data['authority']]
+                # f_date = form.data['date_of_membership']
+                #
+                # # TODO authory_id mi gelmeli, direk authority mi?
+                # add_member_to_sandik2(sandik_id, user.username, authority.id, f_date)
+                # # TODO redirect üyeler sayfası ya da yeni eklenen üyenin sayfası
+
+                if add_member_to_sandik(form, sandik_id):
+                    return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
+                else:
+                    flash(u"Bu kullanıcının bu sandıkta üyeliği zaten var.", 'danger')
         # TODO Authority ve User bulunamamasına karşın iki farklı sorgu yap
         except ObjectNotFound:
             flash(u"User not found.", 'danger')

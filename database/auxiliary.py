@@ -3,7 +3,8 @@ from datetime import date
 from flask import flash
 from pony.orm import db_session, count, select
 
-from database.dbinit import Debt, Transaction, Share, DebtType, Payment, Contribution
+from database.dbinit import (Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik,
+                             MemberAuthorityType, Member,)
 from views.transaction.auxiliary import Period
 
 
@@ -81,3 +82,16 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
 def insert_transaction(in_date, amount, share_id, explanation):
     Transaction(share_ref=Share[share_id], transaction_date=in_date, amount=amount,
                 type='Other', explanation=explanation)
+
+
+@db_session
+def insert_member(webuser_id, sandik_id, authority_id, date_of_membership: date):
+    return Member(webuser_ref=WebUser[webuser_id], sandik_ref=Sandik[sandik_id],
+                  member_authority_type_ref=MemberAuthorityType[authority_id], date_of_membership=date_of_membership)
+
+
+@db_session
+def insert_share(member_id, date_of_opening: date):
+    member = Member[member_id]
+    soom = member.shares_index.count() + 1
+    Share(member_ref=member, share_order_of_member=soom, date_of_opening=date_of_opening)

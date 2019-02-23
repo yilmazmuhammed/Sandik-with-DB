@@ -33,7 +33,7 @@ def signup():
 
 
 @login_required
-def add_webuser():
+def add_webuser_page():
     if not current_user.is_admin:
         abort(404)
 
