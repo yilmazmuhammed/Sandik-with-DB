@@ -20,10 +20,12 @@ def add_share(member_id, date_of_opening=date.today()):
 def add_member_to_sandik(form: MemberForm, sandik_id):
     username = form.username.data
     sandik = Sandik[sandik_id]
+    f_date = form.date_of_membership.data
+
     if sandik.members_index.select(lambda m: m.webuser_ref.username == username).count() > 0:
         return False
-
-    f_date = form.date_of_membership.data
+    elif f_date < sandik.date_of_opening:
+        return False
     new_member = insert_member(webuser_id=username, sandik_id=sandik_id, authority_id=form.authority.data,
                                date_of_membership=f_date)
     insert_share(member_id=new_member.member_id, date_of_opening=f_date)

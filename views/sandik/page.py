@@ -79,7 +79,8 @@ def add_member_to_sandik_page(sandik_id):
                 if add_member_to_sandik(form, sandik_id):
                     return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
                 else:
-                    flash(u"Bu kullanıcının bu sandıkta üyeliği zaten var.", 'danger')
+                    flash(u"Bu kullanıcının bu sandıkta üyeliği zaten var.\n"
+                          u"Ya da bu üyenin kayıt tarihi sandığın kuruluş tarihinden daha eski.", 'danger')
         # TODO Authority ve User bulunamamasına karşın iki farklı sorgu yap
         except ObjectNotFound:
             flash(u"User not found.", 'danger')
