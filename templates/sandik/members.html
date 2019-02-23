@@ -79,7 +79,7 @@
                       <tbody>
                         {% for share in member.shares %}
                         {% set transaction_page_url = transaction_page_url + " - " + share.dbTable.share_order_of_member|string %}
-                        <tr>
+                        <tr class="{% if not share.is_active %}passive-share{% endif %}">
                           <td>{{ share.dbTable.share_order_of_member }}</td>
                           <td>{{ share.paid_contributions }}</td>
                           <td>{{ share.debts_received }}</td>

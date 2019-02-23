@@ -57,7 +57,7 @@ class MemberInfo:
 class ShareInfo:
     def __init__(self, share):
         self.dbTable = share
-
+        self.is_active = share.is_active
         self.share_order_of_member = share.share_order_of_member
 
         self.paid_contributions = sum(t.amount for t in share.transactions_index if t.contribution_index)

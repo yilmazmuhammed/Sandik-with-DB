@@ -7,6 +7,7 @@ $(function () {
 $(function () {
     $("#btn-passive").click(function () {
         $(".passive-member").toggle()
+        $(".passive-share").toggle()
     });
 });
 

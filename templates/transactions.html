@@ -51,7 +51,7 @@
 
         } );
         if(getQueryVariable("share")){
-          table.search("\""+getQueryVariable("share")+"\"").draw();
+          table.search("\""+decodeURIComponent(getQueryVariable("share"))+"\"").draw();
         }
       } );
 

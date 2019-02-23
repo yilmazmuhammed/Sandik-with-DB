@@ -96,6 +96,6 @@
   text-align: center;
 }
 
-tr.passive-member {
+tr.passive-member, tr.passive-share {
   display:none;
 }
