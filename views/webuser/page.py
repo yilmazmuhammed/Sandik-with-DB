@@ -11,8 +11,7 @@ from views.webuser.db import add_webuser
 
 def signup():
     if current_user.is_authenticated:
-        # TODO üye sayfasına gönder
-        return redirect(url_for('home_page'))
+        return redirect(url_for('profile'))
 
     form = SingUpForm()
 

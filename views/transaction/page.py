@@ -7,6 +7,7 @@ from pony.orm import db_session, select
 from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction
 from database.dbinit import Member, Sandik, WebUser, Transaction
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
+from views.authorizations import authorization_to_the_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices
 
@@ -122,8 +123,7 @@ def add_payment_page(sandik_id):
         return render_template('form.html', info=info)
 
 
-# TODO login_admin_required
-# @login_required
+@authorization_to_the_required(writing_transaction=True)
 def add_custom_transaction_for_admin_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]

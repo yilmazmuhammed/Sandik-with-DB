@@ -1,20 +1,19 @@
 url = https://dl.dropboxusercontent.com/s/jv5j8v8azljf9h2/islemler.csv?dl=1
 TODO CONTROL 1 Sandığa işlem eklerken işlemin eklendiği hissenin sandık üyelerinden birinin olup olmadığını kontrol et
-TODO CONTROL 3 Yeni üyenin/hissenin kayıt tarihi sandik açılıl tarihinden önce olamaz
+TODO CONTROL 3 Yeni üyenin/hissenin kayıt tarihi sandik açılış tarihinden önce olamaz
 TODO CONTROL 2 Ödemeyi yapan kişi borcun sahibi mi? kontrol et
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO! 3 Kullanıcı kendi webuser bilgilerini değiştirebilsin
 TODO! 5 Var olan işlemleri islemler.csv'den ekle
 TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?
-TODO 9 @login_required gibi @admin_required oluştur
-TODO 10! custom transaction eklemeye @admin_required
 TODO 11!! Ödenmiş aidat tekrar ödenemez,
 TODO 15!! Ödenmiş işlem tekrar yapılamaz
 TODO 14! Ödenen aidat miktarı seçili ay sayısına göre değişsin (js)
 TODO 16 views.sandik.members_page sayfasında pasif üyeleri/hisseleri başlangıçta js ile gösterme, butona basıldığında göster
-TODO 19! tamamlanmamış kısımlara abort() koy
 
 
 DONE 17! işlemleri yedeklemek için csv formatında sayfaya yazdır
 
 AGAIN 20! Sandıktaki bütün transaction toplamlarını göster
+
+CANCEL 19! tamamlanmamış kısımlara abort() koy

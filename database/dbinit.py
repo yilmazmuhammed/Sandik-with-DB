@@ -115,6 +115,10 @@ class MemberAuthorityType(db.Entity):
     sandik_ref = Required(Sandik)
     members_index = Set(Member)
     is_admin = Required(bool, default=False)
+    reading_transaction = Required(bool, default=False)
+    writing_transaction = Required(bool, default=False)
+    adding_member = Required(bool, default=False)
+    throwing_member = Required(bool, default=False)
 
 
 # PostgreSQL
