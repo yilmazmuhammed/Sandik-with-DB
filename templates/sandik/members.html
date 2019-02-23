@@ -17,11 +17,14 @@
         <!-- Panel başlık satırı -->
         <div class="panel-heading">
           <div class="row">
-            <div class="col col-xs-6">
+            <div class="col col-xs-4">
               <h3 class="panel-title">Yardımlaşma Sandığı</h3>
             </div>
-            <div class="col col-xs-6 text-right">
-              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.sandik_id) }}" class="btn btn-sm btn-primary btn-create">Add New Member</a>
+            <div class="col col-xs-4 text-center">
+              <span class="btn btn-sm btn-success" id="btn-passive">Pasif üyeler</span>
+            </div>
+            <div class="col col-xs-4 text-right">
+              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.sandik_id) }}" class="btn btn-sm btn-primary">Add New Member</a>
             </div>
           </div>
         </div>
@@ -44,7 +47,7 @@
               <tr></tr>
               {% for member in sandik.members %}
               {% set transaction_page_url = url_for('transactions_page', sandik_id=sandik.sandik_id) + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname %}
-              <tr class="member">
+              <tr class="member {% if not member.is_active %}passive-member{% endif %}">
                 <td align="center">
                   <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                 </td>

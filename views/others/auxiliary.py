@@ -18,7 +18,7 @@ class LineTransaction:
         year = int(s_date[2])
         self.id = int(t_id)
         self.date = date(year, month, day)
-        self.amount = abs(int(amount))
+        self.amount = int(amount)
         self.share_name = share_name
         self.inner_type = t_type
         self.explanation = explanation
@@ -26,6 +26,7 @@ class LineTransaction:
 
         if self.inner_type == 'APB' or self.inner_type == 'PDAY':
             self.type = 'Debt'
+            self.amount = abs(self.amount)
             self.number_of_installment = int(additional_info)
         elif self.inner_type == 'APB-Ö' or self.inner_type == 'PDAY-Ö':
             self.type = 'Payment'

@@ -95,3 +95,7 @@
 .table-sandik-shares > thead > tr > th {
   text-align: center;
 }
+
+tr.passive-member {
+  display:none;
+}

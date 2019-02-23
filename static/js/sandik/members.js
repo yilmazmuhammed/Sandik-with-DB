@@ -4,6 +4,12 @@ $(function () {
     });
 });
 
+$(function () {
+    $("#btn-passive").click(function () {
+        $(".passive-member").toggle()
+    });
+});
+
 $(window).resize(function() {
     ChangeWidth();
 });

@@ -26,6 +26,7 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
     share = debt.transaction_ref.share_ref
 
     # Final controls
+    # TODO Kontrolleri excception ile yap, hata mesajını fonksiyonun kullanıldığı yerde ver
     if amount > debt.remaining_debt:  # If new paid amount is bigger than remaining amount of the debt
         flash(u"Paid amount cannot be more than the remaining debt", 'danger')
         return False

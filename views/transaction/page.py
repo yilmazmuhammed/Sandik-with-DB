@@ -1,11 +1,11 @@
 import json
 
-from flask import abort, redirect, url_for, render_template
+from flask import abort, redirect, url_for, render_template, flash
 from flask_login import login_required, current_user
 from pony.orm import db_session, select
 
 from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction
-from database.dbinit import Member, Sandik, WebUser, Transaction
+from database.dbinit import Member, Sandik, WebUser, Transaction, Debt
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views.authorizations import authorization_to_the_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
@@ -116,7 +116,9 @@ def add_payment_page(sandik_id):
         form.debt.choices = debt_choices(member)
 
         if form.validate_on_submit():
-            if insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data, form.debt.data):
+            if Debt[form.debt.data].transaction_ref.share_ref.member_ref.webuser_ref != current_user.webuser:
+                flash(u'Başka birisinin borcunu ödeyemezsiniz. Yöneticiye başvurunuz.', 'danger')
+            elif insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data, form.debt.data):
                 return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add payment")

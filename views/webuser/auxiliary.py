@@ -41,6 +41,7 @@ class SandikInfo:
 class MemberInfo:
     def __init__(self, member):
         self.dbTable = member
+        self.is_active = member.is_active
 
         self.shares = []
         for share in member.shares_index.sort_by(Share.share_order_of_member):
