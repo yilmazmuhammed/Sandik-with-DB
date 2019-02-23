@@ -15,10 +15,10 @@ def authorization_to_the_required(reading_transaction=False, writing_transaction
             with db_session:
                 member = current_user.webuser.members_index.select(lambda m: m.sandik_ref.id == sandik_id)[:][0]
                 ma = member.member_authority_type_ref
-                if not ma.is_admin or not (ma.reading_transaction >= reading_transaction
-                                           and ma.writing_transaction >= writing_transaction
-                                           and ma.adding_member >= adding_member
-                                           and ma.throwing_member >= throwing_member):
+                if not ma.is_admin and not (ma.reading_transaction >= reading_transaction
+                                            and ma.writing_transaction >= writing_transaction
+                                            and ma.adding_member >= adding_member
+                                            and ma.throwing_member >= throwing_member):
                     # TODO yetkilere göre sayfa
                     flash(u"Bu sayfaya giriş yetkiniz yok.", 'danger')
                     return current_app.login_manager.unauthorized()

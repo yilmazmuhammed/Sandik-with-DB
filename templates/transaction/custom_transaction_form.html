@@ -2,7 +2,8 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_head %}
-
+<script src="{{ url_for('static', filename='js/general.js') }}"></script>
+<script src="{{ url_for('static', filename='js/transaction/contribution.js') }}"></script>
 <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 <script>
 var shares_of = {{shares_of|safe}};
@@ -10,30 +11,6 @@ var debts_of = {{debts_of|safe}};
 var periods_of = {{periods_of|safe}};
 var all_periods_of = {{all_periods_of|safe}};
 
-function ChangeSelectList(formSelect, newList, ifListEmpty){
-  if (!formSelect) {
-    return;
-  }
-
-  while(formSelect.options.length) {
-    formSelect.remove(0);
-  }
-
-  if(newList) {
-    if(newList.length){
-      var i;
-      for(i=0; i<newList.length; i++) {
-        var share = new Option(newList[i][1], newList[i][0]);
-        formSelect.options.add(share);
-      }
-    }
-    else{
-      var share = new Option(ifListEmpty, "");
-      formSelect.options.add(share);
-    }
-  }
-
-}
 
 function ChangeShareSelectList() {
   var shareSelects = document.getElementsByName("share");
@@ -47,24 +24,6 @@ function ChangeShareSelectList() {
   }
 }
 
-function ChangeContPeriodSelectList(){
-  var contSelect = document.getElementById("contribution_period");
-
-  var memberSelect = document.getElementById("member");
-  var selectedMemberId = memberSelect.options[memberSelect.selectedIndex].value;
-  var shareSelect = document.getElementById("share");
-  var selectedShareId = shareSelect.options[shareSelect.selectedIndex].value;
-
-  var is_there_old = document.getElementById("is_there_old");
-  var contPeriodList;
-  if(is_there_old.checked == true) {
-    contPeriodList = all_periods_of[selectedMemberId][selectedShareId];
-  } else {
-    contPeriodList = periods_of[selectedMemberId][selectedShareId];
-  }
-
-  ChangeSelectList(contSelect, contPeriodList, "Ödenmemiş aidatınız bulunamadı...");
-}
 
 function ChangeDebtSelectList() {
   var debtSelect = document.getElementById("debt");
@@ -93,45 +52,9 @@ function ChangeFormByType(){
 }
 
 
-function createHtmlElement(htmlStr) {
-    var frag = document.createDocumentFragment(),
-        temp = document.createElement('div');
-    temp.innerHTML = htmlStr;
-    while (temp.firstChild) {
-        frag.appendChild(temp.firstChild);
-    }
-    return frag;
-}
-
-
-function AddCheckBox() {
-  var check_boxes = createHtmlElement('<p style="text-align: center;">\
-  Old contribution: <input type="checkbox" id="is_there_old" onclick="ChangeContPeriodSelectList()"><br>\
-  Multiple contribution: <input type="checkbox" id="is_multiple_period" onclick="ChangeToMultiplePeriod()">\
-  </p>');
-
-  var cp_select = document.getElementById('contribution_period');
-  cp_select.parentNode.insertBefore(check_boxes, cp_select.nextSibling);
-}
-
-
-function ChangeToMultiplePeriod() {
-  var checkBox = document.getElementById("is_multiple_period");
-  if (checkBox.checked == true){
-    document.getElementById('contribution_period').setAttribute("multiple","");
-  }
-  else {
-    document.getElementById('contribution_period').removeAttribute("multiple","");
-  }
-}
-
-
 function SetOnchange(){
   var a = document.getElementById("member");
   a.setAttribute("onchange", "ChangeShareSelectList(), ChangeDebtSelectList(), ChangeContPeriodSelectList()");
-
-  var b = document.getElementById("share");
-  b.setAttribute("onchange", "ChangeContPeriodSelectList()");
 
   var c = document.getElementById("type");
   c.setAttribute("onchange", "ChangeFormByType()");
@@ -139,13 +62,9 @@ function SetOnchange(){
 
 
 function Onload() {
-  document.getElementById('contribution_period').removeAttribute("multiple","");
-
-  AddCheckBox();
   SetOnchange();
 
   ChangeShareSelectList();
-  ChangeContPeriodSelectList();
   ChangeDebtSelectList();
   ChangeFormByType();
 }

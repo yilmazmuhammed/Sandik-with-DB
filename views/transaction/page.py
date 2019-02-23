@@ -59,8 +59,8 @@ def add_contribution_page(sandik_id):
 
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", info=info,
-                               periodsDict=json.dumps(unpaid_dues_choices(member)),
-                               oldPeriodsDict=json.dumps(unpaid_dues_choices(member, is_there_old=True)))
+                               periods_of=json.dumps(unpaid_dues_choices(member)),
+                               all_periods_of=json.dumps(unpaid_dues_choices(member, is_there_old=True)))
 
 
 @login_required
@@ -151,8 +151,8 @@ def add_custom_transaction_for_admin_page(sandik_id):
         for member in sandik.members_index:
             shares_of[member.member_id] = share_choices(member)
             debts_of[member.member_id] = debt_choices(member)
-            periods_of[member.member_id] = unpaid_dues_choices(member)
-            all_periods_of[member.member_id] = unpaid_dues_choices(member, is_there_old=True)
+            periods_of.update(unpaid_dues_choices(member))
+            all_periods_of.update(unpaid_dues_choices(member, is_there_old=True))
 
         # Add debt types of the sandik to d_form.debt_type
         d_form.debt_type.choices += debt_type_choices(sandik)
