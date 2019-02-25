@@ -64,18 +64,13 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
             return False
 
     share = Share[share_id]
-
-    # # TODO hata dönüyor, işlemi de eklemiyor, ama bu ayları ödeme listesinden siliyor
-    # for period in periods:
-    #     if period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share)[:]:
-    #         flash(u"Daha önce ödenmiş aidat tekrar ödenemez.", 'danger')
-    #         return False
-
     transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation)
+
+    contributions = []
     for period in periods:
-        Contribution(transaction_ref=transaction_ref, contribution_period=period)
-    return True
+        contributions.append(Contribution(transaction_ref=transaction_ref, contribution_period=period))
+    return contributions
 
 
 @db_session

@@ -10,6 +10,7 @@ from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, Pay
 from views.authorizations import authorization_to_the_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices
+from views.transaction.db import add_contribution
 
 
 @login_required
@@ -53,8 +54,7 @@ def add_contribution_page(sandik_id):
 
         if form.validate_on_submit():
             # TODO kontrolleri yap
-            if insert_contribution(form.transaction_date.data, form.amount.data, form.share.data,
-                                   form.explanation.data, form.contribution_period.data):
+            if add_contribution(form):
                 return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Contribution")

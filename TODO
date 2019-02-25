@@ -4,12 +4,7 @@ TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO! 3 Kullanıcı kendi webuser bilgilerini değiştirebilsin
 TODO! 5 Var olan işlemleri islemler.csv'den ekle
 TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?
-TODO 11!! Ödenmiş aidat tekrar ödenemez
 TODO 15!! Ödenmiş işlem tekrar yapılamaz
+TODO 17 İşlemleri yedeklemek için csv formatında dosya oluştur
 
-
-DONE 17! işlemleri yedeklemek için csv formatında sayfaya yazdır
-
-AGAIN 20! Sandıktaki bütün transaction toplamlarını göster
-
-CANCEL 19! tamamlanmamış kısımlara abort() koy
+FRONTEND 20! Sandıktaki bütün transaction toplamlarını göster
