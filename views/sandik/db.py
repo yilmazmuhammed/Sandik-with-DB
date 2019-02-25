@@ -3,7 +3,7 @@ from datetime import date
 from pony.orm import db_session
 
 from database.auxiliary import insert_member, insert_share
-from database.dbinit import Member, Share, Sandik
+from database.dbinit import Member, Share
 
 from forms import MemberForm
 
@@ -18,15 +18,14 @@ def add_share(member_id, date_of_opening=date.today()):
 
 # TODO exception kullan, son kullanıcıya çıktıyı exception kullanarak ver
 def add_member_to_sandik(form: MemberForm, sandik_id):
-    username = form.username.data
-    sandik = Sandik[sandik_id]
     f_date = form.date_of_membership.data
 
-    if sandik.members_index.select(lambda m: m.webuser_ref.username == username).count() > 0:
-        return False
-    elif f_date < sandik.date_of_opening:
-        return False
-    new_member = insert_member(webuser_id=username, sandik_id=sandik_id, authority_id=form.authority.data,
+    new_member = insert_member(username=form.username.data, sandik_id=sandik_id, authority_id=form.authority.data,
                                date_of_membership=f_date)
-    insert_share(member_id=new_member.member_id, date_of_opening=f_date)
+    if new_member is None:
+        return False
+
+    if insert_share(member_id=new_member.member_id, date_of_opening=f_date) is None:
+        return False
+
     return True

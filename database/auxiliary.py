@@ -54,16 +54,19 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
 #  mesajı yazdır
 @db_session
 def insert_contribution(in_date: date, amount, share_id, explanation, periods: list, is_from_import_data=False):
+    share = Share[share_id]
+    # TODO Conribution_amount değerini sandık kurallarından al
+    contribution_amount = 25
+
     # TODO bu geçici çözümü kaldırıp import-data daki satırları düzenle ya da hatalı veri tablosu için yeni fonksiyon ekle
     if not is_from_import_data:
-        if amount % 25:
+        if amount % contribution_amount:
             flash(u"Paid amount must be divided by 25.", 'danger')
             return False
-        elif amount/25 != len(periods):
+        elif amount/contribution_amount != len(periods):
             flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
             return False
 
-    share = Share[share_id]
     transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation)
 
@@ -80,13 +83,26 @@ def insert_transaction(in_date, amount, share_id, explanation):
 
 
 @db_session
-def insert_member(webuser_id, sandik_id, authority_id, date_of_membership: date):
-    return Member(webuser_ref=WebUser[webuser_id], sandik_ref=Sandik[sandik_id],
+def insert_member(username, sandik_id, authority_id, date_of_membership: date):
+    sandik = Sandik[sandik_id]
+
+    # TODO Use exception
+    if sandik.members_index.select(lambda m: m.webuser_ref.username == username).count() > 0:
+        return None
+    elif date_of_membership < sandik.date_of_opening:
+        return None
+
+    return Member(webuser_ref=WebUser[username], sandik_ref=Sandik[sandik_id],
                   member_authority_type_ref=MemberAuthorityType[authority_id], date_of_membership=date_of_membership)
 
 
 @db_session
 def insert_share(member_id, date_of_opening: date):
     member = Member[member_id]
+
+    # TODO Use exception
+    if date_of_opening < member.date_of_membership:
+        return None
+
     soom = member.shares_index.count() + 1
-    Share(member_ref=member, share_order_of_member=soom, date_of_opening=date_of_opening)
+    return Share(member_ref=member, share_order_of_member=soom, date_of_opening=date_of_opening)
