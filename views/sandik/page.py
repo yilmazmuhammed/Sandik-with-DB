@@ -5,7 +5,7 @@ from pony.orm import db_session, ObjectNotFound, select
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser, Transaction
 from forms import SandikForm, FormPageInfo, MemberForm
 from views import PageInfo
-from views.authorizations import authorization_to_the_required
+from views.authorizations import authorization_to_the_sandik_required
 from views.sandik.auxiliary import SandikManagementPanel
 from views.sandik.db import add_member_to_sandik
 from views.webuser.auxiliary import SandikInfo
@@ -36,7 +36,7 @@ def new_sandik_page():
     return render_template('form.html', info=info)
 
 
-@login_required
+@authorization_to_the_sandik_required(reading_transaction=True)
 def sandik_management_page(sandik_id):
     try:
         sandik = SandikManagementPanel(sandik_id)
@@ -46,7 +46,7 @@ def sandik_management_page(sandik_id):
         return abort(404)
 
 
-@login_required
+@authorization_to_the_sandik_required(reading_transaction=True)
 def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
@@ -55,7 +55,7 @@ def members_page(sandik_id):
         return render_template("sandik/members.html", page_info=page_info, sandik=sandik_info)
 
 
-@authorization_to_the_required(adding_member=True)
+@authorization_to_the_sandik_required(adding_member=True)
 def add_member_to_sandik_page(sandik_id):
     form = MemberForm()
 
@@ -89,7 +89,7 @@ def add_member_to_sandik_page(sandik_id):
     return render_template("form.html", info=info)
 
 
-@login_required
+@authorization_to_the_sandik_required(reading_transaction=True)
 def transactions_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]

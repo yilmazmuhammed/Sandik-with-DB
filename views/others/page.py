@@ -1,9 +1,9 @@
 from flask import redirect, url_for, render_template
-from flask_login import login_required
 from pony.orm import db_session
 
 from database.dbinit import Sandik
 from forms import ImportDataForm, FormPageInfo
+from views.authorizations import authorization_to_the_sandik_required
 from views.others.auxiliary import read_data_online, add_transactions
 
 
@@ -12,7 +12,7 @@ def home_page():
     return redirect(url_for('profile'))
 
 
-@login_required
+@authorization_to_the_sandik_required(writing_transaction=True)
 def import_data(sandik_id):
     form = ImportDataForm()
 

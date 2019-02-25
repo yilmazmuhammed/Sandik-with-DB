@@ -5,9 +5,9 @@ from flask_login import login_required, current_user
 from pony.orm import db_session
 
 
-def authorization_to_the_required(reading_transaction=False, writing_transaction=False,
+def authorization_to_the_sandik_required(reading_transaction=False, writing_transaction=False,
                                   adding_member=False, throwing_member=False):
-    def authorization_to_the_required_decorator(func):
+    def authorization_to_the_sandik_required_decorator(func):
         @login_required
         @wraps(func)
         def decorated_view(sandik_id, *args, **kwargs):
@@ -24,4 +24,4 @@ def authorization_to_the_required(reading_transaction=False, writing_transaction
                     return current_app.login_manager.unauthorized()
             return func(sandik_id, *args, **kwargs)
         return decorated_view
-    return authorization_to_the_required_decorator
+    return authorization_to_the_sandik_required_decorator
