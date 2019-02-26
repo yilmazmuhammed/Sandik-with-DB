@@ -9,7 +9,7 @@ from views.webuser.auxiliary import FlaskUser, MemberInfo
 from views.webuser.db import add_webuser
 
 
-def signup():
+def signup_page():
     if current_user.is_authenticated:
         return redirect(url_for('profile'))
 
@@ -56,7 +56,7 @@ def add_webuser_page():
     return render_template("form.html", info=info)
 
 
-def login():
+def login_page():
     form = LoginForm()
 
     if form.validate_on_submit():
