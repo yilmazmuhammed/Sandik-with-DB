@@ -18,8 +18,8 @@ def create_sandik_app():
     app.config.from_object("settings")
 
     # Normal kullanıcıların genel işlemleri
-    app.add_url_rule("/signup", view_func=webuser.signup, methods=["GET", "POST"])
-    app.add_url_rule("/login", view_func=webuser.login, methods=["GET", "POST"])
+    app.add_url_rule("/signup", view_func=webuser.signup_page, methods=["GET", "POST"])
+    app.add_url_rule("/login", view_func=webuser.login_page, methods=["GET", "POST"])
     app.add_url_rule("/logout", view_func=webuser.logout)
     app.add_url_rule("/profile", view_func=webuser.profile)
     app.add_url_rule("/", view_func=others.home_page)
@@ -36,7 +36,9 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=sandik.members_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-custom-transaction",
                      view_func=transaction_page.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
-    app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=sandik.transactions_page)
+    app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=transaction_page.transactions_page)
+    app.add_url_rule("/sandik/<int:sandik_id>/transactions/<int:transaction_id>",
+                     view_func=transaction_page.transaction_in_transactions_page)
     app.add_url_rule("/sandik/<int:sandik_id>/export-csv", view_func=transaction_page.csv_raw_transactions_page)
 
     # Üyelerin sandıklarla ilgili işlemleri
@@ -51,7 +53,7 @@ def create_sandik_app():
                      view_func=transaction_page.add_transaction_page, methods=["GET", "POST"])
 
     lm.init_app(app)
-    lm.login_view = "login"
+    lm.login_view = "login_page"
     lm.login_message_category = 'danger'
 
     return app

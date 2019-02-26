@@ -88,12 +88,3 @@ def add_member_to_sandik_page(sandik_id):
     info = FormPageInfo(form=form, title='Add member to sandik')
     return render_template("form.html", info=info)
 
-
-@authorization_to_the_sandik_required(reading_transaction=True)
-def transactions_page(sandik_id):
-    with db_session:
-        sandik = Sandik[sandik_id]
-
-        transactions = select(transaction for transaction in Transaction
-                              if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
-        return render_template("transactions.html", transactions=transactions)

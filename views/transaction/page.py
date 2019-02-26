@@ -231,3 +231,24 @@ def csv_raw_transactions_page(sandik_id):
 
             html += '<br>'
         return html
+
+
+@authorization_to_the_sandik_required(reading_transaction=True)
+def transactions_page(sandik_id):
+    with db_session:
+        sandik = Sandik[sandik_id]
+
+        transactions = select(transaction for transaction in Transaction
+                              if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
+        return render_template("transactions.html", transactions=transactions)
+
+
+@authorization_to_the_sandik_required(reading_transaction=True)
+def transaction_in_transactions_page(sandik_id, transaction_id):
+    with db_session:
+        sandik = Sandik[sandik_id]
+
+        transactions = select(transaction for transaction in Transaction
+                              if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
+        transaction = Transaction[transaction_id]
+        return render_template("transactions.html", transactions=transactions, transaction=transaction)
