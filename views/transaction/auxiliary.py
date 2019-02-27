@@ -5,7 +5,7 @@ from pony.orm import select
 from database.auxiliary import Contribution, Share, DebtType
 
 
-# Return the dictionary that key is share_id and value is list of unpaid_dueses
+# Return the dictionary that key is share.id and value is list of unpaid_dueses
 from database.dbinit import Member
 
 
@@ -19,7 +19,7 @@ def unpaid_dues(member, only_active_shares=True, is_there_old=False):
         for period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share):
             if period in share_list:
                 share_list.remove(period)
-        ret_list[share.share_id] = share_list
+        ret_list[share.id] = share_list
     return ret_list
 
 
@@ -39,12 +39,12 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
             if period in share_list:
                 share_list.remove(period)
 
-        ret_list[share.share_id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in share_list]
+        ret_list[share.id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in share_list]
     return ret_list
 
 
 def share_choices(member, only_active_shares=True):
-    return [(share.share_id, "Share %s" % (share.share_order_of_member,))
+    return [(share.id, "Share %s" % (share.share_order_of_member,))
             for share in member.shares_index.filter(lambda share: share.is_active == only_active_shares).sort_by(
             Share.share_order_of_member)]
 
@@ -54,7 +54,7 @@ def debt_type_choices(sandik):
 
 
 def member_choices(sandik, only_active_member=True):
-    return [(member.member_id, "%s %s" % (member.webuser_ref.name, member.webuser_ref.surname))
+    return [(member.id, "%s %s" % (member.webuser_ref.name, member.webuser_ref.surname))
             for member in sandik.members_index.filter(lambda member: member.is_active == only_active_member).sort_by(
             lambda m: m.webuser_ref.name)]
 

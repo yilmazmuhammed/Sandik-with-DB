@@ -149,8 +149,8 @@ def add_custom_transaction_for_admin_page(sandik_id):
         periods_of = {}
         all_periods_of = {}
         for member in sandik.members_index:
-            shares_of[member.member_id] = share_choices(member)
-            debts_of[member.member_id] = debt_choices(member)
+            shares_of[member.id] = share_choices(member)
+            debts_of[member.id] = debt_choices(member)
             periods_of.update(unpaid_dues_choices(member))
             all_periods_of.update(unpaid_dues_choices(member, is_there_old=True))
 
@@ -195,42 +195,6 @@ def add_custom_transaction_for_admin_page(sandik_id):
                                title="Add Contribution",
                                periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
                                shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of))
-
-
-def csv_raw_transactions_page(sandik_id):
-    with db_session:
-        sandik = Sandik[sandik_id]
-
-        transactions = select(transaction for transaction in Transaction
-                              if transaction.share_ref.member_ref.sandik_ref == sandik).sort_by(lambda tr: tr.id)[:]
-
-        html = ""
-        for t in transactions:
-            html += "%s;%s.%s.%s;%s;%s %s %s;" % (t.id, t.transaction_date.day, t.transaction_date.month, t.transaction_date.year, t.amount, t.share_ref.member_ref.webuser_ref.name, t.share_ref.member_ref.webuser_ref.surname, t.share_ref.share_order_of_member,)
-
-            if t.debt_ref:
-                html += "%s;" % (t.debt_ref.debt_type_ref.name,)
-            elif t.payment_ref:
-                html += "%s-Ö;" % (t.payment_ref.debt_ref.debt_type_ref.name,)
-            elif t.contribution_index:
-                html += "Aidat;"
-            else:
-                # html += "%s;" % (t.type.capitalize(),)
-                html += "Diğer;"
-
-            html += "%s;" % (t.explanation,)
-
-            if t.debt_ref:
-                html += "%s" % t.debt_ref.number_of_installment
-            elif t.payment_ref:
-                html += "%s" % t.payment_ref.debt_ref.transaction_ref.id
-            elif t.contribution_index:
-                for c in t.contribution_index.sort_by(lambda co: co.contribution_period):
-                    html += "%s " % c.contribution_period
-                html = html[:-1]
-
-            html += '<br>'
-        return html
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)

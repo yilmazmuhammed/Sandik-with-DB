@@ -83,7 +83,14 @@ def insert_transaction(in_date, amount, share_id, explanation):
 
 
 @db_session
-def insert_member(username, sandik_id, authority_id, date_of_membership: date):
+def insert_webuser(username, password_hash, date_of_registration: date=date.today(), name=None, surname=None,
+                   is_admin=False,  is_active=True):
+    return WebUser(username=username, password_hash=password_hash, date_of_registration=date_of_registration, name=name,
+                   surname=surname, is_active=is_active, is_admin=is_admin)
+
+
+@db_session
+def insert_member(username, sandik_id, authority_id, date_of_membership: date=date.today(), is_active=True):
     sandik = Sandik[sandik_id]
 
     # TODO Use exception
@@ -93,16 +100,20 @@ def insert_member(username, sandik_id, authority_id, date_of_membership: date):
         return None
 
     return Member(webuser_ref=WebUser[username], sandik_ref=Sandik[sandik_id],
-                  member_authority_type_ref=MemberAuthorityType[authority_id], date_of_membership=date_of_membership)
+                  member_authority_type_ref=MemberAuthorityType[authority_id], date_of_membership=date_of_membership,
+                  is_active=is_active)
 
 
 @db_session
-def insert_share(member_id, date_of_opening: date):
+def insert_share(member_id, date_of_opening: date=date.today(), is_active=True, share_order_of_member=None):
     member = Member[member_id]
 
     # TODO Use exception
     if date_of_opening < member.date_of_membership:
         return None
 
-    soom = member.shares_index.count() + 1
-    return Share(member_ref=member, share_order_of_member=soom, date_of_opening=date_of_opening)
+    if not share_order_of_member:
+        share_order_of_member = member.shares_index.count() + 1
+
+    return Share(member_ref=member, share_order_of_member=share_order_of_member, date_of_opening=date_of_opening,
+                 is_active=is_active)

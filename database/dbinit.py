@@ -30,7 +30,7 @@ class WebUser(db.Entity):
 class Member(db.Entity):
     """Her sandıktaki üyelik
 Örneğin bir kişinin(webuser) birden fazla sandıkta üyeliği(member) olabilir. """
-    member_id = PrimaryKey(int, auto=True)
+    id = PrimaryKey(int, auto=True)
     webuser_ref = Required(WebUser)
     sandik_ref = Required(Sandik)
     date_of_membership = Required(date, default=lambda: date.today())
@@ -40,7 +40,7 @@ class Member(db.Entity):
 
 
 class Share(db.Entity):
-    share_id = PrimaryKey(int, auto=True)
+    id = PrimaryKey(int, auto=True)
     member_ref = Required(Member)
     share_order_of_member = Required(int, size=8)
     date_of_opening = Required(date, default=lambda: date.today())
@@ -133,94 +133,6 @@ db.generate_mapping(create_tables=True)
 
 
 def create_sandik_and_users():
-    listem = [
-        [
-            ('myilmaz', hasher.hash('myilmaz'), 'Muhammed', 'YILMAZ', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Sandık Başkanı', True,),
-            [(1, date(2016, 5, 21), True,), (2, date(2016, 5, 21), True,)]
-        ],
-        [
-            ('yildirim', hasher.hash('yildirim1'), 'Abbas', 'YILDIRIM', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Üye', True,),
-            [(1, date(2016, 5, 21), True,), (2, date(2018, 4, 3), True,)]
-        ],
-        [
-            ('yuksek', hasher.hash('yuksek2'), 'Abdullah', 'YÜKSEK', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Üye', True,),
-            [(1, date(2016, 5, 21), True), (2, date(2017, 12, 23), False,),
-             (3, date(2018, 1, 5), False,), (4, date(2018, 1, 5), False,)
-             ]
-        ],
-        [
-            ('dere', hasher.hash('dere3'), 'Ahmet Kutsay', 'DERE', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Üye', True,),
-            [(1, date(2016, 5, 21), True)]
-        ],
-        [
-            ('gunes', hasher.hash('gunes4'), 'Feyzi', 'GÜNEŞ', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Sandık Başkan Yardımcısı', True,),
-            [(1, date(2016, 5, 21), True,)]
-        ],
-        [
-            ('tekin', hasher.hash('tekin5'), 'Furkan Necati', 'TEKİN', date(2018, 12, 19), True,),
-            (date(2018, 12, 19), 'Üye', True,),
-            [(1, date(2018, 12, 19), True,)]
-        ],
-        [
-            ('balci', hasher.hash('balci6'), 'Gökhan', 'BALCI', date(2016, 5, 21), False,),
-            (date(2016, 5, 21), 'Üye', False,),
-            [(1, date(2016, 5, 21), False,), (2, date(2016, 5, 21), False,)]
-        ],
-        [
-            ('altiok', hasher.hash('altiok7'), 'Huzeyfe', 'ALTIOK', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Üye', True,),
-            [(1, date(2016, 5, 21), True,)]
-        ],
-        [
-            ('tekinm', hasher.hash('tekinm8'), 'Mehmet Nazım', 'TEKİN', date(2019, 1, 1), True,),
-            (date(2019, 1, 1), 'Üye', True,),
-            [(1, date(2019, 1, 1), True,)]
-        ],
-        [
-            ('erdem', hasher.hash('erdem9'), 'Muhammed Hamidullah', 'ERDEM', date(2017, 7, 27), True,),
-            (date(2017, 7, 27), 'Üye', True,),
-            [(1, date(2017, 7, 27), True,), (2, date(2018, 10, 24), True,)]
-        ],
-        [
-            ('tekeli', hasher.hash('tekeli10'), 'Muhammed Refik', 'TEKELİ', date(2018, 8, 20), True,),
-            (date(2018, 8, 20), 'Üye', True,),
-            [(1, date(2018, 8, 20), True,), (2, date(2018, 8, 20), True,)]
-        ],
-        [
-            ('leventler', hasher.hash('leventler11'), 'Muhammet Emin', 'LEVENTLER', date(2016, 5, 21), True,),
-            (date(2016, 5, 21), 'Üye', True,),
-            [(1, date(2016, 5, 21), True,)]
-        ],
-        [
-            ('yilmazmusa', hasher.hash('yilmazmusa11'), 'Musa Alperen', 'YILMAZ', date(2017, 12, 14), True,),
-            (date(2017, 12, 14), 'Üye', True,),
-            [(1, date(2017, 12, 14), True,), (2, date(2018, 9, 13), True,)]
-        ],
-        [
-            ('yanik', hasher.hash('yanik12'), 'Ömer', 'YANIK', date(2018, 10, 26), True,),
-            (date(2018, 10, 26), 'Üye', True,),
-            [(1, date(2018, 10, 26), True,), (2, date(2018, 10, 26), True,),
-             (3, date(2018, 10, 26), True,), (4, date(2018, 10, 26), True,)
-             ]
-        ],
-        [
-            ('akcan', hasher.hash('akcan13'), 'Talha', 'AKCAN', date(2016, 5, 21), False,),
-            (date(2016, 5, 21), 'Üye', False,),
-            [(1, date(2016, 5, 21), False)]
-        ],
-
-        [
-            ('isik', hasher.hash('isik14'), 'Yusuf', 'IŞIK', date(2017, 5, 12), True,),
-            (date(2017, 5, 12), 'Üye', True,),
-            [(1, date(2017, 5, 12), True)]
-        ],
-    ]
-
     sandik = Sandik(name='Yardımlaşma Sandığı', date_of_opening=date(2016, 5, 21))
 
     MemberAuthorityType(name='Sandık Başkanı', sandik_ref=sandik, is_admin=True)
@@ -229,19 +141,6 @@ def create_sandik_and_users():
 
     DebtType(sandik_ref=sandik, name="APB")
     DebtType(sandik_ref=sandik, name="PDAY")
-
-    for wu, m, shares in listem:
-        username, password_hash, name, surname, date_of_registration, ia = wu
-        webuser = WebUser(username=username, password_hash=password_hash, name=name, surname=surname,
-                          date_of_registration=date_of_registration, is_active=ia)
-
-        dof, mat, ia = m
-        member = Member(webuser_ref=webuser, sandik_ref=sandik, date_of_membership=dof,
-                        member_authority_type_ref=MemberAuthorityType.select(lambda p: p.name == mat)[:][0], is_active=ia)
-                        # member_authority_type_ref=MemberAuthorityType.select(name=mat)[0], is_active=ia) # pony==0.7.7
-
-        for soof, dor, ia in shares:
-            Share(member_ref=member, share_order_of_member=soof, date_of_opening=dor, is_active=ia)
 
     return sandik
 

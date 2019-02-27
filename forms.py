@@ -223,5 +223,11 @@ class ImportDataForm(FlaskForm):
     open = form_open(form_name='import-data-form')
     close = form_close()
 
-    url = StringField("Url:", id='url', render_kw={"placeholder": "Url", "class": "form-control"})
+    webusers_url = StringField("WebUsers url:", id='url',
+                               render_kw={"placeholder": "WebUsers url", "class": "form-control"})
+    members_url = StringField("Members url:", id='url',
+                              render_kw={"placeholder": "Members url", "class": "form-control"})
+    shares_url = StringField("Shares url:", id='url', render_kw={"placeholder": "Shares url", "class": "form-control"})
+    transactions_url = StringField("Transactions url:", id='url',
+                                   render_kw={"placeholder": "Transactions url", "class": "form-control"})
     submit = SubmitField("Import data", render_kw={"class": "btn btn-primary sandik-btn-form"})

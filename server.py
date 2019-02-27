@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from views import others, sandik, webuser
+from views import others, sandik, webuser, backup
 from views.webuser.auxiliary import FlaskUser
 import views.transaction.page as transaction_page
 
@@ -26,10 +26,15 @@ def create_sandik_app():
 
     # Site yöneticisinin işlemleri
     app.add_url_rule("/add-webuser", view_func=webuser.add_webuser_page, methods=["GET", "POST"])
+    app.add_url_rule("/export-transactions-as-csv", view_func=backup.export_transactions_as_csv_page)
+    app.add_url_rule("/export-members-as-csv", view_func=backup.export_members_as_csv_page)
+    app.add_url_rule("/export-webusers-as-csv", view_func=backup.export_webusers_as_csv_page)
+    app.add_url_rule("/export-shares-as-csv", view_func=backup.export_shares_as_csv_page)
+    app.add_url_rule("/import-transactions-from-csv",
+                     view_func=backup.import_transactions_from_csv_page, methods=["GET", "POST"])
 
     # Sandık yöneticilerin sandıkla ilgili işlemleri
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
-    app.add_url_rule("/sandik/<int:sandik_id>/import-data", view_func=others.import_data, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member",
                      view_func=sandik.add_member_to_sandik_page, methods=["GET", "POST"])
@@ -39,7 +44,6 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=transaction_page.transactions_page)
     app.add_url_rule("/sandik/<int:sandik_id>/transactions/<int:transaction_id>",
                      view_func=transaction_page.transaction_in_transactions_page)
-    app.add_url_rule("/sandik/<int:sandik_id>/export-csv", view_func=transaction_page.csv_raw_transactions_page)
 
     # Üyelerin sandıklarla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions", view_func=webuser.transactions_in_sandik)
