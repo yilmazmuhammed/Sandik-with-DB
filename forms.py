@@ -62,10 +62,11 @@ class WebuserForm(FlaskForm):
                              validators=[InputRequired("Please enter your password"),
                                          Length(max=20, message="Password cannot be longer than 20 character")],
                              id='password', render_kw={"placeholder": "Password", "class": "form-control"})
-    password_verify = PasswordField("Password:",
+    password_verify = PasswordField("Password (again):",
                                     validators=[InputRequired("Please enter your password"),
                                                 Length(max=20, message="Password cannot be longer than 20 character")],
-                                    id='password', render_kw={"placeholder": "Password", "class": "form-control"})
+                                    id='password_verify',
+                                    render_kw={"placeholder": "Password (again)", "class": "form-control"})
     name = StringField("Name:", validators=[InputRequired("Please enter your name"),
                                             Length(max=40, message="Name field cannot be longer than 40 character")],
                        id='name', render_kw={"placeholder": "Name", "class": "form-control"})
@@ -86,6 +87,33 @@ class SingUpForm(WebuserForm):
     is_admin = None
     date_of_registration = None
     submit = SubmitField("Sign Up", render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+
+class EditWebUserForm(FlaskForm):
+    open = form_open(form_name='edit-webuser-form')
+    close = form_close()
+
+    username = StringField("Username:",
+                           validators=[Length(max=20, message="Username cannot be longer than 20 character")],
+                           id='username', render_kw={"class": "form-control", "readonly": ""})
+    old_password = PasswordField("Old password:",
+                                 validators=[InputRequired("Please enter your password"),
+                                             Length(max=20, message="Password cannot be longer than 20 character")],
+                                 id='old_password', render_kw={"class": "form-control"})
+    new_password = PasswordField("New password:",
+                                 validators=[Length(max=20, message="Password cannot be longer than 20 character")],
+                                 id='new_password', render_kw={"class": "form-control"})
+    new_password_verify = PasswordField("New password (again):",
+                                        validators=[
+                                            Length(max=20, message="Password cannot be longer than 20 character")],
+                                        id='new_password_verify',
+                                        render_kw={"class": "form-control"})
+    name = StringField("Name:", validators=[Length(max=40, message="Name field cannot be longer than 40 character")],
+                       id='name', render_kw={"class": "form-control"})
+    surname = StringField("Surname:",
+                          validators=[Length(max=40, message="Surname field cannot be longer than 40 character")],
+                          id='surname', render_kw={"class": "form-control"})
+    submit = SubmitField("Submit", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class LoginForm(FlaskForm):

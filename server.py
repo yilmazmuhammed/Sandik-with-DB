@@ -23,6 +23,7 @@ def create_sandik_app():
     app.add_url_rule("/logout", view_func=webuser.logout)
     app.add_url_rule("/profile", view_func=webuser.profile)
     app.add_url_rule("/", view_func=others.home_page)
+    app.add_url_rule("/edit-webuser-info", view_func=webuser.edit_webuser_info_page, methods=["GET", "POST"])
 
     # Site yöneticisinin işlemleri
     app.add_url_rule("/add-webuser", view_func=webuser.add_webuser_page, methods=["GET", "POST"])
@@ -46,7 +47,8 @@ def create_sandik_app():
                      view_func=transaction_page.transaction_in_transactions_page)
 
     # Üyelerin sandıklarla ilgili işlemleri
-    app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions", view_func=webuser.transactions_in_sandik)
+    app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions",
+                     view_func=transaction_page.member_transactions_in_sandik_page)
     app.add_url_rule("/sandik/<int:sandik_id>/cm/add-contribution",
                      view_func=transaction_page.add_contribution_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/cm/add-debt",

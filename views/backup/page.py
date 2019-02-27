@@ -55,6 +55,8 @@ def export_webusers_as_csv_page():
 
         html = ""
         for wu in webusers:
+            if wu.username == 'admin':
+                continue
             html += "%s;%s;%s;%s;%s.%s.%s;%s;%s<br>" % (wu.username, wu.password_hash, wu.name, wu.surname,
                                                         wu.date_of_registration.day, wu.date_of_registration.month,
                                                         wu.date_of_registration.year, wu.is_admin, wu.is_active)

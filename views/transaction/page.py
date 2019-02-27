@@ -209,10 +209,16 @@ def transactions_page(sandik_id):
 
 @authorization_to_the_sandik_required(reading_transaction=True)
 def transaction_in_transactions_page(sandik_id, transaction_id):
+    return "Bu sayfa henüz yapılmadı"
+
+
+@login_required
+def member_transactions_in_sandik_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
+        webuser = current_user.webuser
 
         transactions = select(transaction for transaction in Transaction
-                              if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
-        transaction = Transaction[transaction_id]
-        return render_template("transactions.html", transactions=transactions, transaction=transaction)
+                              if transaction.share_ref.member_ref.webuser_ref == webuser
+                              and transaction.share_ref.member_ref.sandik_ref == sandik)[:]
+        return render_template("transactions.html", transactions=transactions)

@@ -36,7 +36,7 @@
             <tbody>
             <tr></tr>
             {% for member in members %}
-            {% set transaction_page_url = url_for('transactions_in_sandik', sandik_id=member.dbTable.sandik_ref.id) %}
+            {% set transaction_page_url = url_for('member_transactions_in_sandik_page', sandik_id=member.dbTable.sandik_ref.id) %}
             <tr class="member-row">
               <td align="center">
                 <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
