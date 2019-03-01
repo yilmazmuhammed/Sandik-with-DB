@@ -1,3 +1,8 @@
+webusers_url = https://www.dropbox.com/s/snx2t584qqkv5bb/webusers.csv?dl=1
+members_url = https://www.dropbox.com/s/64dwk3qwtnjxuez/members.csv?dl=1
+shares_url = https://www.dropbox.com/s/lz6vvk7axlm16id/shares.csv?dl=1
+transaction_url = https://dl.dropboxusercontent.com/s/jv5j8v8azljf9h2/islemler.csv?dl=1
+
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO! 5 Var olan işlemleri islemler.csv dosyasından ekle
 TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?

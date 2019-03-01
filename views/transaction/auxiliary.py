@@ -92,7 +92,7 @@ class Period:
         year = first.year
 
         month_list = []
-        while date(year, month, 1) < second:
+        while date(year, month, 1) <= second:
             month_list.append("%s-%s" % (year, month,))
             if month < 12:
                 month += 1
