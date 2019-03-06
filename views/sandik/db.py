@@ -1,6 +1,6 @@
 from datetime import date
 
-from pony.orm import db_session
+from pony.orm import db_session, select
 
 from database.auxiliary import insert_member, insert_share
 from database.dbinit import Member, Share
@@ -8,12 +8,12 @@ from database.dbinit import Member, Share
 from forms import MemberForm
 
 
-def add_share(member_id, date_of_opening=date.today()):
+def add_share_to_member(member_id, date_of_opening=date.today()):
     with db_session:
         member = Member[member_id]
-        last_order = max(s.share_order_of_member for s in Share if s.member_ref == member)
+        last_order = max(select(s.share_order_of_member for s in Share if s.member_ref == member))
         new_order = last_order + 1
-        Share(member_ref=member, share_order_of_member=new_order, date_of_opening=date_of_opening)
+        return Share(member_ref=member, share_order_of_member=new_order, date_of_opening=date_of_opening)
 
 
 # TODO exception kullan, son kullanıcıya çıktıyı exception kullanarak ver

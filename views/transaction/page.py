@@ -189,7 +189,7 @@ def add_custom_transaction_for_admin_page(sandik_id):
                 errors += field.errors
 
         select_form = CustomTransactionSelectForm()
-        select_form.member.choices += member_choices(sandik)
+        select_form.member.choices += member_choices(sandik.id)
         forms.insert(0, select_form)
         return render_template("transaction/custom_transaction_form.html", forms=forms, errors=errors,
                                title="Add Contribution",

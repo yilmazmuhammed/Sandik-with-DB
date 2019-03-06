@@ -259,3 +259,15 @@ class ImportDataForm(FlaskForm):
     transactions_url = StringField("Transactions url:", id='url',
                                    render_kw={"placeholder": "Transactions url", "class": "form-control"})
     submit = SubmitField("Import data", render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+
+class AddingShareForm(FlaskForm):
+    open = form_open(form_name='adding-share-form')
+    close = form_close()
+
+    member = SelectField("Member:", validators=[InputRequired("Please select a member type in list")], choices=[],
+                         id='member', coerce=int, render_kw={"class": "form-control"})
+    date_of_opening = DateField("Date of opening:", default=date.today(),
+                                validators=[InputRequired("Please enter date of membership")], id='date_of_opening',
+                                render_kw={"placeholder": "Date of opening", "class": "form-control"})
+    submit = SubmitField("Add Share", render_kw={"class": "btn btn-primary sandik-btn-form"})

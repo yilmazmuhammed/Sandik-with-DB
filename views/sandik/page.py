@@ -1,13 +1,14 @@
 from flask import redirect, url_for, render_template, abort, flash
 from flask_login import login_required, current_user
-from pony.orm import db_session, ObjectNotFound, select
+from pony.orm import db_session, ObjectNotFound
 
-from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser, Transaction
-from forms import SandikForm, FormPageInfo, MemberForm
+from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
+from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm
 from views import PageInfo
 from views.authorizations import authorization_to_the_sandik_required
 from views.sandik.auxiliary import SandikManagementPanel
-from views.sandik.db import add_member_to_sandik
+from views.sandik.db import add_member_to_sandik, add_share_to_member
+from views.transaction.auxiliary import member_choices
 from views.webuser.auxiliary import SandikInfo
 
 
@@ -80,11 +81,33 @@ def add_member_to_sandik_page(sandik_id):
                     return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
                 else:
                     flash(u"Bu kullanıcının bu sandıkta üyeliği zaten var.\n"
-                          u"Ya da bu üyenin kayıt tarihi sandığın kuruluş tarihinden daha eski.", 'danger')
+                          u"ya da\n"
+                          u"Bu üyenin kayıt tarihi sandığın kuruluş tarihinden daha eski.", 'danger')
         # TODO Authority ve User bulunamamasına karşın iki farklı sorgu yap
         except ObjectNotFound:
             flash(u"User not found.", 'danger')
 
     info = FormPageInfo(form=form, title='Add member to sandik')
+    return render_template("form.html", info=info)
+
+
+@authorization_to_the_sandik_required(adding_member=True)
+def add_share_to_member_page(sandik_id):
+    form = AddingShareForm()
+
+    form.member.choices = member_choices(sandik_id)
+
+    if form.validate_on_submit():
+        try:
+            with db_session:
+                if add_share_to_member(form.member.data, form.date_of_opening.data):
+                    return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
+                else:
+                    flash(u"Hisse eklenemedi.", 'danger')
+        # Member bulunamadıysa
+        except ObjectNotFound:
+            flash(u"Member not found.", 'danger')
+
+    info = FormPageInfo(form=form, title='Add share to member')
     return render_template("form.html", info=info)
 

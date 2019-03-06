@@ -39,6 +39,8 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member",
                      view_func=sandik.add_member_to_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-share",
+                     view_func=sandik.add_share_to_member_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=sandik.members_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-custom-transaction",
                      view_func=transaction_page.add_custom_transaction_for_admin_page, methods=["GET", "POST"])

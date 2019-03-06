@@ -1,14 +1,13 @@
 from datetime import date
 
-from pony.orm import select
+from pony.orm import select, db_session
 
 from database.auxiliary import Contribution, Share, DebtType
 
+from database.dbinit import Member, Sandik
+
 
 # Return the dictionary that key is share.id and value is list of unpaid_dueses
-from database.dbinit import Member
-
-
 def unpaid_dues(member, only_active_shares=True, is_there_old=False):
     ret_list = {}
     for share in member.shares_index.filter(lambda s: s.is_active == only_active_shares):
@@ -53,7 +52,9 @@ def debt_type_choices(sandik):
     return [(debt_type.id, debt_type.name) for debt_type in sandik.debt_types_index.sort_by(DebtType.name)]
 
 
-def member_choices(sandik, only_active_member=True):
+@db_session
+def member_choices(sandik_id, only_active_member=True):
+    sandik = Sandik[sandik_id]
     return [(member.id, "%s %s" % (member.webuser_ref.name, member.webuser_ref.surname))
             for member in sandik.members_index.filter(lambda member: member.is_active == only_active_member).sort_by(
             lambda m: m.webuser_ref.name)]
