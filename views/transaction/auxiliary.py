@@ -56,8 +56,8 @@ def debt_type_choices(sandik):
 def member_choices(sandik_id, only_active_member=True):
     sandik = Sandik[sandik_id]
     return [(member.id, "%s %s" % (member.webuser_ref.name, member.webuser_ref.surname))
-            for member in sandik.members_index.filter(lambda member: member.is_active == only_active_member).sort_by(
-            lambda m: m.webuser_ref.name)]
+            for member in sandik.members_index.filter(lambda member: member.is_active >= only_active_member).sort_by(
+            lambda m: m.webuser_ref.name + " " + m.webuser_ref.surname)]
 
 
 def debt_choices(member):
