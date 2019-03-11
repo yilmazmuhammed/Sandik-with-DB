@@ -31,7 +31,7 @@ def create_sandik_app():
     app.add_url_rule("/export-members-as-csv", view_func=backup.export_members_as_csv_page)
     app.add_url_rule("/export-webusers-as-csv", view_func=backup.export_webusers_as_csv_page)
     app.add_url_rule("/export-shares-as-csv", view_func=backup.export_shares_as_csv_page)
-    app.add_url_rule("/import-transactions-from-csv",
+    app.add_url_rule("/import-datas-from-csv",
                      view_func=backup.import_transactions_from_csv_page, methods=["GET", "POST"])
 
     # Sandık yöneticilerin sandıkla ilgili işlemleri

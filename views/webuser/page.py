@@ -5,6 +5,7 @@ from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session
 
 from database.dbinit import WebUser
 from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm, EditWebUserForm
+from bots.telegram_bot import sandik_bot, admin_chat_id
 from views.authorizations import admin_required
 from views.webuser.auxiliary import FlaskUser, MemberInfo
 from views.webuser.db import add_webuser
@@ -61,6 +62,8 @@ def login_page():
         try:
             user = FlaskUser(form.data['username'])
             if hasher.verify(form.data['password'], user.webuser.password_hash) and user.is_active:
+                telegram_message = "%s %s giriş yaptı." % (user.webuser.name, user.webuser.surname)
+                sandik_bot.sendMessage(admin_chat_id, telegram_message)
                 login_user(user)
                 flash("You have logged in.", 'success')
                 next_page = request.args.get("next", url_for("home_page"))
