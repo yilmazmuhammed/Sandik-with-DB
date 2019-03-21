@@ -65,7 +65,8 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
             return False
         elif amount/contribution_amount != len(periods):
             flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
-            return False
+            flash(u"Fakat başlangıç aidatı sistemi yapılana kadar işlem eklendi.", 'danger')
+            # return False
 
     transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation)
