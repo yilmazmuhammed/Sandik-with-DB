@@ -113,6 +113,7 @@ def insert_share(member_id, date_of_opening: date=date.today(), is_active=True, 
     if date_of_opening < member.date_of_membership:
         return None
 
+    # TODO max(select(s.share_order_of_member for s in Share if s.member_ref == member))
     if not share_order_of_member:
         share_order_of_member = member.shares_index.count() + 1
 
