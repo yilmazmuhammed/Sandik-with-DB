@@ -114,7 +114,10 @@ def insert_share(member_id, date_of_opening: date=date.today(), is_active=True, 
         return None
 
     if not share_order_of_member:
-        share_order_of_member = max(select(s.share_order_of_member for s in member.shares_index)) + 1
+        if member.shares_index:
+            share_order_of_member = max(select(s.share_order_of_member for s in member.shares_index)) + 1
+        else:
+            share_order_of_member = 1
 
     return Share(member_ref=member, share_order_of_member=share_order_of_member, date_of_opening=date_of_opening,
                  is_active=is_active)
