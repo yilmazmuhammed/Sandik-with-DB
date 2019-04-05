@@ -63,6 +63,7 @@
               </tr>
               <tr class="share">
                 <td colspan="6">
+                  {% if member_authority %}
                   <div class="share-table-div">
                     <table class="table table-bordered table-sandik-shares">
                       <thead class="thead-dark">
@@ -105,6 +106,7 @@
                       </tbody>
                     </table>
                   </div>
+                  {% endif %}
                 </td>
               </tr>
               {% endfor %}

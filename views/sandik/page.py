@@ -6,7 +6,7 @@ from database.auxiliary import insert_share
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm
 from views import PageInfo
-from views.authorizations import authorization_to_the_sandik_required
+from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
 from views.sandik.db import add_member_to_sandik
 from views.transaction.auxiliary import member_choices
@@ -48,13 +48,15 @@ def sandik_management_page(sandik_id):
         return abort(404)
 
 
-@authorization_to_the_sandik_required(reading_transaction=True)
+# @authorization_to_the_sandik_required(reading_transaction=True)
 def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
         sandik_info = SandikInfo(sandik)
         page_info = PageInfo(title='Members')
-        return render_template("sandik/members.html", page_info=page_info, sandik=sandik_info)
+        member_authority = is_there_authorization_to_the_sandik(sandik_id=sandik_id, reading_transaction=True)
+        return render_template("sandik/members.html", page_info=page_info, sandik=sandik_info,
+                               member_authority=member_authority)
 
 
 @authorization_to_the_sandik_required(adding_member=True)

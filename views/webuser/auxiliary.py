@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from pony.orm import db_session
 
-from database.dbinit import WebUser, Share, Member
+from database.dbinit import WebUser, Share
 
 
 class FlaskUser(UserMixin):
