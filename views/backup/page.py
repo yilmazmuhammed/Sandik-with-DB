@@ -3,6 +3,7 @@ from pony.orm import db_session, select
 
 from database.dbinit import Transaction, Member, WebUser, Share
 from forms import ImportDataForm, FormPageInfo
+from views import LayoutPageInfo
 from views.authorizations import admin_required
 from views.backup.auxiliary import LineTransaction, LineWebUser, LineShare, LineMember, add_transactions, add_members, \
     add_shares, add_webusers
@@ -112,4 +113,4 @@ def import_transactions_from_csv_page():
         return redirect(url_for('home_page'))
 
     info = FormPageInfo(form=form, title="Import transactions from url")
-    return render_template("transaction/contribution_form.html", info=info)
+    return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Import transactions from url"), info=info)

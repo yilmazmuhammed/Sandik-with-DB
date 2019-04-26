@@ -6,6 +6,7 @@ from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session
 from database.dbinit import WebUser
 from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm, EditWebUserForm
 from bots.telegram_bot import sandik_bot, admin_chat_id
+from views import LayoutPageInfo
 from views.authorizations import admin_required
 from views.webuser.auxiliary import FlaskUser, MemberInfo
 from views.webuser.db import add_webuser
@@ -31,7 +32,7 @@ def signup_page():
 
     info = FormPageInfo(form=form, title="Sign Up")
 
-    return render_template("form.html", info=info)
+    return render_template("form.html", layout_page=LayoutPageInfo("Sign Up"), info=info)
 
 
 @admin_required
@@ -52,7 +53,7 @@ def add_webuser_page():
 
     info = FormPageInfo(form=form, title="Sign Up")
 
-    return render_template("form.html", info=info)
+    return render_template("form.html", layout_page=LayoutPageInfo("Sign Up"), info=info)
 
 
 def login_page():
@@ -75,7 +76,7 @@ def login_page():
 
     info = FormPageInfo(title='Login', form=form)
 
-    return render_template("form.html", info=info)
+    return render_template("form.html", layout_page=LayoutPageInfo("Login"), info=info)
 
 
 @login_required
@@ -92,7 +93,7 @@ def profile():
         members = []
         for member in webuser.members_index:
             members.append(MemberInfo(member))
-        return render_template("webuser/profile.html", user=webuser, members=members)
+        return render_template("webuser/profile.html", layout_page=LayoutPageInfo("Profile"), user=webuser, members=members)
 
 
 @login_required
@@ -130,4 +131,4 @@ def edit_webuser_info_page():
 
     info = FormPageInfo(form=form, title="Edit User's Info Page")
     flash(u'Değiştirmek istemediğiniz alanları boş bırakabilirsiniz.', 'info')
-    return render_template("form.html", info=info)
+    return render_template("form.html", layout_page=LayoutPageInfo("Edit User's Info Page"), info=info)

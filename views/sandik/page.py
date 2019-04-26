@@ -5,7 +5,7 @@ from pony.orm import db_session, ObjectNotFound
 from database.auxiliary import insert_share
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm
-from views import PageInfo
+from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
 from views.sandik.db import add_member_to_sandik
@@ -35,15 +35,15 @@ def new_sandik_page():
             return redirect(url_for('sandik_management_page', sandik_id=new_sandik.id))
 
     info = FormPageInfo(form=form, title='Add new sandık')
-    return render_template('form.html', info=info)
+    return render_template('form.html', layout_page=LayoutPageInfo("Add new sandık"), info=info)
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)
 def sandik_management_page(sandik_id):
     try:
         sandik = SandikManagementPanel(sandik_id)
-        info = PageInfo(title='Sandık Management Panel')
-        return render_template('sandik/management_panel.html', info=info, sandik=sandik)
+        info = LayoutPageInfo(title='Sandık Management Panel')
+        return render_template('sandik/management_panel.html', layout_page=info, sandik=sandik)
     except ObjectNotFound:
         return abort(404)
 
@@ -53,9 +53,9 @@ def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]
         sandik_info = SandikInfo(sandik)
-        page_info = PageInfo(title='Members')
+        page_info = LayoutPageInfo(title='Members')
         member_authority = is_there_authorization_to_the_sandik(sandik_id=sandik_id, reading_transaction=True)
-        return render_template("sandik/members.html", page_info=page_info, sandik=sandik_info,
+        return render_template("sandik/members.html", layout_page=page_info, sandik=sandik_info,
                                member_authority=member_authority)
 
 
@@ -91,7 +91,7 @@ def add_member_to_sandik_page(sandik_id):
             flash(u"User not found.", 'danger')
 
     info = FormPageInfo(form=form, title='Add member to sandik')
-    return render_template("form.html", info=info)
+    return render_template("form.html", layout_page=LayoutPageInfo("Add member to sandik"), info=info)
 
 
 @authorization_to_the_sandik_required(adding_member=True)
@@ -112,5 +112,5 @@ def add_share_to_member_page(sandik_id):
             flash(u"Member not found.", 'danger')
 
     info = FormPageInfo(form=form, title='Add share to member')
-    return render_template("form.html", info=info)
+    return render_template("form.html", layout_page=LayoutPageInfo("Add share to member"), info=info)
 

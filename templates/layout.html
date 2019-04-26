@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <title>{% block title %}{% endblock %} - Yardımlaşma Sandığı</title>
+    <title>{{ layout_page.title }} - Yardımlaşma Sandığı</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -14,6 +14,10 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sandik.css') }}"/>
+
+    <!-- dropdown-submenu CSS/JS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dropdown-submenu.css') }}"/>
+    <script src="{{ url_for('static', filename='js/dropdown-submenu.js') }}"></script>
 
     <!-- block extra_head -->
     {% block extra_head %}{% endblock %}
@@ -73,6 +77,27 @@
               </li>
               <li><a href="{{ url_for('logout') }}">Log out</a></li>
               {% else %}
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sandıklarım<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  {% for sandik_id, sandik_name in layout_page.my_sandiks %}
+                  <li class="dropdown dropdown-submenu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ sandik_name }}</a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{{ url_for('member_transactions_in_sandik_page', sandik_id=sandik_id) }}">İşlemlerim</a></li>
+                      <li><a href="{{ url_for('members_page', sandik_id=sandik_id) }}">Üyeler</a></li>
+                      <li><a href="{{ url_for('members_page', sandik_id=sandik_id) }}#son-mali-durum">Son Mali Durum</a></li>
+                    </ul>
+                  </li>
+                  <!--<li class="dropdown">-->
+                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: black;">{{ sandik_name }}<span class="caret"></span></a>-->
+                    <!--<ul class="dropdown-menu">-->
+                      <!--<li><a href="{{ url_for('members_page', sandik_id=sandik_id) }}">Üyeler</a></li>-->
+                    <!--</ul>-->
+                  <!--</li>-->
+                  {% endfor %}
+                </ul>
+              </li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: black;">{{ current_user.username }}<span class="caret"></span></a>
                 <ul class="dropdown-menu">

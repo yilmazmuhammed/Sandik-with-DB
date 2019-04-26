@@ -7,6 +7,7 @@ from pony.orm import db_session, select
 from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
+from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices
@@ -34,7 +35,7 @@ def add_transaction_page(sandik_id):
             return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Transaction")
-        return render_template("form.html", info=info)
+        return render_template("form.html", layout_page=LayoutPageInfo("Add Transaction"), info=info)
 
 
 @login_required
@@ -58,7 +59,7 @@ def add_contribution_page(sandik_id):
                 return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Contribution")
-        return render_template("transaction/contribution_form.html", info=info,
+        return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"), info=info,
                                periods_of=json.dumps(unpaid_dues_choices(member)),
                                all_periods_of=json.dumps(unpaid_dues_choices(member, is_there_old=True)))
 
@@ -97,7 +98,7 @@ def add_debt_page(sandik_id):
             return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Take Debt")
-        return render_template('form.html', info=info)
+        return render_template('form.html', layout_page=LayoutPageInfo("Take Debt"), info=info)
 
 
 @login_required
@@ -122,7 +123,7 @@ def add_payment_page(sandik_id):
                 return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add payment")
-        return render_template('form.html', info=info)
+        return render_template('form.html', layout_page=LayoutPageInfo("Add payment"), info=info)
 
 
 @authorization_to_the_sandik_required(writing_transaction=True)
@@ -192,7 +193,7 @@ def add_custom_transaction_for_admin_page(sandik_id):
         select_form.member.choices += member_choices(sandik.id)
         forms.insert(0, select_form)
         return render_template("transaction/custom_transaction_form.html", forms=forms, errors=errors,
-                               title="Add Contribution",
+                               layout_page=LayoutPageInfo("Add Contribution"),
                                periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
                                shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of))
 
@@ -204,7 +205,7 @@ def transactions_page(sandik_id):
 
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
-        return render_template("transactions.html", transactions=transactions)
+        return render_template("transactions.html", layout_page=LayoutPageInfo("All Transactions of The Sandik"), transactions=transactions)
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)
@@ -221,4 +222,4 @@ def member_transactions_in_sandik_page(sandik_id):
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.webuser_ref == webuser
                               and transaction.share_ref.member_ref.sandik_ref == sandik)[:]
-        return render_template("transactions.html", transactions=transactions)
+        return render_template("transactions.html", layout_page=LayoutPageInfo("My Transactions"), transactions=transactions)

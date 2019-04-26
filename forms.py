@@ -4,7 +4,7 @@ from wtforms.validators import InputRequired, Length, Optional
 from wtforms.fields.html5 import DateField
 from datetime import date
 
-from views import PageInfo
+from views import LayoutPageInfo
 
 
 # Normalde;
@@ -41,7 +41,7 @@ def form_close():
     return """</form>"""
 
 
-class FormPageInfo(PageInfo):
+class FormPageInfo(LayoutPageInfo):
     def __init__(self, form, title):
         super().__init__(title)
         self.form = form
