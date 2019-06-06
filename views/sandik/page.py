@@ -48,7 +48,7 @@ def sandik_management_page(sandik_id):
         return abort(404)
 
 
-# @authorization_to_the_sandik_required(reading_transaction=True)
+@authorization_to_the_sandik_required(reading_transaction=True)
 def members_page(sandik_id):
     with db_session:
         sandik = Sandik[sandik_id]

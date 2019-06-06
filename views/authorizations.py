@@ -41,6 +41,7 @@ def admin_required(func):
     return decorated_view
 
 
+@login_required
 def is_there_authorization_to_the_sandik(sandik_id, reading_transaction=False, writing_transaction=False,
                                          adding_member=False, throwing_member=False):
     if current_user.is_admin:
