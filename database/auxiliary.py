@@ -4,13 +4,14 @@ from flask import flash
 from pony.orm import db_session, count, select
 
 from database.dbinit import (Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik,
-                             MemberAuthorityType, Member,)
+                             MemberAuthorityType, Member, )
 from views.transaction.auxiliary import Period
 
 
 @db_session
-def insert_debt(in_date, amount, share_id, type_id, explanation, num_of_inst):
-    ia = amount / num_of_inst
+def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst):
+    num_of_inst = int(num_of_inst)
+    ia = int(amount) / num_of_inst
     ia = int(ia) if ia % 1 == 0 else int(ia) + 1
     Debt(
         transaction_ref=Transaction(
@@ -25,6 +26,8 @@ def insert_debt(in_date, amount, share_id, type_id, explanation, num_of_inst):
 def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=None):
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref
+
+    amount = int(amount)
 
     # Final controls
     # TODO Kontrolleri excception ile yap, hata mesajını fonksiyonun kullanıldığı yerde ver
@@ -63,7 +66,7 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
         if amount % contribution_amount:
             flash(u"Paid amount must be divided by 25.", 'danger')
             return False
-        elif amount/contribution_amount != len(periods):
+        elif amount / contribution_amount != len(periods):
             flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
             flash(u"Fakat başlangıç aidatı sistemi yapılana kadar işlem eklendi.", 'danger')
             # return False
@@ -84,14 +87,14 @@ def insert_transaction(in_date, amount, share_id, explanation):
 
 
 @db_session
-def insert_webuser(username, password_hash, date_of_registration: date=date.today(), name=None, surname=None,
-                   is_admin=False,  is_active=True):
+def insert_webuser(username, password_hash, date_of_registration: date = date.today(), name=None, surname=None,
+                   is_admin: bool = False, is_active: bool = True):
     return WebUser(username=username, password_hash=password_hash, date_of_registration=date_of_registration, name=name,
                    surname=surname, is_active=is_active, is_admin=is_admin)
 
 
 @db_session
-def insert_member(username, sandik_id, authority_id, date_of_membership: date=date.today(), is_active=True):
+def insert_member(username, sandik_id, authority_id, date_of_membership: date = date.today(), is_active: bool = True):
     sandik = Sandik[sandik_id]
 
     # TODO Use exception
@@ -106,7 +109,7 @@ def insert_member(username, sandik_id, authority_id, date_of_membership: date=da
 
 
 @db_session
-def insert_share(member_id, date_of_opening: date=date.today(), is_active=True, share_order_of_member=None):
+def insert_share(member_id, date_of_opening: date = date.today(), is_active: bool =True, share_order_of_member=None):
     member = Member[member_id]
 
     # TODO Use exception
@@ -121,3 +124,25 @@ def insert_share(member_id, date_of_opening: date=date.today(), is_active=True, 
 
     return Share(member_ref=member, share_order_of_member=share_order_of_member, date_of_opening=date_of_opening,
                  is_active=is_active)
+
+
+@db_session
+def insert_sandik(name, explanation, date_of_opening: date = date.today(), is_active: bool =True, ):
+    return Sandik(name=name, explanation=explanation, date_of_opening=date_of_opening, is_active=is_active)
+
+
+@db_session
+def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, reading_transaction=False,
+                                 writing_transaction: bool =False, adding_member: bool =False, throwing_member: bool =False):
+    sandik = Sandik[sandik_id]
+    return MemberAuthorityType(name=name, max_number_of_members=capacity, sandik_ref=sandik, is_admin=is_admin,
+                               reading_transaction=reading_transaction, writing_transaction=writing_transaction,
+                               adding_member=adding_member, throwing_member=throwing_member)
+
+
+@db_session
+def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=-1, max_amount=-1, min_installment_amount=-1):
+    sandik = Sandik[sandik_id]
+    DebtType(sandik_ref=sandik, name=name, explanation=explanation,
+             max_number_of_installments=max_number_of_instalments, max_amount=max_amount,
+             min_installment_amount=min_installment_amount)

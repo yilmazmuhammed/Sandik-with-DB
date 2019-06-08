@@ -132,29 +132,14 @@ db.bind(provider='postgres', user='auykhzkqcbtuek',
 db.generate_mapping(create_tables=True)
 
 
-def create_sandik_and_users():
-    sandik = Sandik(name='Yardımlaşma Sandığı', date_of_opening=date(2016, 5, 21))
-
-    MemberAuthorityType(name='Sandık Başkanı', sandik_ref=sandik, is_admin=True)
-    MemberAuthorityType(name='Sandık Başkan Yardımcısı', sandik_ref=sandik, reading_transaction=True)
-    MemberAuthorityType(name='Üye', sandik_ref=sandik)
-
-    DebtType(sandik_ref=sandik, name="APB")
-    DebtType(sandik_ref=sandik, name="PDAY")
-
-    return sandik
-
-
 # TODO Bir sandıktan aynı webuser'ın sadece 1 tane üyeliği olabilir
 if __name__ == "__main__":
-    from passlib.hash import pbkdf2_sha256 as hasher
-
-    with db_session:
-        WebUser(username='admin',
-                password_hash='$pbkdf2-sha256$29000$lpLy/t8bo3TuXat1rlVKiQ$iXwe.imUemN2QLCwG/q5qADvWforaCydKxRE3rRe10s',
-                name='Muhammed', surname='YILMAZ',
-                is_admin=True)
-        create_sandik_and_users()
+    # with db_session:
+    #     WebUser(username='admin',
+    #             password_hash='$pbkdf2-sha256$29000$lpLy/t8bo3TuXat1rlVKiQ$iXwe.imUemN2QLCwG/q5qADvWforaCydKxRE3rRe10s',
+    #             name='Muhammed', surname='YILMAZ',
+    #             is_admin=True)
+    pass
 
 
 class DbTypes:

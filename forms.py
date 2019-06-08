@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField, SelectMultipleField
 from wtforms.validators import InputRequired, Length, Optional
 from wtforms.fields.html5 import DateField
@@ -30,11 +31,17 @@ class DynamicSelectMultipleField(SelectMultipleField):
         pass
 
 
-def form_open(form_name, id=None):
+def form_open(form_name, id=None, enctype=None):
+    open = """<form action="" method="post" name="%s" """ %(form_name)
+
     if id:
-        return """<form action="" method="post" name="%s" id="%s" class="sandik-form">""" % (form_name, id)
-    else:
-        return """<form action="" method="post" name="%s" class="sandik-form">""" % (form_name,)
+        open += """ id="%s" """ % (id)
+    if enctype:
+        open += """ enctype="%s" """ % (enctype)
+
+    open += """class="sandik-form">"""
+
+    return open
 
 
 def form_close():
@@ -247,17 +254,14 @@ class CustomTransactionSelectForm(FlaskForm):
     type = SelectField("Type:", choices=type_choices, id='type', render_kw={"class": "form-control"})
 
 
-class ImportDataForm(FlaskForm):
-    open = form_open(form_name='import-data-form')
+class ImportAllDataForm(FlaskForm):
+    open = form_open(form_name='import-all-data-form', enctype="multipart/form-data")
     close = form_close()
 
-    webusers_url = StringField("WebUsers url:", id='url',
-                               render_kw={"placeholder": "WebUsers url", "class": "form-control"})
-    members_url = StringField("Members url:", id='url',
-                              render_kw={"placeholder": "Members url", "class": "form-control"})
-    shares_url = StringField("Shares url:", id='url', render_kw={"placeholder": "Shares url", "class": "form-control"})
-    transactions_url = StringField("Transactions url:", id='url',
-                                   render_kw={"placeholder": "Transactions url", "class": "form-control"})
+    data_url = StringField("Data url:", id='data-url', render_kw={"placeholder": "Data url", "class": "form-control"})
+    data_file = FileField("Data file",  id='data-file', validators=[FileAllowed(['csv'], 'Csv file only!')],
+                          render_kw={"class": "form-control"})
+
     submit = SubmitField("Import data", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 

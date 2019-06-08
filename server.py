@@ -27,12 +27,8 @@ def create_sandik_app():
 
     # Site yöneticisinin işlemleri
     app.add_url_rule("/add-webuser", view_func=webuser.add_webuser_page, methods=["GET", "POST"])
-    app.add_url_rule("/export-transactions-as-csv", view_func=backup.export_transactions_as_csv_page)
-    app.add_url_rule("/export-members-as-csv", view_func=backup.export_members_as_csv_page)
-    app.add_url_rule("/export-webusers-as-csv", view_func=backup.export_webusers_as_csv_page)
-    app.add_url_rule("/export-shares-as-csv", view_func=backup.export_shares_as_csv_page)
-    app.add_url_rule("/import-datas-from-csv",
-                     view_func=backup.import_transactions_from_csv_page, methods=["GET", "POST"])
+    app.add_url_rule("/export-all-datas", view_func=backup.export_all_datas)
+    app.add_url_rule("/import-all-datas", view_func=backup.import_all_datas, methods=["GET", "POST"])
 
     # Sandık yöneticilerin sandıkla ilgili işlemleri
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
