@@ -34,14 +34,8 @@ def db_tables(csv_table):
 
 
 def add_webusers(webusers):
-    # if webusers[0][0] == 'admin':
-    #     webusers.remove(webusers[0])
-
-    for wu in webusers:
-        if wu[5] == 'False':
-            wu[5] = False
-        if wu[6] == 'False':
-            wu[6] = False
+    if webusers[0][0] == 'admin':
+        webusers.remove(webusers[0])
 
     with db_session:
         for wu in webusers:

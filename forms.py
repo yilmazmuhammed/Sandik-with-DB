@@ -258,8 +258,8 @@ class ImportAllDataForm(FlaskForm):
     open = form_open(form_name='import-all-data-form', enctype="multipart/form-data")
     close = form_close()
 
-    data_url = StringField("Data url:", id='data-url', render_kw={"placeholder": "Data url", "class": "form-control"})
-    data_file = FileField("Data file",  id='data-file', validators=[FileAllowed(['csv'], 'Csv file only!')],
+    # data_url = StringField("Data url:", id='data-url', render_kw={"placeholder": "Data url", "class": "form-control"})
+    data_file = FileField("Data file (only csv):",  id='data-file', validators=[FileAllowed(['csv'], 'Csv file only!')],
                           render_kw={"class": "form-control"})
 
     submit = SubmitField("Import data", render_kw={"class": "btn btn-primary sandik-btn-form"})
