@@ -141,7 +141,7 @@ def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, read
 
 
 @db_session
-def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=-1, max_amount=-1, min_installment_amount=-1):
+def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, max_amount=0, min_installment_amount=0):
     sandik = Sandik[sandik_id]
     DebtType(sandik_ref=sandik, name=name, explanation=explanation,
              max_number_of_installments=max_number_of_instalments, max_amount=max_amount,

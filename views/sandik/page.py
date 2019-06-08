@@ -4,11 +4,11 @@ from pony.orm import db_session, ObjectNotFound
 
 from database.auxiliary import insert_share
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
-from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm
+from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
-from views.sandik.db import add_member_to_sandik
+from views.sandik.db import add_member_to_sandik, add_member_authority_type_to_sandik
 from views.transaction.auxiliary import member_choices
 from views.webuser.auxiliary import SandikInfo
 
@@ -25,7 +25,7 @@ def new_sandik_page():
             # Varsayılan olarak sandık başkanı ve normal üye yetkisi oluştur
             admin_user = MemberAuthorityType(name='Sandık başkanı', max_number_of_members=1, sandik_ref=new_sandik,
                                              is_admin=True)
-            MemberAuthorityType(name='Normal üye', max_number_of_members=-1, sandik_ref=new_sandik)
+            MemberAuthorityType(name='Normal üye', max_number_of_members=0, sandik_ref=new_sandik)
 
             # Varsayılan olarak sandığı oluşturan kişiye sandık başkanı olarak üyelik oluşturulur.
             Member(webuser_ref=WebUser[current_user.webuser.username], sandik_ref=new_sandik,
@@ -114,3 +114,16 @@ def add_share_to_member_page(sandik_id):
     info = FormPageInfo(form=form, title='Add share to member')
     return render_template("form.html", layout_page=LayoutPageInfo("Add share to member"), info=info)
 
+
+@authorization_to_the_sandik_required(is_admin=True)
+def add_member_authority_type_to_sandik_page(sandik_id):
+    form = MemberAuthorityTypeForm()
+
+    if form.validate_on_submit():
+        if add_member_authority_type_to_sandik(form, sandik_id):
+            return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
+        else:
+            flash(u"Üye yetki türü eklenemedi.", 'danger')
+
+    info = FormPageInfo(form=form, title='Add member authority type to the sandik')
+    return render_template("form.html", layout_page=LayoutPageInfo("Add member authority type to sandik"), info=info)

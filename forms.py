@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField, SelectMultipleField
-from wtforms.validators import InputRequired, Length, Optional
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField, \
+    SelectMultipleField
+from wtforms.validators import InputRequired, Length, Optional, NumberRange
 from wtforms.fields.html5 import DateField
 from datetime import date
 
@@ -32,7 +33,7 @@ class DynamicSelectMultipleField(SelectMultipleField):
 
 
 def form_open(form_name, id=None, enctype=None):
-    open = """<form action="" method="post" name="%s" """ %(form_name)
+    open = """<form action="" method="post" name="%s" """ % (form_name)
 
     if id:
         open += """ id="%s" """ % (id)
@@ -81,7 +82,8 @@ class WebuserForm(FlaskForm):
                           validators=[InputRequired("Please enter your name"),
                                       Length(max=40, message="Surname field cannot be longer than 40 character")],
                           id='surname', render_kw={"placeholder": "Surname", "class": "form-control"})
-    is_admin = BooleanField(label="Is admin:", id='is_admin', render_kw={"class": "form-control"})
+    is_admin = BooleanField(label="Is admin:", id='is_admin',
+                            render_kw={"class": "form-control", "data-toggle": "toggle", "data-onstyle": "success"})
     date_of_registration = DateField("Date of registration:", default=date.today(),
                                      validators=[InputRequired("Please enter date of registration")],
                                      id='date_of_registration',
@@ -167,6 +169,37 @@ class MemberForm(FlaskForm):
     submit = SubmitField("Add Member", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
+class MemberAuthorityTypeForm(FlaskForm):
+    open = form_open(form_name='member-authority-type-form')
+    close = form_close()
+
+    name = StringField("Name:",
+                       validators=[InputRequired("Please enter name of Member Authority Type"),
+                                   Length(max=20, message="Name cannot be longer than 20 character")],
+                       id='name', render_kw={"placeholder": "Name", "class": "form-control"})
+    capacity = IntegerField("Capacity:",
+                            validators=[InputRequired("Sayı sınırı belirlemek istemiyorsanız 0 giriniz.\n"
+                                                      "Değilse 0'dan büyük bir tamsayı giriniz."),
+                                        NumberRange(min=0, message="Lütfen geçerli bir kapasite giriniz.")],
+                            id='amount', render_kw={"placeholder": "Capacity", "class": "form-control"})
+    is_admin = BooleanField(label="Is admin:", id='is_admin',
+                            render_kw={"class": "form-control", "data-toggle": "toggle", "data-onstyle": "success"})
+    reading_transaction = BooleanField(label="Reading transaction:", id='reading_transaction',
+                                       render_kw={"class": "form-control",
+                                                  "data-toggle": "toggle", "data-onstyle": "success"})
+    writing_transaction = BooleanField(label="Writing transaction:", id='writing_transaction',
+                                       render_kw={"class": "form-control",
+                                                  "data-toggle": "toggle", "data-onstyle": "success"})
+    adding_member = BooleanField(label="Adding Member:", id='adding_member',
+                                 render_kw={"class": "form-control",
+                                            "data-toggle": "toggle", "data-onstyle": "success"})
+    throwing_member = BooleanField(label="Throwing Member:", id='throwing_member',
+                                   render_kw={"class": "form-control",
+                                              "data-toggle": "toggle", "data-onstyle": "success"})
+
+    submit = SubmitField("Add Member Authority Type", render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+
 class TransactionForm(FlaskForm):
     open = form_open(form_name='transaction-form')
     close = form_close()
@@ -232,8 +265,8 @@ class PaymentForm(TransactionForm):
     close = form_close()
 
     share = None
-    debt = DynamicSelectField("Debt:", validators=[InputRequired("Please select the debt from list")], coerce=int, choices=[],
-                              id='debt', render_kw={"class": "form-control"})
+    debt = DynamicSelectField("Debt:", validators=[InputRequired("Please select the debt from list")], coerce=int,
+                              choices=[], id='debt', render_kw={"class": "form-control"})
 
     # TODO use super()
     explanation = TextAreaField("Explanation:",
@@ -259,7 +292,7 @@ class ImportAllDataForm(FlaskForm):
     close = form_close()
 
     # data_url = StringField("Data url:", id='data-url', render_kw={"placeholder": "Data url", "class": "form-control"})
-    data_file = FileField("Data file (only csv):",  id='data-file', validators=[FileAllowed(['csv'], 'Csv file only!')],
+    data_file = FileField("Data file (only csv):", id='data-file', validators=[FileAllowed(['csv'], 'Csv file only!')],
                           render_kw={"class": "form-control"})
 
     submit = SubmitField("Import data", render_kw={"class": "btn btn-primary sandik-btn-form"})

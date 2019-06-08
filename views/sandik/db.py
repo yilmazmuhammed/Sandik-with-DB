@@ -1,6 +1,6 @@
 from pony.orm import commit
 
-from database.auxiliary import insert_member, insert_share
+from database.auxiliary import insert_member, insert_share, insert_member_authority_type
 
 from forms import MemberForm
 
@@ -22,3 +22,9 @@ def add_member_to_sandik(form: MemberForm, sandik_id):
         return False
 
     return True
+
+
+def add_member_authority_type_to_sandik(form, sandik_id):
+    return insert_member_authority_type(form.name.data, form.capacity.data, sandik_id, form.is_admin.data if form.is_admin else False,
+                                        form.reading_transaction.data, form.writing_transaction.data,
+                                        form.adding_member.data, form.throwing_member.data)

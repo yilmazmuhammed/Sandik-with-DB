@@ -6,7 +6,7 @@ from pony.orm import db_session
 
 
 def authorization_to_the_sandik_required(reading_transaction=False, writing_transaction=False,
-                                  adding_member=False, throwing_member=False):
+                                  adding_member=False, throwing_member=False, is_admin=False):
     def authorization_to_the_sandik_required_decorator(func):
         @login_required
         @wraps(func)
@@ -18,7 +18,8 @@ def authorization_to_the_sandik_required(reading_transaction=False, writing_tran
             with db_session:
                 member = current_user.webuser.members_index.select(lambda m: m.sandik_ref.id == sandik_id)[:][0]
                 ma = member.member_authority_type_ref
-                if not ma.is_admin and not (ma.reading_transaction >= reading_transaction
+                if not ma.is_admin and not (ma.is_admin >= is_admin
+                                            and ma.reading_transaction >= reading_transaction
                                             and ma.writing_transaction >= writing_transaction
                                             and ma.adding_member >= adding_member
                                             and ma.throwing_member >= throwing_member):

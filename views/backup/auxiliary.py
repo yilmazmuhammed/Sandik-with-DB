@@ -61,7 +61,6 @@ def add_member_authority_types(member_authority_types):
 
 
 def add_members(members):
-    print(members)
     with db_session:
         for m in members:
             date_of_membership = date(*(list(map(int, m[3].split('-')))))
@@ -78,7 +77,6 @@ def add_shares(shares):
 def add_debt_types(debt_types):
     with db_session:
         for dt in debt_types:
-            print(dt)
             insert_debt_type(sandik_id=dt[1], name=dt[2], explanation=dt[3], max_number_of_instalments=dt[4],
                              max_amount=dt[5], min_installment_amount=dt[6])
 

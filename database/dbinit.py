@@ -112,12 +112,12 @@ class MemberAuthorityType(db.Entity):
     name = Required(str)
     max_number_of_members = Required(int, default="-1")
     sandik_ref = Required(Sandik)
-    members_index = Set(Member)
     is_admin = Required(bool, default=False)
     reading_transaction = Required(bool, default=False)
     writing_transaction = Required(bool, default=False)
     adding_member = Required(bool, default=False)
     throwing_member = Required(bool, default=False)
+    members_index = Set(Member)
 
 
 # PostgreSQL
@@ -134,11 +134,11 @@ db.generate_mapping(create_tables=True)
 
 # TODO Bir sandıktan aynı webuser'ın sadece 1 tane üyeliği olabilir
 if __name__ == "__main__":
-    # with db_session:
-    #     WebUser(username='admin',
-    #             password_hash='$pbkdf2-sha256$29000$lpLy/t8bo3TuXat1rlVKiQ$iXwe.imUemN2QLCwG/q5qADvWforaCydKxRE3rRe10s',
-    #             name='Muhammed', surname='YILMAZ',
-    #             is_admin=True)
+    with db_session:
+        WebUser(username='admin',
+                password_hash='$pbkdf2-sha256$29000$lpLy/t8bo3TuXat1rlVKiQ$iXwe.imUemN2QLCwG/q5qADvWforaCydKxRE3rRe10s',
+                name='Muhammed', surname='YILMAZ',
+                is_admin=True)
     pass
 
 
