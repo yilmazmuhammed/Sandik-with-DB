@@ -85,10 +85,12 @@ def add_transactions(transactions):
     with db_session:
         for t in transactions:
             transaction_date = date(*(list(map(int, t[1].split('-')))))
-            # TODO Burada Payment ve Debt yani türleri belirle
-            if t[4] == 'APB' or t[4] == 'PDAY':
+            # TODO Burada Payment ve Debt yani türleri her sandığın kendi borç türlerine göre belirle
+            debt = ['APB', 'PDAY']
+            payment = ['APB-Ö', 'PDAY-Ö']
+            if t[4] in debt:
                 insert_debt(transaction_date, t[2], t[3], t[5], DebtType.get(name=t[4]).id, t[6])
-            elif t[4] == 'PDAY-Ö' or t[4] == 'APB-Ö':
+            elif t[4] in payment:
                 insert_payment(transaction_date, t[2], t[5], transaction_id=t[6])
             elif t[4] == 'Aidat':
                 insert_contribution(transaction_date, t[2], t[3], t[5], t[6].split(" "), is_from_import_data=True)

@@ -4,6 +4,8 @@ from flask import current_app, flash
 from flask_login import login_required, current_user
 from pony.orm import db_session
 
+from database.dbinit import Member, Sandik, WebUser
+
 
 def authorization_to_the_sandik_required(reading_transaction=False, writing_transaction=False,
                                   adding_member=False, throwing_member=False, is_admin=False):
@@ -11,7 +13,6 @@ def authorization_to_the_sandik_required(reading_transaction=False, writing_tran
         @login_required
         @wraps(func)
         def decorated_view(sandik_id, *args, **kwargs):
-            # TODO bir sandıkta bir webuser'ın sadece 1 üyeliği olmalı
             if current_user.is_admin:
                 return func(sandik_id, *args, **kwargs)
 
@@ -48,8 +49,7 @@ def is_there_authorization_to_the_sandik(sandik_id, reading_transaction=False, w
     if current_user.is_admin:
         return True
     with db_session:
-        # TODO DENE member = current_user.webuser.members_index[sandik_ref.id = sandik_id]
-        member = current_user.webuser.members_index.select(lambda m: m.sandik_ref.id == sandik_id)[:][0]
+        member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
         ma = member.member_authority_type_ref
         if ma.is_admin:
             return True

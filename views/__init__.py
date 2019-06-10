@@ -8,5 +8,9 @@ class LayoutPageInfo:
         if current_user.is_authenticated:
             self.my_sandiks = []
             with db_session:
-                for sandik in select(member.sandik_ref for member in current_user.webuser.members_index):
-                    self.my_sandiks.append((sandik.id, sandik.name,))
+                for member, sandik in select((member, member.sandik_ref, ) for member in current_user.webuser.members_index):
+                    mat = member.member_authority_type_ref
+                    is_there_authorizations = mat.is_admin or mat.reading_transaction or mat.writing_transaction or \
+                                              mat.adding_member or mat.throwing_member
+                    self.my_sandiks.append({"id": sandik.id, "name": sandik.name,
+                                            "is_there_authorizations": is_there_authorizations, 'mat': mat})

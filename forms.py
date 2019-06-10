@@ -200,6 +200,41 @@ class MemberAuthorityTypeForm(FlaskForm):
     submit = SubmitField("Add Member Authority Type", render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
+class DebtTypeForm(FlaskForm):
+    open = form_open(form_name='debt-type-form')
+    close = form_close()
+
+    name = StringField("Name:",
+                       validators=[InputRequired("Please enter name of Debt Type"),
+                                   Length(max=20, message="Name cannot be longer than 20 character")],
+                       id='name', render_kw={"placeholder": "Name", "class": "form-control"})
+    explanation = TextAreaField("Explanation:",
+                                validators=[Optional(),
+                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
+                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
+    max_number_of_installments = IntegerField("Max Number of Installment:",
+                                              validators=[InputRequired("Sınır belirlemek istemiyorsanız 0 giriniz.\n"
+                                                                        "Değilse 0'dan büyük bir tamsayı giriniz."),
+                                                          NumberRange(min=0, message="Lütfen geçerli bir sayı giriniz.")
+                                                          ],
+                                              id='max_number_of_installments',
+                                              render_kw={"placeholder": "Max number of installment",
+                                                         "class": "form-control"})
+    max_amount = IntegerField("Max Amount:",
+                              validators=[InputRequired("Sınır belirlemek istemiyorsanız 0 giriniz.\n"
+                                                        "Değilse 0'dan büyük bir tamsayı giriniz."),
+                                          NumberRange(min=0, message="Lütfen geçerli bir sayı giriniz.")],
+                              id='max_amount', render_kw={"placeholder": "Max amount", "class": "form-control"})
+    min_installment_amount = IntegerField("Min Installment Amount:",
+                                          validators=[InputRequired("Sınır belirlemek istemiyorsanız 0 giriniz.\n"
+                                                                    "Değilse 0'dan büyük bir tamsayı giriniz."),
+                                                      NumberRange(min=0, message="Lütfen geçerli bir sayı giriniz.")],
+                                          id='min_installment_amount',
+                                          render_kw={"placeholder": "Min installment amount", "class": "form-control"})
+
+    submit = SubmitField("Add Debt Type", render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+
 class TransactionForm(FlaskForm):
     open = form_open(form_name='transaction-form')
     close = form_close()

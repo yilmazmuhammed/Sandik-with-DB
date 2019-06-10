@@ -59,8 +59,8 @@ def add_contribution_page(sandik_id):
                 return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Contribution")
-        return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"), info=info,
-                               periods_of=json.dumps(unpaid_dues_choices(member)),
+        return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"),
+                               info=info, periods_of=json.dumps(unpaid_dues_choices(member)),
                                all_periods_of=json.dumps(unpaid_dues_choices(member, is_there_old=True)))
 
 
@@ -165,22 +165,18 @@ def add_custom_transaction_for_admin_page(sandik_id):
         if c_form.validate_on_submit():
             if insert_contribution(c_form.transaction_date.data, c_form.amount.data, c_form.share.data,
                                    c_form.explanation.data, c_form.contribution_period.data):
-                # TODO return işlemler sayfasına
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif d_form.validate_on_submit():
             insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.debt_type.data,
                         d_form.explanation.data, d_form.number_of_installment.data)
-            # TODO return işlemler sayfasına
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif p_form.validate_on_submit():
             if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
                               p_form.debt.data):
-                # TODO return işlemler sayfasına
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif o_form.validate_on_submit():
             insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
                                o_form.explanation.data)
-            # TODO return işlemler sayfasına
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
 
         forms = [c_form, d_form, p_form, o_form]

@@ -45,6 +45,8 @@ def create_sandik_app():
                      view_func=transaction_page.transaction_in_transactions_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member-authority-type",
                      view_func=sandik.add_member_authority_type_to_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/add-debt-type",
+                     view_func=sandik.add_debt_type_to_sandik_page, methods=["GET", "POST"])
 
     # Üyelerin sandıklarla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions",

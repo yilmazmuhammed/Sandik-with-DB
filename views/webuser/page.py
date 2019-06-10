@@ -93,7 +93,8 @@ def profile():
         members = []
         for member in webuser.members_index:
             members.append(MemberInfo(member))
-        return render_template("webuser/profile.html", layout_page=LayoutPageInfo("Profile"), user=webuser, members=members)
+        return render_template("webuser/profile.html", layout_page=LayoutPageInfo("Profile"), user=webuser,
+                               members=members)
 
 
 @login_required

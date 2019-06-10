@@ -9,7 +9,7 @@
         <div class="panel-heading">
           <div class="row">
             <div class="col-xs-3">
-              <i class="fa fa-comments fa-5x"></i>
+              <a href="{{ url_for('add_custom_transaction_for_admin_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-success"><em class="glyphicon glyphicon-plus"></em></a>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">{{ sandik.number_of_transactions }}</div>
@@ -32,7 +32,11 @@
         <div class="panel-heading">
           <div class="row">
             <div class="col-xs-3">
-              <i class="fa fa-comments fa-5x"></i>
+                <a href="#" class="dropdown-toggle btn btn-xs btn-info " data-toggle="dropdown"><em class="glyphicon glyphicon-plus"></em></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.id) }}">Member</a>
+                  <li><a href="{{ url_for('add_share_to_member_page', sandik_id=sandik.id) }}">Share</a>
+                </ul>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">{{ sandik.number_of_members }}</div>
@@ -55,10 +59,10 @@
         <div class="panel-heading">
           <div class="row">
             <div class="col-xs-3">
-              <i class="fa fa-comments fa-5x"></i>
+              <a href="{{ url_for('add_member_authority_type_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-warning"><em class="glyphicon glyphicon-plus"></em></a>
             </div>
             <div class="col-xs-9 text-right">
-              <div class="huge">2</div>
+              <div class="huge">Numbers... </div>
               <div>Member Authority Types</div>
             </div>
           </div>
@@ -78,7 +82,7 @@
         <div class="panel-heading">
           <div class="row">
             <div class="col-xs-3">
-              <i class="fa fa-comments fa-5x"></i>
+              <a href="{{ url_for('add_debt_type_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-danger"><em class="glyphicon glyphicon-plus"></em></a>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">Numbers...</div>
@@ -101,7 +105,7 @@
         <div class="panel-heading">
           <div class="row">
             <div class="col-xs-3">
-              <i class="fa fa-comments fa-5x"></i>
+              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-primary"><em class="glyphicon glyphicon-plus"></em></a>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">Numbers...</div>

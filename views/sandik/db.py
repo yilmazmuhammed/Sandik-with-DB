@@ -1,8 +1,8 @@
 from pony.orm import commit
 
-from database.auxiliary import insert_member, insert_share, insert_member_authority_type
+from database.auxiliary import insert_member, insert_share, insert_member_authority_type, insert_debt_type
 
-from forms import MemberForm
+from forms import MemberForm, DebtTypeForm
 
 
 # TODO exception kullan, son kullanıcıya çıktıyı exception kullanarak ver
@@ -25,6 +25,12 @@ def add_member_to_sandik(form: MemberForm, sandik_id):
 
 
 def add_member_authority_type_to_sandik(form, sandik_id):
-    return insert_member_authority_type(form.name.data, form.capacity.data, sandik_id, form.is_admin.data if form.is_admin else False,
+    return insert_member_authority_type(form.name.data, form.capacity.data, sandik_id,
+                                        form.is_admin.data if form.is_admin else False,
                                         form.reading_transaction.data, form.writing_transaction.data,
                                         form.adding_member.data, form.throwing_member.data)
+
+
+def add_debt_type_to_sandik(form: DebtTypeForm, sandik_id):
+    return insert_debt_type(sandik_id, form.name.data, form.explanation.data, form.max_number_of_installments.data,
+                            form.max_amount.data, form.min_installment_amount.data)

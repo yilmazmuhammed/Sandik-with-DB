@@ -109,7 +109,7 @@ def insert_member(username, sandik_id, authority_id, date_of_membership: date = 
 
 
 @db_session
-def insert_share(member_id, date_of_opening: date = date.today(), is_active: bool =True, share_order_of_member=None):
+def insert_share(member_id, date_of_opening: date = date.today(), is_active: bool = True, share_order_of_member=None):
     member = Member[member_id]
 
     # TODO Use exception
@@ -127,13 +127,14 @@ def insert_share(member_id, date_of_opening: date = date.today(), is_active: boo
 
 
 @db_session
-def insert_sandik(name, explanation, date_of_opening: date = date.today(), is_active: bool =True, ):
+def insert_sandik(name, explanation, date_of_opening: date = date.today(), is_active: bool = True, ):
     return Sandik(name=name, explanation=explanation, date_of_opening=date_of_opening, is_active=is_active)
 
 
 @db_session
 def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, reading_transaction=False,
-                                 writing_transaction: bool =False, adding_member: bool =False, throwing_member: bool =False):
+                                 writing_transaction: bool = False, adding_member: bool = False,
+                                 throwing_member: bool = False):
     sandik = Sandik[sandik_id]
     return MemberAuthorityType(name=name, max_number_of_members=capacity, sandik_ref=sandik, is_admin=is_admin,
                                reading_transaction=reading_transaction, writing_transaction=writing_transaction,
@@ -143,6 +144,6 @@ def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, read
 @db_session
 def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, max_amount=0, min_installment_amount=0):
     sandik = Sandik[sandik_id]
-    DebtType(sandik_ref=sandik, name=name, explanation=explanation,
-             max_number_of_installments=max_number_of_instalments, max_amount=max_amount,
-             min_installment_amount=min_installment_amount)
+    return DebtType(sandik_ref=sandik, name=name, explanation=explanation,
+                    max_number_of_installments=max_number_of_instalments, max_amount=max_amount,
+                    min_installment_amount=min_installment_amount)

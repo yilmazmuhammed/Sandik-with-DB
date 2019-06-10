@@ -63,5 +63,6 @@ class ShareInfo:
         self.paid_contributions = sum(t.amount for t in share.transactions_index if t.contribution_index)
         self.debts_received = sum(t.amount for t in share.transactions_index if t.debt_ref)
         self.paid_installments = sum(t.amount for t in share.transactions_index if t.payment_ref)
-        self.others = sum(t.amount for t in share.transactions_index if not t.contribution_index and not t.debt_ref and not t.payment_ref)
+        self.others = sum(t.amount for t in share.transactions_index if
+                          not t.contribution_index and not t.debt_ref and not t.payment_ref)
         self.remaining_debts = sum(t.debt_ref.remaining_debt for t in share.transactions_index if t.debt_ref)

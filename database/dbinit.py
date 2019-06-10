@@ -105,7 +105,7 @@ class Payment(db.Entity):
     transaction_ref = Required(Transaction)
 
 
-# TODO yetkileri ayarla (üye ekle/çıkar, tüm işlemleri görüntüle, tüm işlemleri düzenle gibi...)
+# TODO yetkileri ayarla (tüm işlemleri düzenle gibi...)
 # TODO max_number_of_members'e göre sınır koy
 class MemberAuthorityType(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -132,7 +132,6 @@ db.bind(provider='postgres', user='auykhzkqcbtuek',
 db.generate_mapping(create_tables=True)
 
 
-# TODO Bir sandıktan aynı webuser'ın sadece 1 tane üyeliği olabilir
 if __name__ == "__main__":
     with db_session:
         WebUser(username='admin',

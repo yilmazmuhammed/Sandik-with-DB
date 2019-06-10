@@ -4,11 +4,11 @@ from pony.orm import db_session, ObjectNotFound
 
 from database.auxiliary import insert_share
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
-from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm
+from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
-from views.sandik.db import add_member_to_sandik, add_member_authority_type_to_sandik
+from views.sandik.db import add_member_to_sandik, add_member_authority_type_to_sandik, add_debt_type_to_sandik
 from views.transaction.auxiliary import member_choices
 from views.webuser.auxiliary import SandikInfo
 
@@ -78,7 +78,6 @@ def add_member_to_sandik_page(sandik_id):
                 #
                 # # TODO authory_id mi gelmeli, direk authority mi?
                 # add_member_to_sandik2(sandik_id, user.username, authority.id, f_date)
-                # # TODO redirect üyeler sayfası ya da yeni eklenen üyenin sayfası
 
                 if add_member_to_sandik(form, sandik_id):
                     return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
@@ -127,3 +126,17 @@ def add_member_authority_type_to_sandik_page(sandik_id):
 
     info = FormPageInfo(form=form, title='Add member authority type to the sandik')
     return render_template("form.html", layout_page=LayoutPageInfo("Add member authority type to sandik"), info=info)
+
+
+@authorization_to_the_sandik_required(is_admin=True)
+def add_debt_type_to_sandik_page(sandik_id):
+    form = DebtTypeForm()
+
+    if form.validate_on_submit():
+        if add_debt_type_to_sandik(form, sandik_id):
+            return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
+        else:
+            flash(u"Borç türü eklenemedi.", 'danger')
+
+    info = FormPageInfo(form=form, title='Add debt type to the sandik')
+    return render_template("form.html", layout_page=LayoutPageInfo("Add debt type to sandik"), info=info)
