@@ -92,8 +92,8 @@ def add_debt_page(sandik_id):
         if form.validate_on_submit():
             # TODO kontrolleri yap, (borcu varsa bir daha alamaz[sayfaya giriş de engellenebilir], en fazla taksit,
             #  parasına göre en fazla borç)
-            insert_debt(form.transaction_date.data, form.amount.data, form.share.data, form.debt_type.data,
-                        form.explanation.data, form.number_of_installment.data)
+            insert_debt(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
+                        form.debt_type.data, form.number_of_installment.data)
 
             return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
 
@@ -167,8 +167,8 @@ def add_custom_transaction_for_admin_page(sandik_id):
                                    c_form.explanation.data, c_form.contribution_period.data):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif d_form.validate_on_submit():
-            insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.debt_type.data,
-                        d_form.explanation.data, d_form.number_of_installment.data)
+            insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.explanation.data,
+                        d_form.debt_type.data, d_form.number_of_installment.data)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif p_form.validate_on_submit():
             if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
@@ -206,6 +206,9 @@ def transactions_page(sandik_id):
 
 @authorization_to_the_sandik_required(reading_transaction=True)
 def transaction_in_transactions_page(sandik_id, transaction_id):
+    with db_session:
+        transaction = Transaction[transaction_id]
+    # transaction.
     return "Bu sayfa henüz yapılmadı"
 
 
