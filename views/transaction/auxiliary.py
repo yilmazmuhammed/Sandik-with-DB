@@ -28,7 +28,7 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
                    'Kasım', 'Aralık']
 
     ret_list = {}
-    for share in member.shares_index.filter(lambda s: s.is_active == only_active_shares):
+    for share in member.shares_index.filter(lambda s: s.is_active == only_active_shares).sort_by(Share.id):
         if is_there_old:
             share_list = Period.all_months_from_date(member.sandik_ref.date_of_opening)
         else:

@@ -19,7 +19,7 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
             explanation=explanation),
         debt_type_ref=DebtType[type_id], number_of_installment=num_of_inst, installment_amount=ia,
         paid_debt=0, paid_installment=0, remaining_debt=amount, remaining_installment=num_of_inst,
-        starting_period=Period.last_period(in_date, 1), due_period=Period.last_period(in_date, num_of_inst + 1))
+        starting_period=Period.last_period(in_date, 1), due_period=Period.last_period(in_date, num_of_inst))
 
 
 @db_session

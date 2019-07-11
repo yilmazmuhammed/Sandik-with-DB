@@ -189,7 +189,7 @@ def add_custom_transaction_for_admin_page(sandik_id):
         select_form.member.choices += member_choices(sandik.id)
         forms.insert(0, select_form)
         return render_template("transaction/custom_transaction_form.html", forms=forms, errors=errors,
-                               layout_page=LayoutPageInfo("Add Contribution"),
+                               layout_page=LayoutPageInfo("Add Transaction"),
                                periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
                                shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of))
 
@@ -201,7 +201,8 @@ def transactions_page(sandik_id):
 
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
-        return render_template("transactions.html", layout_page=LayoutPageInfo("All Transactions of The Sandik"), transactions=transactions)
+        return render_template("transactions.html", layout_page=LayoutPageInfo("All Transactions of The Sandik"),
+                               transactions=transactions)
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)
