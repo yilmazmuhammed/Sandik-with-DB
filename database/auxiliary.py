@@ -147,3 +147,16 @@ def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, 
     return DebtType(sandik_ref=sandik, name=name, explanation=explanation,
                     max_number_of_installments=max_number_of_instalments, max_amount=max_amount,
                     min_installment_amount=min_installment_amount)
+
+
+@db_session
+def name_surname(webuser_id=None, member_id=None, share_id=None):
+    if webuser_id:
+        webuser = WebUser[webuser_id]
+        return webuser.name + " " + webuser.surname
+    if member_id:
+        member = Member[member_id]
+        return member.webuser_ref.name + " " + member.webuser_ref.surname
+    if share_id:
+        share = Share[share_id]
+        return share.member_ref.webuser_ref.name + " " + share.member_ref.webuser_ref.surname
