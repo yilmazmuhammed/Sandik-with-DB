@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% for period, name in periods %}
+{% for cont in contributions[period] %}
+<p>{{name}} ({{period}}) -> {{cont[0].share_order_of_member}}, {{cont[1]}}</p>
+{% endfor %}
+{% for debt in payments[period] %}
+<p>{{name}} ({{period}}) -> {{debt.transaction_ref.share_ref.member_ref.webuser_ref.name}} {{debt.transaction_ref.share_ref.member_ref.webuser_ref.surname}} - {{debt.installment_amount}} </p>
+{% endfor %}
+{% endfor %}
+{% endblock %}

@@ -30,7 +30,7 @@ def create_sandik_app():
     app.add_url_rule("/export-all-datas", view_func=backup.export_all_datas)
     app.add_url_rule("/import-all-datas", view_func=backup.import_all_datas, methods=["GET", "POST"])
 
-    # Sandık yöneticilerin sandıkla ilgili işlemleri
+    # Sandık yöneticilerinin sandıkla ilgili işlemleri
     app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member",
@@ -47,6 +47,7 @@ def create_sandik_app():
                      view_func=sandik.add_member_authority_type_to_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-debt-type",
                      view_func=sandik.add_debt_type_to_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/unpaid", view_func=transaction_page.unpaid_transactions_page)
 
     # Üyelerin sandıklarla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions",

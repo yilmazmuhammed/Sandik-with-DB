@@ -4,13 +4,13 @@ from flask import abort, redirect, url_for, render_template, flash
 from flask_login import login_required, current_user
 from pony.orm import db_session, select
 
-from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction
-from database.dbinit import Member, Sandik, WebUser, Transaction, Debt
+from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction, name_surname
+from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
-    member_choices
+    member_choices, Period
 from views.transaction.db import add_contribution
 
 
@@ -222,4 +222,50 @@ def member_transactions_in_sandik_page(sandik_id):
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.webuser_ref == webuser
                               and transaction.share_ref.member_ref.sandik_ref == sandik)[:]
-        return render_template("transactions.html", layout_page=LayoutPageInfo("My Transactions"), transactions=transactions)
+        return render_template("transactions.html", layout_page=LayoutPageInfo("My Transactions"),
+                               transactions=transactions)
+
+
+@authorization_to_the_sandik_required(reading_transaction=True)
+def unpaid_transactions_page(sandik_id):
+    with db_session:
+        sandik = Sandik[sandik_id]
+
+        unpaid_contributions = {}
+        for member in sandik.members_index.sort_by(lambda m: m.webuser_ref.name + " " + m.webuser_ref.surname):
+            unpaid_dues = unpaid_dues_choices(member)
+            for share in unpaid_dues:
+                for due in unpaid_dues[share]:
+                    if unpaid_contributions.get(due[0]):
+                        unpaid_contributions[due[0]].append((Share[share], name_surname(share_id=share)))
+                    else:
+                        unpaid_contributions[due[0]] = [(Share[share], name_surname(share_id=share))]
+
+        unpaid_payments = {}
+        for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref.sandik_ref == sandik and
+                                                    debt.remaining_debt).sort_by(Debt.id)[:]:
+            unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
+            for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
+                add_debt = debt
+                if unpaid_payments.get(period):
+                    unpaid_payments[period].append(add_debt)
+                else:
+                    unpaid_payments[period] = [add_debt]
+
+        periods = []
+        for ekle in list(set(list(unpaid_contributions.keys()) + list(unpaid_payments.keys()))):
+            if len(periods) == 0:
+                periods.append((ekle, Period.period_name(ekle),))
+            else:
+                eklendi = False
+                for i in range(len(periods)):
+                    if Period.compare(after=periods[i][0], before=ekle):
+                        periods.insert(i, (ekle, Period.period_name(ekle),))
+                        eklendi = True
+                        break
+                if not eklendi:
+                    periods.append((ekle, Period.period_name(ekle),))
+
+        return render_template("transaction/unpaid_transactions.html",
+                               layout_page=LayoutPageInfo("Unpaid transactions"), periods=periods,
+                               contributions=unpaid_contributions, payments=unpaid_payments)
