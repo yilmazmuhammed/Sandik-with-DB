@@ -17,7 +17,12 @@ def authorization_to_the_sandik_required(reading_transaction=False, writing_tran
                 return func(sandik_id, *args, **kwargs)
 
             with db_session:
-                member = current_user.webuser.members_index.select(lambda m: m.sandik_ref.id == sandik_id)[:][0]
+                # TODO liste olarak değil de direk 1 eleman olarak seç member'i
+                members_index = current_user.webuser.members_index.select(lambda m: m.sandik_ref.id == sandik_id)[:]
+                if len(members_index) == 0:
+                    flash(u"Bu sayfaya giriş yetkiniz yok.", 'danger')
+                    return current_app.login_manager.unauthorized()
+                member = members_index[0]
                 ma = member.member_authority_type_ref
                 if not ma.is_admin and not (ma.is_admin >= is_admin
                                             and ma.reading_transaction >= reading_transaction
