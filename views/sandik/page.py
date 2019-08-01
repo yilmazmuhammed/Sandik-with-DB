@@ -94,6 +94,51 @@ def add_member_to_sandik_page(sandik_id):
 
 
 @authorization_to_the_sandik_required(adding_member=True)
+def edit_member_of_sandik_page(sandik_id, username):
+    form = MemberForm()
+    selected_dict=None
+    selected_ids=None
+    with db_session:
+        sandik = Sandik[sandik_id]
+        authorities = sandik.member_authority_types_index.sort_by(lambda a: a.id)
+        for authority in authorities:
+            form.authority.choices.append((authority.id, authority.name))
+
+        try:
+            webuser = WebUser[username]
+            member = Member.get(sandik_ref=sandik, webuser_ref=webuser)
+            form.username.data = webuser.username
+            form.username.render_kw["readonly"] = ""
+            selected_dict = {form.authority.id: str(member.member_authority_type_ref.id)}
+            selected_ids = [form.authority.id]
+            form.date_of_membership.render_kw["value"] = member.date_of_membership
+            form.submit.label.text = "Edit member"
+        except ObjectNotFound:
+            flash(u"Member not found.", 'danger')
+            return abort(404)
+
+    if form.validate_on_submit():
+        try:
+            with db_session:
+                print(form.username.data)
+                if username != form.username.data:
+                    flash(u"Kullanıcı adı değiştirilemez", 'danger')
+                else:
+                    print(member.member_authority_type_ref, member.date_of_membership)
+                    print(form.authority.data, form.date_of_membership.data)
+                    member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[username])
+                    member.member_authority_type_ref = MemberAuthorityType[form.authority.data]
+                    member.date_of_membership = form.date_of_membership.data
+                    return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
+        # TODO Authority ve User bulunamamasına karşın iki farklı sorgu yap
+        except Exception as exc:
+            flash(u"Exception: %s." % exc, 'danger')
+
+    info = FormPageInfo(form=form, title='Edit member of sandik')
+    return render_template("form.html", layout_page=LayoutPageInfo("Edit member of sandik"), info=info, selected_dict=selected_dict, selected_ids=selected_ids)
+
+
+@authorization_to_the_sandik_required(adding_member=True)
 def add_share_to_member_page(sandik_id):
     form = AddingShareForm()
 

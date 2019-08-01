@@ -24,6 +24,7 @@ def create_sandik_app():
     app.add_url_rule("/profile", view_func=webuser.profile)
     app.add_url_rule("/", view_func=others.home_page)
     app.add_url_rule("/edit-webuser-info", view_func=webuser.edit_webuser_info_page, methods=["GET", "POST"])
+    app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
 
     # Site yöneticisinin işlemleri
     app.add_url_rule("/add-webuser", view_func=webuser.add_webuser_page, methods=["GET", "POST"])
@@ -31,10 +32,11 @@ def create_sandik_app():
     app.add_url_rule("/import-all-datas", view_func=backup.import_all_datas, methods=["GET", "POST"])
 
     # Sandık yöneticilerinin sandıkla ilgili işlemleri
-    app.add_url_rule("/new-sandik", view_func=sandik.new_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/management-panel", view_func=sandik.sandik_management_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member",
                      view_func=sandik.add_member_to_sandik_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/edit-member/<string:username>",
+                     view_func=sandik.edit_member_of_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-share",
                      view_func=sandik.add_share_to_member_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/members", view_func=sandik.members_page)

@@ -49,3 +49,12 @@ function CreateHtmlElement(htmlStr) {
   }
   return frag;
 }
+
+
+function getSelectOption(selectField,  value){
+  for(i=0; i<selectField.options.length; i++){
+    if (selectField.options[i].value == value){
+      return selectField.options[i];
+    }
+  }
+}

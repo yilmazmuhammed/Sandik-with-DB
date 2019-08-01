@@ -1,8 +1,28 @@
 {% extends "layout.html" %}
 
 {% block extra_head %}
-<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/general.js') }}"></script>
+    <script type="text/javascript">
+      {% if selected_dict and selected_ids %}
+      var selected_dict = {{selected_dict|safe}};
+      var selected_ids = {{selected_ids|safe}};
+
+      function selectDefaultValues() {
+        var selectField;
+        var option;
+        for (i = 0; i < selected_ids.length; i++){
+          selectField = document.getElementById(selected_ids[i]);
+          option = getSelectOption(selectField, selected_dict[selected_ids[i]] );
+          option.setAttribute("selected","");
+        }
+      }
+
+      window.onload = selectDefaultValues;
+      {% endif %}
+    </script>
 {% endblock %}
 
 {% block content %}
