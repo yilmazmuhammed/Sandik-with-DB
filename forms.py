@@ -337,9 +337,21 @@ class AddingShareForm(FlaskForm):
     open = form_open(form_name='adding-share-form')
     close = form_close()
 
-    member = SelectField("Member:", validators=[InputRequired("Please select a member type in list")], choices=[],
+    member = SelectField("Member:", validators=[InputRequired("Please select a member in list")], choices=[],
                          id='member', coerce=int, render_kw={"class": "form-control"})
     date_of_opening = DateField("Date of opening:", default=date.today(),
                                 validators=[InputRequired("Please enter date of membership")], id='date_of_opening',
                                 render_kw={"placeholder": "Date of opening", "class": "form-control"})
     submit = SubmitField("Add Share", render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+
+def select_form(form_name, tag, coerce, choices, id, submit_tag):
+    class SelectForm(FlaskForm):
+        open = form_open(form_name=form_name)
+        close = form_close()
+
+        member = SelectField("%s:"%tag, validators=[InputRequired("Please select from the list")], choices=choices,
+                             id=id, coerce=coerce, render_kw={"class": "form-control"})
+        submit = SubmitField(submit_tag, render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+    return SelectForm()

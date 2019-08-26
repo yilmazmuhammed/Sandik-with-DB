@@ -4,7 +4,8 @@ from pony.orm import db_session, ObjectNotFound
 
 from database.auxiliary import insert_share
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
-from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm
+from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm, \
+    select_form
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
@@ -94,10 +95,29 @@ def add_member_to_sandik_page(sandik_id):
 
 
 @authorization_to_the_sandik_required(adding_member=True)
+def select_member_to_edit_page(sandik_id):
+    member_list = member_choices(sandik_id)
+    form = select_form(form_name='member-form', tag='Member', id='member', coerce=int, submit_tag="Edit Member",
+                       choices=member_list)
+    if form.validate_on_submit():
+        try:
+            with db_session:
+                member = Member[form.member.data]
+                username = member.webuser_ref.username
+            return redirect(url_for('edit_member_of_sandik_page', sandik_id=sandik_id, username=username))
+        except ObjectNotFound:
+            flash(u"Member not found.", 'danger')
+            return abort(404)
+
+    info = FormPageInfo(form=form, title='Select member to edit')
+    return render_template("form.html", layout_page=LayoutPageInfo("Select member to edit"), info=info)
+
+
+@authorization_to_the_sandik_required(adding_member=True)
 def edit_member_of_sandik_page(sandik_id, username):
     form = MemberForm()
-    selected_dict=None
-    selected_ids=None
+    selected_dict = None
+    selected_ids = None
     with db_session:
         sandik = Sandik[sandik_id]
         authorities = sandik.member_authority_types_index.sort_by(lambda a: a.id)
@@ -112,7 +132,7 @@ def edit_member_of_sandik_page(sandik_id, username):
             selected_dict = {form.authority.id: str(member.member_authority_type_ref.id)}
             selected_ids = [form.authority.id]
             form.date_of_membership.render_kw["value"] = member.date_of_membership
-            form.submit.label.text = "Edit member"
+            form.submit.label.text = "Save"
         except ObjectNotFound:
             flash(u"Member not found.", 'danger')
             return abort(404)
@@ -135,7 +155,8 @@ def edit_member_of_sandik_page(sandik_id, username):
             flash(u"Exception: %s." % exc, 'danger')
 
     info = FormPageInfo(form=form, title='Edit member of sandik')
-    return render_template("form.html", layout_page=LayoutPageInfo("Edit member of sandik"), info=info, selected_dict=selected_dict, selected_ids=selected_ids)
+    return render_template("form.html", layout_page=LayoutPageInfo("Edit member of sandik"), info=info,
+                           selected_dict=selected_dict, selected_ids=selected_ids)
 
 
 @authorization_to_the_sandik_required(adding_member=True)
