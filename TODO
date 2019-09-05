@@ -2,7 +2,6 @@ settings = https://www.dropbox.com/s/2o30r4ffzaqc3co/settings.py?dl=1
 
 TODO 2 Transactions sayfasına filtreleme/sıralama özelliği getir
 TODO! 5 Var olan işlemleri islemler.csv dosyasından ekle
-TODO 8 Ayrılmanın perioduna 0-0 yazılsın mı, yazılmasın mı?
 TODO 17 İşlemleri yedeklemek için csv formatında dosya oluştur
 TODO 23 Başlangıç aidatı özelliği ekle (geriye yönelik ödemeler için
 TODO 25 sandık üyeleri için bütün üyelerin gözüktüğü ve toplam işlemlerin gözüktüğü bir sayfa yap ya da

@@ -1,6 +1,7 @@
 from pony.orm import commit
 
-from database.auxiliary import insert_member, insert_share, insert_member_authority_type, insert_debt_type
+from database.auxiliary import insert_member, insert_share, insert_member_authority_type, insert_debt_type, \
+    remove_member
 
 from forms import MemberForm, DebtTypeForm
 
@@ -34,3 +35,7 @@ def add_member_authority_type_to_sandik(form, sandik_id):
 def add_debt_type_to_sandik(form: DebtTypeForm, sandik_id):
     return insert_debt_type(sandik_id, form.name.data, form.explanation.data, form.max_number_of_installments.data,
                             form.max_amount.data, form.min_installment_amount.data)
+
+
+def remove_member_from_sandik(member_id):
+    return remove_member(member_id)

@@ -52,6 +52,9 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/add-debt-type",
                      view_func=sandik.add_debt_type_to_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/unpaid", view_func=transaction_page.unpaid_transactions_page)
+    app.add_url_rule("/sandik/<int:sandik_id>/remove_member",
+                     view_func=sandik.make_member_passive_page, methods=["GET", "POST"])
+
 
     # Üyelerin sandıklarla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions",

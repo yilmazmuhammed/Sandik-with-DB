@@ -160,3 +160,35 @@ def name_surname(webuser_id=None, member_id=None, share_id=None):
     if share_id:
         share = Share[share_id]
         return share.member_ref.webuser_ref.name + " " + share.member_ref.webuser_ref.surname
+
+
+class RemoveShareError(Exception):
+    pass
+
+
+class OutstandingDebt(RemoveShareError):
+    pass
+
+
+@db_session
+def remove_share(share_id):
+    share = Share[share_id]
+    remaining_debts = sum(t.debt_ref.remaining_debt for t in share.transactions_index if t.debt_ref)
+    if remaining_debts > 0:
+        raise OutstandingDebt("Hissenin ödenmemiş borcu var.")
+    paid_contributions = sum(t.amount for t in share.transactions_index if t.contribution_index)
+    transaction_ref = Transaction(share_ref=share, transaction_date=date.today(),
+                                  amount=-paid_contributions, type='Contribution', explanation="Üye ayrılması")
+    return Contribution(transaction_ref=transaction_ref, contribution_period='0-0')
+
+
+@db_session
+def remove_member(member_id):
+    member = Member[member_id]
+    try:
+        for share in member.shares_index:
+            remove_share(share.id)
+        member.is_active = False
+        return member
+    except OutstandingDebt:
+        raise OutstandingDebt("Hissenin ödenmemiş borcu var.")

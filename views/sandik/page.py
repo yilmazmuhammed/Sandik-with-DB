@@ -2,14 +2,15 @@ from flask import redirect, url_for, render_template, abort, flash
 from flask_login import login_required, current_user
 from pony.orm import db_session, ObjectNotFound
 
-from database.auxiliary import insert_share
+from database.auxiliary import insert_share, OutstandingDebt
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm, \
     select_form
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
-from views.sandik.db import add_member_to_sandik, add_member_authority_type_to_sandik, add_debt_type_to_sandik
+from views.sandik.db import add_member_to_sandik, add_member_authority_type_to_sandik, add_debt_type_to_sandik, \
+    remove_member_from_sandik
 from views.transaction.auxiliary import member_choices
 from views.webuser.auxiliary import SandikInfo
 
@@ -92,25 +93,6 @@ def add_member_to_sandik_page(sandik_id):
 
     info = FormPageInfo(form=form, title='Add member to sandik')
     return render_template("form.html", layout_page=LayoutPageInfo("Add member to sandik"), info=info)
-
-
-@authorization_to_the_sandik_required(adding_member=True)
-def select_member_to_edit_page(sandik_id):
-    member_list = member_choices(sandik_id)
-    form = select_form(form_name='member-form', tag='Member', id='member', coerce=int, submit_tag="Edit Member",
-                       choices=member_list)
-    if form.validate_on_submit():
-        try:
-            with db_session:
-                member = Member[form.member.data]
-                username = member.webuser_ref.username
-            return redirect(url_for('edit_member_of_sandik_page', sandik_id=sandik_id, username=username))
-        except ObjectNotFound:
-            flash(u"Member not found.", 'danger')
-            return abort(404)
-
-    info = FormPageInfo(form=form, title='Select member to edit')
-    return render_template("form.html", layout_page=LayoutPageInfo("Select member to edit"), info=info)
 
 
 @authorization_to_the_sandik_required(adding_member=True)
@@ -206,3 +188,45 @@ def add_debt_type_to_sandik_page(sandik_id):
 
     info = FormPageInfo(form=form, title='Add debt type to the sandik')
     return render_template("form.html", layout_page=LayoutPageInfo("Add debt type to sandik"), info=info)
+
+
+@authorization_to_the_sandik_required(adding_member=True)
+def select_member_to_edit_page(sandik_id):
+    member_list = member_choices(sandik_id)
+    form = select_form(form_name='member-form', tag='Member', id='member', coerce=int, submit_tag="Edit Member",
+                       choices=member_list)
+    if form.validate_on_submit():
+        try:
+            with db_session:
+                member = Member[form.member.data]
+                username = member.webuser_ref.username
+            return redirect(url_for('edit_member_of_sandik_page', sandik_id=sandik_id, username=username))
+        except ObjectNotFound:
+            flash(u"Member not found.", 'danger')
+            return abort(404)
+
+    info = FormPageInfo(form=form, title='Select member to edit')
+    return render_template("form.html", layout_page=LayoutPageInfo("Select member to edit"), info=info)
+
+
+@authorization_to_the_sandik_required(adding_member=True)
+def make_member_passive_page(sandik_id):
+    member_list = member_choices(sandik_id)
+    form = select_form(form_name='member-form', tag='Member', id='member', coerce=int, submit_tag="Remove Member",
+                       choices=member_list)
+    if form.validate_on_submit():
+        try:
+            with db_session:
+                member = Member[form.member.data]
+                remove_member_from_sandik(member.id)
+            return redirect(url_for('members_page', sandik_id=sandik_id))
+        except ObjectNotFound:
+            flash(u"Member not found.", 'danger')
+            return abort(404)
+        except OutstandingDebt as od:
+            flash(u"Exception: %s" % od, 'danger')
+        except Exception as e:
+            print("Something else went wrong: ", e)
+
+    info = FormPageInfo(form=form, title='Select member to edit')
+    return render_template("form.html", layout_page=LayoutPageInfo("Select member to remove"), info=info)
