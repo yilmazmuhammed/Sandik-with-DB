@@ -31,24 +31,30 @@
       <div class="panel panel-info">
         <div class="panel-heading">
           <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-5">
               <div class="row">
-                <div class="col-xs-5">
+                <div class="col-xs-3">
                   <a href="#" class="dropdown-toggle btn btn-xs btn-info " data-toggle="dropdown"><em class="glyphicon glyphicon-plus"></em></a>
                   <ul class="dropdown-menu">
                     <li><a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.id) }}">Member</a>
                     <li><a href="{{ url_for('add_share_to_member_page', sandik_id=sandik.id) }}">Share</a>
                   </ul>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-3">
                   <a href="#" class="dropdown-toggle btn btn-xs btn-info " data-toggle="dropdown"><em class="glyphicon glyphicon-pencil"></em></a>
                   <ul class="dropdown-menu">
                     <li><a href="{{ url_for('select_member_to_edit_page', sandik_id=sandik.id) }}">Member</a>
                   </ul>
                 </div>
+                <div class="col-xs-3">
+                  <a href="#" class="dropdown-toggle btn btn-xs btn-info " data-toggle="dropdown"><em class="glyphicon glyphicon-trash"></em></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{{ url_for('remove_member_of_sandik_page', sandik_id=sandik.id) }}">Member</a>
+                  </ul>
+                </div>
               </div>
             </div>
-            <div class="col-xs-9 text-right">
+            <div class="col-xs-7 text-right">
               <div class="huge">{{ sandik.number_of_members }}</div>
               <div>Members</div>
             </div>

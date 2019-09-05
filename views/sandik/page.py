@@ -210,7 +210,7 @@ def select_member_to_edit_page(sandik_id):
 
 
 @authorization_to_the_sandik_required(adding_member=True)
-def make_member_passive_page(sandik_id):
+def remove_member_of_sandik_page(sandik_id):
     member_list = member_choices(sandik_id)
     form = select_form(form_name='member-form', tag='Member', id='member', coerce=int, submit_tag="Remove Member",
                        choices=member_list)
