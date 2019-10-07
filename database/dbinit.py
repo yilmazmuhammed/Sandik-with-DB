@@ -37,6 +37,7 @@ class Member(db.Entity):
     is_active = Required(bool, default=True)
     member_authority_type_ref = Required('MemberAuthorityType')
     shares_index = Set('Share')
+    composite_key(webuser_ref, sandik_ref)
 
 
 class Share(db.Entity):
@@ -88,9 +89,9 @@ class DebtType(db.Entity):
     sandik_ref = Required(Sandik)
     name = Required(str, 20)
     explanation = Optional(str, 200)
-    max_number_of_installments = Optional(int, unsigned=True)
-    max_amount = Optional(int, unsigned=True)
-    min_installment_amount = Optional(int, unsigned=True)
+    max_number_of_installments = Optional(int, unsigned=True, default=0)
+    max_amount = Optional(int, unsigned=True, default=0)
+    min_installment_amount = Optional(int, unsigned=True, default=0)
     debts_index = Set(Debt)
 
 
@@ -110,7 +111,7 @@ class Payment(db.Entity):
 class MemberAuthorityType(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str)
-    max_number_of_members = Required(int, default="-1")
+    max_number_of_members = Required(int, default="0")
     sandik_ref = Required(Sandik)
     is_admin = Required(bool, default=False)
     reading_transaction = Required(bool, default=False)

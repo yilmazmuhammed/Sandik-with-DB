@@ -4,7 +4,7 @@ from pony.orm import db_session
 
 from database.auxiliary import insert_debt, insert_payment, insert_contribution, insert_transaction, insert_member, \
     insert_share, insert_webuser, insert_sandik, insert_member_authority_type, insert_debt_type
-from database.dbinit import DebtType
+from database.dbinit import DebtType, Share
 
 
 def db_tables(csv_table):
@@ -89,7 +89,7 @@ def add_transactions(transactions):
             debt = ['APB', 'PDAY']
             payment = ['APB-Ö', 'PDAY-Ö']
             if t[4] in debt:
-                insert_debt(transaction_date, t[2], t[3], t[5], DebtType.get(name=t[4]).id, t[6])
+                insert_debt(transaction_date, t[2], t[3], t[5], DebtType.get(name=t[4], sandik_ref=Share[t[3]].member_ref.sandik_ref).id, t[6])
             elif t[4] in payment:
                 insert_payment(transaction_date, t[2], t[5], transaction_id=t[6])
             elif t[4] == 'Aidat':
