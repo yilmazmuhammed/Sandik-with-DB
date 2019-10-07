@@ -1,6 +1,5 @@
-from flask import flash
-from flask_login import UserMixin, logout_user
-from pony.orm import db_session, ObjectNotFound
+from flask_login import UserMixin
+from pony.orm import db_session
 
 from database.dbinit import WebUser, Share
 
@@ -12,13 +11,6 @@ class FlaskUser(UserMixin):
             self.username = username
             self.webuser = WebUser[username]
             self.is_admin = self.webuser.is_admin
-            # try:
-            #     self.webuser = WebUser[username]
-            #     self.is_admin = self.webuser.is_admin
-            # except ObjectNotFound as obj:
-            #     flash(u"Username or password is incorrect.", 'danger')
-            #     logout_user()
-            #     raise obj
 
     def get_id(self):
         return self.webuser.username

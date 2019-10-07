@@ -122,11 +122,11 @@ class MemberAuthorityType(db.Entity):
 
 
 # PostgreSQL
-db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb',
-        port='5432')
-# db.bind(provider='postgres', user='auykhzkqcbtuek',
-#         password='dea61b13d38a6b893a353b30e865fedacc805572c9d035975a248f0ef09fbd93',
-#         host='ec2-54-247-125-116.eu-west-1.compute.amazonaws.com', database='dfuubeej01nmtv', port='5432')
+# db.bind(provider='postgres', user='sandikadmin', password='sandikadminpw', host='localhost', database='sandikdb',
+#         port='5432')
+db.bind(provider='postgres', user='auykhzkqcbtuek',
+        password='dea61b13d38a6b893a353b30e865fedacc805572c9d035975a248f0ef09fbd93',
+        host='ec2-54-247-125-116.eu-west-1.compute.amazonaws.com', database='dfuubeej01nmtv', port='5432')
 
 # set_sql_debug(True)
 
