@@ -4,7 +4,7 @@ from pony.orm import select, db_session
 
 from database.auxiliary import Contribution, Share, DebtType
 
-from database.dbinit import Member, Sandik
+from database.dbinit import Member, Sandik, WebUser
 
 
 # Return the dictionary that key is share.id and value is list of unpaid_dueses
@@ -64,9 +64,9 @@ def debt_choices(member):
     debts = select(transaction.debt_ref for transaction in
                    select(share.transactions_index for share in Share if share.member_ref == member)
                    if transaction.debt_ref)[:]
-    ret = [(debt.id, "Share %s - %s - %stl - kalan:%stl Görünen ad" % (
-        debt.transaction_ref.share_ref.share_order_of_member, debt.transaction_ref.transaction_date,
-        debt.transaction_ref.amount, debt.remaining_debt)) for debt in debts if debt.remaining_debt > 0]
+    ret = [(debt.id, "%s: H-%s -> %stl - %s/%s" % (
+        debt.transaction_ref.transaction_date, debt.transaction_ref.share_ref.share_order_of_member,
+        debt.installment_amount, debt.paid_installment, debt.number_of_installment)) for debt in debts if debt.remaining_debt > 0]
     return ret if len(ret) > 0 else [("", "Ödenmemiş borcunuz bulunmamaktadır...")]
 
 
@@ -176,3 +176,12 @@ class Period:
             return True
         else:
             return False
+
+
+def name_surname(share: Share=None, member: Member=None, webuser: WebUser=None):
+    if share:
+        member = share.member_ref
+    if member:
+       webuser = member.webuser_ref
+    if webuser:
+        return webuser.name +  " " + webuser.surname
