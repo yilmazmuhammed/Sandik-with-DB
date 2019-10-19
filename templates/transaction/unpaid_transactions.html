@@ -10,18 +10,18 @@
 <table class="table table-bordered ">
     <thead>
 <tr>
-<th colspan="2">ÖDENMEMİŞ "{{name}}" AİDATLARI</th>
+<th colspan="2" class="text-center">"{{name}}" Aidatlarını Ödemeyenler</th>
 </tr>
-<tr>
-        <th>Period</th>
-        <th>Üye ismi - Hissesi</th>
-    </tr>
+<!--<tr>-->
+<!--        <th>Period</th>-->
+<!--        <th>Üye ismi - Hissesi</th>-->
+<!--    </tr>-->
     </thead>
 <tbody>
 {% for cont in contributions[period] %}
 <!--<p>{{name}}: {{cont[1]}} - {{cont[0].share_order_of_member}}</p>-->
 <tr>
-<td >{{name}}</td>
+<!--<td >{{name}}</td>-->
 <td >{{cont[1]}} - {{cont[0].share_order_of_member}}</td>
 </tr>
 {% endfor %}
@@ -31,26 +31,26 @@
 {% endif %}
 {% if payments[period]|length %}
 <!--<p><b>ÖDENMEMİŞ "{{name}}" BORÇ TAKSİTLERİ</b></p>-->
-<table class="table table-bordered">
+<table class="table table-bordered" >
     <thead>
 <tr>
-<th colspan="4">ÖDENMEMİŞ "{{name}}" BORÇ TAKSİTLERİ</th>
+<th colspan="3" class="text-center">"{{name}}" Taksitleri</th>
 </tr>
     <tr>
-        <th>Period</th>
-        <th>Üye ismi - Hissesi</th>
-        <th>Taksit tutarı</th>
-        <th>Taksitler</th>
+<!--        <th>Period</th>-->
+        <th class="text-center">Üye ismi - Hissesi</th>
+        <th class="text-center">Taksit tutarı</th>
+        <th class="text-center">Taksitler</th>
     </tr>
     </thead>
     <tbody>
 {% for debt in payments[period] %}
 <!--<p>{{name}}: {{debt.transaction_ref.share_ref.member_ref.webuser_ref.name}} {{debt.transaction_ref.share_ref.member_ref.webuser_ref.surname}} - {{debt.transaction_ref.share_ref.share_order_of_member}} -> {{debt.installment_amount}}tl - {{debt.paid_installment}}/{{debt.number_of_installment}}</p>-->
 <tr>
-<td >{{name}}</td>
+<!--<td >{{name}}</td>-->
 <td >{{debt.transaction_ref.share_ref.member_ref.webuser_ref.name}} {{debt.transaction_ref.share_ref.member_ref.webuser_ref.surname}} - {{debt.transaction_ref.share_ref.share_order_of_member}}</td>
-<td>{{debt.installment_amount}}tl </td>
-<td >{{debt.paid_installment}}/{{debt.number_of_installment}}</td>
+<td class="text-center">{{debt.installment_amount}}tl </td>
+<td  class="text-center">{{debt.paid_installment}}/{{debt.number_of_installment}}</td>
 </tr>
 {% endfor %}
 </tbody>
