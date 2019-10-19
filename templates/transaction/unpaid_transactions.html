@@ -34,23 +34,26 @@
 <table class="table table-bordered" >
     <thead>
 <tr>
-<th colspan="3" class="text-center">"{{name}}" Taksitleri</th>
+<th colspan="5" class="text-center">"{{name}}" Taksitleri</th>
 </tr>
     <tr>
 <!--        <th>Period</th>-->
+        <th class="text-center">ID</th>
         <th class="text-center">Üye ismi - Hissesi</th>
+        <th class="text-center">Borç Tipi</th>
         <th class="text-center">Taksit tutarı</th>
         <th class="text-center">Taksit</th>
     </tr>
     </thead>
     <tbody>
 {% for debt in payments[period] %}
-<!--<p>{{name}}: {{debt.transaction_ref.share_ref.member_ref.webuser_ref.name}} {{debt.transaction_ref.share_ref.member_ref.webuser_ref.surname}} - {{debt.transaction_ref.share_ref.share_order_of_member}} -> {{debt.installment_amount}}tl - {{debt.paid_installment}}/{{debt.number_of_installment}}</p>-->
 <tr>
 <!--<td >{{name}}</td>-->
-<td >{{debt.transaction_ref.share_ref.member_ref.webuser_ref.name}} {{debt.transaction_ref.share_ref.member_ref.webuser_ref.surname}} - {{debt.transaction_ref.share_ref.share_order_of_member}}</td>
-<td class="text-center">{{debt.installment_amount}}tl </td>
-<td  class="text-center">{{debt.paid_installment}}/{{debt.number_of_installment}}</td>
+<td class="text-center">{{debt.debt_id}}</td>
+<td >{{debt.name_surname_share}}</td>
+<td class="text-center">{{debt.debt_type}}</td>
+<td class="text-center">{{debt.installment_amount_of_this_period}}tl </td>
+<td  class="text-center">{{debt.order_of_installment}}/{{debt.number_of_installment}}</td>
 </tr>
 {% endfor %}
 </tbody>

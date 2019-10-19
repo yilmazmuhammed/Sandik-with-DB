@@ -165,7 +165,7 @@ def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share=No
         webuser = WebUser[webuser_id]
 
     if webuser:
-        return webuser.name +  " " + webuser.surname
+        return webuser.name + " " + webuser.surname
 
 
 class RemoveShareError(Exception):

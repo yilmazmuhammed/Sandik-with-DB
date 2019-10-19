@@ -1,4 +1,5 @@
 import json
+from copy import copy
 
 from flask import abort, redirect, url_for, render_template, flash
 from flask_login import login_required, current_user
@@ -10,7 +11,7 @@ from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, Pay
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
-    member_choices, Period
+    member_choices, Period, UnpaidDebt
 from views.transaction.db import add_contribution
 
 
@@ -243,14 +244,17 @@ def unpaid_transactions_page(sandik_id):
 
         unpaid_payments = {}
         for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref.sandik_ref == sandik and
-                                                    debt.remaining_debt).sort_by(Debt.id)[:]:
+                                                    debt.remaining_debt).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + str(d.transaction_ref.share_ref.share_order_of_member))[:]:
             unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
+            add_debt = UnpaidDebt(debt)
             for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
-                add_debt = debt
+                add_debt.order_of_installment += 1
+                x = copy(add_debt)
+                add_debt.installment_amount_of_this_period = add_debt.debt.installment_amount
                 if unpaid_payments.get(period):
-                    unpaid_payments[period].append(add_debt)
+                    unpaid_payments[period].append(x)
                 else:
-                    unpaid_payments[period] = [add_debt]
+                    unpaid_payments[period] = [x]
 
         periods = []
         for ekle in list(set(list(unpaid_contributions.keys()) + list(unpaid_payments.keys()))):

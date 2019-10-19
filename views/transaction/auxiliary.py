@@ -2,9 +2,7 @@ from datetime import date
 
 from pony.orm import select, db_session
 
-from database.auxiliary import Contribution, Share, DebtType
-
-from database.dbinit import Member, Sandik, WebUser
+from database.dbinit import Member, Sandik, Debt, Contribution, Share, DebtType, WebUser
 
 
 # Return the dictionary that key is share.id and value is list of unpaid_dueses
@@ -61,12 +59,11 @@ def member_choices(sandik_id, only_active_member=True):
 
 
 def debt_choices(member):
-    debts = select(transaction.debt_ref for transaction in
-                   select(share.transactions_index for share in Share if share.member_ref == member)
-                   if transaction.debt_ref)[:]
-    ret = [(debt.id, "%s: H-%s -> %stl - %s/%s" % (
-        debt.transaction_ref.transaction_date, debt.transaction_ref.share_ref.share_order_of_member,
-        debt.installment_amount, debt.paid_installment, debt.number_of_installment)) for debt in debts if debt.remaining_debt > 0]
+    debts = select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref == member and debt.remaining_debt)
+    ret = [(debt.id, "%s (%s): H-%s -> %stl - %s/%s" % (
+        debt.id, Period.period_name(Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)),
+        debt.transaction_ref.share_ref.share_order_of_member,
+        debt.installment_amount, debt.paid_installment + 1, debt.number_of_installment)) for debt in debts]
     return ret if len(ret) > 0 else [("", "Ödenmemiş borcunuz bulunmamaktadır...")]
 
 
@@ -178,10 +175,35 @@ class Period:
             return False
 
 
-def name_surname(share: Share=None, member: Member=None, webuser: WebUser=None):
+class UnpaidDebt:
+    def __init__(self, debt: Debt):
+        self.debt = debt
+        self.debt_id = debt.id
+        self.name_surname_share = local_name_surname(share=debt.transaction_ref.share_ref) + " - " + str(
+            debt.transaction_ref.share_ref.share_order_of_member)
+        self.order_of_installment = debt.paid_installment
+        self.number_of_installment = debt.number_of_installment
+        self.installment_amount = debt.installment_amount
+        self.installment_amount_of_this_period = debt.remaining_debt - \
+                                                 (debt.remaining_installment - 1) * debt.installment_amount
+        self.debt_type = debt.debt_type_ref.name
+
+
+@db_session
+def local_name_surname(webuser_id=None, member_id=None, share_id=None, share: Share = None, member: Member = None,
+                       webuser: WebUser = None):
+    if share_id:
+        share = Share[share_id]
+
     if share:
         member = share.member_ref
+    elif member_id:
+        member = Member[member_id]
+
     if member:
-       webuser = member.webuser_ref
+        webuser = member.webuser_ref
+    elif webuser_id:
+        webuser = WebUser[webuser_id]
+
     if webuser:
-        return webuser.name +  " " + webuser.surname
+        return webuser.name + " " + webuser.surname
