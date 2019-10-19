@@ -150,16 +150,22 @@ def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, 
 
 
 @db_session
-def name_surname(webuser_id=None, member_id=None, share_id=None):
-    if webuser_id:
-        webuser = WebUser[webuser_id]
-        return webuser.name + " " + webuser.surname
-    if member_id:
-        member = Member[member_id]
-        return member.webuser_ref.name + " " + member.webuser_ref.surname
+def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share=None, member: Member=None, webuser: WebUser=None):
     if share_id:
         share = Share[share_id]
-        return share.member_ref.webuser_ref.name + " " + share.member_ref.webuser_ref.surname
+
+    if share:
+        member = share.member_ref
+    elif member_id:
+        member = Member[member_id]
+
+    if member:
+       webuser = member.webuser_ref
+    elif webuser_id:
+        webuser = WebUser[webuser_id]
+
+    if webuser:
+        return webuser.name +  " " + webuser.surname
 
 
 class RemoveShareError(Exception):
