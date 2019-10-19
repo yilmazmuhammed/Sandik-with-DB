@@ -3,10 +3,11 @@
 {% block content %}
 <div class="container">
   <div class="row">
+      <div class="col-md-10 col-md-offset-1">
 {% for period, name in periods %}
 {% if contributions[period]|length %}
 <!--<p><b>ÖDENMEMİŞ "{{name}}" AİDATLARI</b></p>-->
-<table class="table table-bordered">
+<table class="table table-bordered ">
     <thead>
 <tr>
 <th colspan="2">ÖDENMEMİŞ "{{name}}" AİDATLARI</th>
@@ -57,6 +58,7 @@
 <br>
 {% endif %}
 {% endfor %}
+      </div>
   </div>
 </div>
 {% endblock %}
