@@ -81,8 +81,8 @@ class Period:
     def last_period_2(period: str, times: int) -> str:
         first_month = int(period[5:])
         first_year = int(period[:4])
-        month = (first_month + times) % 12
-        year = first_year + int((first_month + times) / 12)
+        month = (first_month + times - 1) % 12 + 1
+        year = first_year + int((first_month + times - 1) / 12)
         return "%s-%s" % (year, month)
 
     @staticmethod
