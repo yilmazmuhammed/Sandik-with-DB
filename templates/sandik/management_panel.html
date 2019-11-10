@@ -28,6 +28,29 @@
     </div>
 
     <div class="col-lg-3 col-md-6">
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <div class="row">
+<!--            <div class="col-xs-3">-->
+<!--              <a href="#" class="btn btn-xs btn-danger"><em class="glyphicon glyphicon-plus"></em></a>-->
+<!--            </div>-->
+            <div class="col-xs-12 text-right">
+              <div class="huge">Unpaid Contributions</div>
+              <div>and Installments</div>
+            </div>
+          </div>
+        </div>
+        <a href="{{ url_for('unpaid_transactions_page', sandik_id=sandik.id) }}">
+          <div class="panel-footer">
+            <span class="pull-left">Views...</span>
+            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+            <div class="clearfix"></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
       <div class="panel panel-info">
         <div class="panel-heading">
           <div class="row">
@@ -94,11 +117,11 @@
     </div>
 
     <div class="col-lg-3 col-md-6">
-      <div class="panel panel-danger">
+      <div class="panel panel-primary">
         <div class="panel-heading">
           <div class="row">
             <div class="col-xs-3">
-              <a href="{{ url_for('add_debt_type_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-danger"><em class="glyphicon glyphicon-plus"></em></a>
+              <a href="{{ url_for('add_debt_type_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-primary"><em class="glyphicon glyphicon-plus"></em></a>
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">Numbers...</div>
@@ -116,28 +139,7 @@
       </div>
     </div>
 
-    <div class="col-lg-3 col-md-6">
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <div class="row">
-            <div class="col-xs-3">
-              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-primary"><em class="glyphicon glyphicon-plus"></em></a>
-            </div>
-            <div class="col-xs-9 text-right">
-              <div class="huge">Numbers...</div>
-              <div>Members</div>
-            </div>
-          </div>
-        </div>
-        <a href="#">
-          <div class="panel-footer">
-            <span class="pull-left">Manage...</span>
-            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-            <div class="clearfix"></div>
-          </div>
-        </a>
-      </div>
-    </div>
+
 
   </div>
 
