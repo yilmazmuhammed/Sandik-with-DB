@@ -13,7 +13,7 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
     num_of_inst = int(num_of_inst)
     ia = int(amount) / num_of_inst
     ia = int(ia) if ia % 1 == 0 else int(ia) + 1
-    Debt(
+    return Debt(
         transaction_ref=Transaction(
             share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Debt',
             explanation=explanation),
@@ -33,24 +33,24 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
     # TODO Kontrolleri excception ile yap, hata mesajını fonksiyonun kullanıldığı yerde ver
     if amount > debt.remaining_debt:  # If new paid amount is bigger than remaining amount of the debt
         flash(u"Paid amount cannot be more than the remaining debt", 'danger')
-        return False
+        return None
     else:  # There is no problem
         pnod = count(select(p for p in Payment if p.debt_ref == debt))
         pdsf = debt.paid_debt + amount
         pisf = int(pdsf / debt.installment_amount)
         rdsf = debt.remaining_debt - amount
         risf = debt.number_of_installment - pisf
-        Payment(debt_ref=debt, payment_number_of_debt=pnod, paid_debt_so_far=pdsf, paid_installment_so_far=pisf,
-                remaining_debt_so_far=rdsf, remaining_installment_so_far=risf,
-                transaction_ref=Transaction(share_ref=share, transaction_date=in_date, amount=amount,
-                                            type='Payment', explanation=explanation
-                                            )
-                )
+        p = Payment(debt_ref=debt, payment_number_of_debt=pnod, paid_debt_so_far=pdsf, paid_installment_so_far=pisf,
+                    remaining_debt_so_far=rdsf, remaining_installment_so_far=risf,
+                    transaction_ref=Transaction(share_ref=share, transaction_date=in_date, amount=amount,
+                                                type='Payment', explanation=explanation
+                                                )
+                    )
         debt.paid_debt = pdsf
         debt.paid_installment = pisf
         debt.remaining_debt = rdsf
         debt.remaining_installment = risf
-        return True
+        return p
 
 
 # TODO flash yerine exception kullan, fonksiyonun kullanıdığı yerlerde exceptionları yakalayarak flash ile gerekli
@@ -70,6 +70,10 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
             flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
             flash(u"Fakat başlangıç aidatı sistemi yapılana kadar işlem eklendi.", 'danger')
             # return False
+        for period in periods:
+            if period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share)[:]:
+                flash(u"Paid amount must be divided by 25.", 'danger')
+                return False
 
     transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation)
@@ -82,8 +86,8 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
 
 @db_session
 def insert_transaction(in_date, amount, share_id, explanation):
-    Transaction(share_ref=Share[share_id], transaction_date=in_date, amount=amount,
-                type='Other', explanation=explanation)
+    return Transaction(share_ref=Share[share_id], transaction_date=in_date, amount=amount,
+                       type='Other', explanation=explanation)
 
 
 @db_session
@@ -150,7 +154,8 @@ def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, 
 
 
 @db_session
-def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share=None, member: Member=None, webuser: WebUser=None):
+def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share = None, member: Member = None,
+                 webuser: WebUser = None):
     if share_id:
         share = Share[share_id]
 
@@ -160,7 +165,7 @@ def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share=No
         member = Member[member_id]
 
     if member:
-       webuser = member.webuser_ref
+        webuser = member.webuser_ref
     elif webuser_id:
         webuser = WebUser[webuser_id]
 

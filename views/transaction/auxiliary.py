@@ -73,8 +73,8 @@ class Period:
     def last_period(first: date, times: int) -> str:
         first_month = first.month
         first_year = first.year
-        month = (first_month + times) % 12
-        year = first_year + int((first_month + times) / 12)
+        month = (first_month + times - 1) % 12 + 1
+        year = first_year + int((first_month + times - 1) / 12)
         return "%s-%s" % (year, month)
 
     @staticmethod
@@ -105,21 +105,10 @@ class Period:
 
     @staticmethod
     def months_between_two_period(first_period: str, second_period: str) -> list:
-        if first_period > second_period:
-            first_period, second_period = second_period, first_period
+        first = date(int(first_period[:4]), int(first_period[5:]), 1)
+        second = date(int(second_period[:4]), int(second_period[5:]), 1)
 
-        month = int(first_period[5:])
-        year = int(first_period[:4])
-
-        month_list = []
-        while "%s-%s" % (year, month) <= second_period:
-            month_list.append("%s-%s" % (year, month,))
-            if month < 12:
-                month += 1
-            else:
-                year += 1
-                month = 1
-        return month_list
+        return Period.months_between_two_date(first, second)
 
     @staticmethod
     def all_months_of_sandik(sandik: Sandik) -> list:
