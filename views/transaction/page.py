@@ -31,9 +31,10 @@ def add_transaction_page(sandik_id):
         form.share.choices += share_choices(member)
 
         if form.validate_on_submit():
-            insert_transaction(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data)
+            insert_transaction(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
+                               created_by_username=current_user.webuser.username)
 
-            return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+            return redirect(url_for('member_transactions_in_sandik_page', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Transaction")
         return render_template("form.html", layout_page=LayoutPageInfo("Add Transaction"), info=info)
@@ -94,9 +95,10 @@ def add_debt_page(sandik_id):
             # TODO kontrolleri yap, (borcu varsa bir daha alamaz[sayfaya giriş de engellenebilir], en fazla taksit,
             #  parasına göre en fazla borç)
             insert_debt(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
-                        form.debt_type.data, form.number_of_installment.data)
+                        form.debt_type.data, form.number_of_installment.data,
+                        created_by_username=current_user.webuser.username)
 
-            return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+            return redirect(url_for('member_transactions_in_sandik_page', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Take Debt")
         return render_template('form.html', layout_page=LayoutPageInfo("Take Debt"), info=info)
@@ -118,10 +120,11 @@ def add_payment_page(sandik_id):
         form.debt.choices = debt_choices(member)
 
         if form.validate_on_submit():
-            if Debt[form.debt.data].transaction_ref.share_ref.member_ref.webuser_ref != current_user.webuser:
+            if Debt[form.debt.data].transaction_ref.share_ref.member_ref.webuser_ref.username != current_user.webuser.username:
                 flash(u'Başka birisinin borcunu ödeyemezsiniz. Yöneticiye başvurunuz.', 'danger')
-            elif insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data, form.debt.data):
-                return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+            elif insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data,
+                                created_by_username=current_user.webuser.username, debt_id=form.debt.data):
+                return redirect(url_for('member_transactions_in_sandik_page', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add payment")
         return render_template('form.html', layout_page=LayoutPageInfo("Add payment"), info=info)
@@ -165,19 +168,22 @@ def add_custom_transaction_for_admin_page(sandik_id):
 
         if c_form.validate_on_submit():
             if insert_contribution(c_form.transaction_date.data, c_form.amount.data, c_form.share.data,
-                                   c_form.explanation.data, c_form.contribution_period.data):
+                                   c_form.explanation.data, c_form.contribution_period.data,
+                                   created_by_username=current_user.webuser.username):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif d_form.validate_on_submit():
             insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.explanation.data,
-                        d_form.debt_type.data, d_form.number_of_installment.data)
+                        d_form.debt_type.data, d_form.number_of_installment.data,
+                        created_by_username=current_user.webuser.username)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif p_form.validate_on_submit():
             if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
-                              p_form.debt.data):
+                              created_by_username=current_user.webuser.username,
+                              debt_id=p_form.debt.data):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif o_form.validate_on_submit():
             insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
-                               o_form.explanation.data)
+                               o_form.explanation.data, created_by_username=current_user.webuser.username)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
 
         forms = [c_form, d_form, p_form, o_form]
@@ -244,7 +250,7 @@ def unpaid_transactions_page(sandik_id):
 
         unpaid_payments = {}
         for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref.sandik_ref == sandik and
-                                                    debt.remaining_debt).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + str(d.transaction_ref.share_ref.share_order_of_member))[:]:
+                                                    debt.remaining_debt).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(d.transaction_ref.share_ref.share_order_of_member))[:]:
             unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
             add_debt = UnpaidDebt(debt)
             for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):

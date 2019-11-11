@@ -89,10 +89,16 @@ def add_transactions(transactions):
             debt = ['APB', 'PDAY']
             payment = ['APB-Ö', 'PDAY-Ö']
             if t[4] in debt:
-                insert_debt(transaction_date, t[2], t[3], t[5], DebtType.get(name=t[4], sandik_ref=Share[t[3]].member_ref.sandik_ref).id, t[6])
+                insert_debt(transaction_date, t[2], t[3], t[5],
+                            DebtType.get(name=t[4], sandik_ref=Share[t[3]].member_ref.sandik_ref).id, t[6],
+                            created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9])
             elif t[4] in payment:
-                insert_payment(transaction_date, t[2], t[5], transaction_id=t[6])
+                insert_payment(transaction_date, t[2], t[5], created_by_username=t[7], confirmed_by_username=t[8],
+                               deleted_by_username=t[9], transaction_id=t[6])
             elif t[4] == 'Aidat':
-                insert_contribution(transaction_date, t[2], t[3], t[5], t[6].split(" "), is_from_import_data=True)
+                insert_contribution(transaction_date, t[2], t[3], t[5], t[6].split(" "),
+                                    created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9],
+                                    is_from_import_data=True)
             elif t[4] == 'Diğer':
-                insert_transaction(transaction_date, t[2], t[3], t[5])
+                insert_transaction(transaction_date, t[2], t[3], t[5],
+                                   created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9])

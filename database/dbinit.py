@@ -25,6 +25,9 @@ class WebUser(db.Entity):
     is_admin = Required(bool, default=False)
     is_active = Required(bool, default=True)
     members_index = Set('Member')
+    created_transactions = Set('Transaction', reverse='created_by')
+    confirmed_transactions = Set('Transaction', reverse='confirmed_by')
+    deleted_transactions = Set('Transaction', reverse='deleted_by')
 
 
 class Member(db.Entity):
@@ -55,11 +58,13 @@ class Transaction(db.Entity):
     transaction_date = Required(date)
     amount = Required(int)
     type = Required(str, 15)  # Bu işlem tipi diye kendi veri tipim olması gerekiyor. CONTRIBUTION, DEBT, PAYMENT, OTHER
-    explanation = Optional(str, 300)
-    is_confirm = Required(bool, default=False)
+    explanation = Optional(str, 400)
     contribution_index = Set('Contribution')
     payment_ref = Optional('Payment')
     debt_ref = Optional('Debt')
+    created_by = Required(WebUser, reverse='created_transactions')
+    confirmed_by = Optional(WebUser, reverse='confirmed_transactions')
+    deleted_by = Optional(WebUser, reverse='deleted_transactions')
 
 
 class Contribution(db.Entity):
@@ -89,9 +94,9 @@ class DebtType(db.Entity):
     sandik_ref = Required(Sandik)
     name = Required(str, 20)
     explanation = Optional(str, 200)
-    max_number_of_installments = Optional(int, unsigned=True, default=0)
-    max_amount = Optional(int, unsigned=True, default=0)
-    min_installment_amount = Optional(int, unsigned=True, default=0)
+    max_number_of_installments = Optional(int, default=0, unsigned=True)
+    max_amount = Optional(int, default=0, unsigned=True)
+    min_installment_amount = Optional(int, default=0, unsigned=True)
     debts_index = Set(Debt)
 
 
@@ -111,7 +116,7 @@ class Payment(db.Entity):
 class MemberAuthorityType(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(str)
-    max_number_of_members = Required(int, default="0")
+    max_number_of_members = Required(int, default=0)
     sandik_ref = Required(Sandik)
     is_admin = Required(bool, default=False)
     reading_transaction = Required(bool, default=False)

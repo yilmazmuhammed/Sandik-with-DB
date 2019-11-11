@@ -9,23 +9,45 @@ from views.transaction.auxiliary import Period
 
 
 @db_session
-def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst):
+def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst,
+                created_by_username, confirmed_by_username=None, deleted_by_username=None):
+    created_by = WebUser[created_by_username]
+    if confirmed_by_username is not "" and confirmed_by_username is not None:
+        confirmed_by = WebUser[confirmed_by_username]
+    else:
+        confirmed_by = None
+    if deleted_by_username is not "" and deleted_by_username is not None:
+        deleted_by = WebUser[deleted_by_username]
+    else:
+        deleted_by = None
+
     num_of_inst = int(num_of_inst)
     ia = int(amount) / num_of_inst
     ia = int(ia) if ia % 1 == 0 else int(ia) + 1
     return Debt(
         transaction_ref=Transaction(
-            share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Debt',
-            explanation=explanation),
+            share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Debt', explanation=explanation,
+            created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by),
         debt_type_ref=DebtType[type_id], number_of_installment=num_of_inst, installment_amount=ia,
         paid_debt=0, paid_installment=0, remaining_debt=amount, remaining_installment=num_of_inst,
         starting_period=Period.last_period(in_date, 1), due_period=Period.last_period(in_date, num_of_inst))
 
 
 @db_session
-def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=None):
+def insert_payment(in_date, amount, explanation,
+                   created_by_username, confirmed_by_username=None, deleted_by_username=None,
+                   debt_id=None, transaction_id=None):
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref
+    created_by = WebUser[created_by_username]
+    if confirmed_by_username is not "" and confirmed_by_username is not None:
+        confirmed_by = WebUser[confirmed_by_username]
+    else:
+        confirmed_by = None
+    if deleted_by_username is not "" and deleted_by_username is not None:
+        deleted_by = WebUser[deleted_by_username]
+    else:
+        deleted_by = None
 
     amount = int(amount)
 
@@ -43,7 +65,8 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
         p = Payment(debt_ref=debt, payment_number_of_debt=pnod, paid_debt_so_far=pdsf, paid_installment_so_far=pisf,
                     remaining_debt_so_far=rdsf, remaining_installment_so_far=risf,
                     transaction_ref=Transaction(share_ref=share, transaction_date=in_date, amount=amount,
-                                                type='Payment', explanation=explanation
+                                                type='Payment', explanation=explanation, created_by=created_by,
+                                                confirmed_by=confirmed_by, deleted_by=deleted_by
                                                 )
                     )
         debt.paid_debt = pdsf
@@ -56,8 +79,21 @@ def insert_payment(in_date, amount, explanation, debt_id=None, transaction_id=No
 # TODO flash yerine exception kullan, fonksiyonun kullanıdığı yerlerde exceptionları yakalayarak flash ile gerekli
 #  mesajı yazdır
 @db_session
-def insert_contribution(in_date: date, amount, share_id, explanation, periods: list, is_from_import_data=False):
+def insert_contribution(in_date: date, amount, share_id, explanation, periods: list,
+                        created_by_username, confirmed_by_username=None, deleted_by_username=None,
+                        is_from_import_data=False):
+    # ..._by_username'ler None mı olsun yoksa "" mı?
     share = Share[share_id]
+    created_by = WebUser[created_by_username]
+    if confirmed_by_username is not "" and confirmed_by_username is not None:
+        confirmed_by = WebUser[confirmed_by_username]
+    else:
+        confirmed_by = None
+    if deleted_by_username is not "" and deleted_by_username is not None:
+        deleted_by = WebUser[deleted_by_username]
+    else:
+        deleted_by = None
+
     # TODO Conribution_amount değerini sandık kurallarından al
     contribution_amount = 25
 
@@ -76,7 +112,8 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
                 return False
 
     transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
-                                  amount=amount, type='Contribution', explanation=explanation)
+                                  amount=amount, type='Contribution', explanation=explanation,
+                                  created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
     contributions = []
     for period in periods:
@@ -85,9 +122,21 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
 
 
 @db_session
-def insert_transaction(in_date, amount, share_id, explanation):
+def insert_transaction(in_date, amount, share_id, explanation,
+                       created_by_username, confirmed_by_username=None, deleted_by_username=None):
+    created_by = WebUser[created_by_username]
+    if confirmed_by_username is not "" and confirmed_by_username is not None:
+        confirmed_by = WebUser[confirmed_by_username]
+    else:
+        confirmed_by = None
+    if deleted_by_username is not "" and deleted_by_username is not None:
+        deleted_by = WebUser[deleted_by_username]
+    else:
+        deleted_by = None
+
     return Transaction(share_ref=Share[share_id], transaction_date=in_date, amount=amount,
-                       type='Other', explanation=explanation)
+                       type='Other', explanation=explanation,
+                       created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
 
 @db_session

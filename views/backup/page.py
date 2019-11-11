@@ -24,11 +24,11 @@ def export_all_datas():
 
         # html of sandiks
         sandiks = select(sandik for sandik in Sandik).sort_by(Sandik.id)[:]
-        html += "SANDIKLAR;%s<br>" %len(sandiks)
+        html += "SANDIKLAR;%s<br>" % len(sandiks)
         html += "id;name;date_of_opening;is_active;explanation<br>"
         for sandik in sandiks:
             html += "%s;%s;%s;%s;%s<br>" % (sandik.id, sandik.name, sandik.date_of_opening, sandik.is_active,
-                                           sandik.explanation)
+                                            sandik.explanation)
 
         # html of member_authority_types
         ma_types = select(ma_type for ma_type in MemberAuthorityType).sort_by(MemberAuthorityType.id)[:]
@@ -93,6 +93,11 @@ def export_all_datas():
                 for c in t.contribution_index.sort_by(lambda co: co.contribution_period):
                     html += "%s " % c.contribution_period
                 html = html[:-1]
+
+            html += ";"
+            html += "%s;" % (t.created_by.username,)
+            html += "%s;" % (t.confirmed_by.username if t.confirmed_by else ";",)
+            html += "%s" % (t.deleted_by.username if t.deleted_by else "",)
 
             html += '<br>'
     return html

@@ -1,4 +1,5 @@
 from flask import flash
+from flask_login import current_user
 from pony.orm import select
 
 from database.auxiliary import insert_contribution
@@ -16,7 +17,7 @@ def add_contribution(form: ContributionForm):
             return False
 
     if insert_contribution(form.transaction_date.data, form.amount.data, share.share_id,
-                           form.explanation.data, periods):
+                           form.explanation.data, periods, created_by_username=current_user.webuser.username):
         return True
 
     return False
