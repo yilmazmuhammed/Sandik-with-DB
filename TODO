@@ -8,9 +8,11 @@ TODO 25 sandık üyeleri için bütün üyelerin gözüktüğü ve toplam işlem
         sandik/id/members sayfasını düzenle
 TODO 26 Ödenmeyen taksit ve aidatların sayfasını düzenle
 TODO 28 Kişiyi çıkartırken hisseleri de False yap
-TODO 29 Ödenmiş aidat bir daha ödenemez.
-TODO 30
+TODO 30 Onaylanmamış işlemler sayfası
+TODO 31 Onaylanmamış işlemleri hesaplamalara katma
+TODO 32 İşlem silme sayfası
+TODO 33 İşlem düzenleme sayfası
+TODO 34 dbtables (transactions) tablosunu hızlandır/değiştir
+TODO 35
 
 FRONTEND 20! Sandıktaki bütün transaction toplamlarını göster
-
-DONE __ Sandık üyesini düzenleme sayfası eklendi

@@ -3,7 +3,7 @@ from copy import copy
 
 from flask import abort, redirect, url_for, render_template, flash
 from flask_login import login_required, current_user
-from pony.orm import db_session, select
+from pony.orm import db_session, select, desc
 
 from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction, name_surname
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
@@ -207,7 +207,7 @@ def transactions_page(sandik_id):
         sandik = Sandik[sandik_id]
 
         transactions = select(transaction for transaction in Transaction
-                              if transaction.share_ref.member_ref.sandik_ref == sandik)[:]
+                              if transaction.share_ref.member_ref.sandik_ref == sandik).sort_by(desc(Transaction.id))[:]
         return render_template("transactions.html", layout_page=LayoutPageInfo("All Transactions of The Sandik"),
                                transactions=transactions)
 
@@ -216,8 +216,16 @@ def transactions_page(sandik_id):
 def transaction_in_transactions_page(sandik_id, transaction_id):
     with db_session:
         transaction = Transaction[transaction_id]
-    # transaction.
-    return "Bu sayfa henüz yapılmadı"
+        # TODO abort u değistir
+        if transaction.share_ref.member_ref.sandik_ref.id != sandik_id:
+            abort(404)
+        payments = None
+        if transaction.debt_ref:
+            payments = transaction.debt_ref.payments_index.sort_by(lambda p: p.id)
+        elif transaction.payment_ref:
+            payments = transaction.payment_ref.debt_ref.payments_index.sort_by(lambda p: p.id)
+
+        return render_template("transaction/transaction_information.html", layout_page=LayoutPageInfo("Transaction information"),t=transaction, payments = payments)
 
 
 @login_required

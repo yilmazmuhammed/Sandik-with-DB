@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    İşlem bilgileri
+                </div>
+              <div class="panel-body">
+                  <table>
+                      <tbody>
+                      <tr>
+                          <td>ID: </td>
+                          <td>{{t.id}}</td>
+                      </tr>
+                      <tr>
+                          {% set share = t.share_ref.member_ref.webuser_ref.name + " " + t.share_ref.member_ref.webuser_ref.surname + " - " + t.share_ref.share_order_of_member|string %}
+                          {% set share_link = url_for('transactions_page', sandik_id=t.share_ref.member_ref.sandik_ref.id) + "?share=" + share %}
+                          <td>Üye: </td>
+                          <td><a href="{{share_link}}">  {{ share }}</a></td>
+                      </tr>
+                      <tr>
+                          <td>Tarih: </td>
+                          <td>{{t.transaction_date}}</td>
+                      </tr>
+                      <tr>
+                          <td>Tür: </td>
+                          <td>{{t.type}} {% if t.debt_ref %}- {{t.debt_ref.debt_type_ref.name}}{%endif%}</td>
+                      </tr>
+                      <tr>
+                          <td>Miktar: </td>
+                          <td>{{t.amount}}₺</td>
+                      </tr>
+                      {% if t.contribution_index %}
+                      <tr>
+                          <td>Aidat Periyodu: </td>
+                          <td>
+                          {% for c in t.contribution_index %}
+                                  {{ c.contribution_period }}
+                          {%endfor%}
+                          </td>
+                      </tr>
+
+                      {% elif t.debt_ref %}
+                      <tr>
+                          <td>Ödeme Aralığı: </td>
+                          <td>{{t.debt_ref.starting_period}} -> {{t.debt_ref.due_period}}</td>
+                      </tr>
+                      <tr>
+                          <td>Ödeme durumu: </td>
+                          <td>{{t.debt_ref.paid_installment}} / {{t.debt_ref.number_of_installment}}</td>
+                      </tr>
+
+                      {% elif t.payment_ref %}
+                      <tr>
+                          <td>Ödenmiş taksit: </td>
+                          <td>{{t.payment_ref.paid_installment_so_far}} / {{t.payment_ref.debt_ref.number_of_installment}}</td>
+                      </tr>
+                      {% endif %}
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+        </div>
+        {% if t.payment_ref.debt_ref %}
+        {%set d = t.payment_ref.debt_ref %}
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Borç bilgileri
+                </div>
+              <div class="panel-body">
+                  <table>
+                      <tbody>
+                      <tr>
+                          <td>ID: </td>
+                              <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=d.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=d.transaction_ref.id)}}">{{d.transaction_ref.id}}</a></td>
+                      </tr>
+                      <tr>
+                          <td>Tarih: </td>
+                          <td>{{d.transaction_ref.transaction_date}}</td>
+                      </tr>
+                      <tr>
+                          <td>Tür: </td>
+                          <td>{{d.debt_type_ref.name}}</td>
+                      </tr>
+                      <tr>
+                          <td>Miktar: </td>
+                          <td>{{d.transaction_ref.amount}}₺</td>
+                      </tr>
+                      <tr>
+                          <td>Ödeme Aralığı: </td>
+                          <td>{{d.starting_period}} / {{d.due_period}}</td>
+                      </tr>
+                      <tr>
+                          <td>Ödeme durumu: </td>
+                          <td>{{d.paid_installment}} / {{d.number_of_installment}}</td>
+                      </tr>
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% if payments %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Borca ait ödemeler</h3>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Tarih</th>
+                            <th>Miktar</th>
+                            <th>Ödenen Borç</th>
+                            <th>Kalan Borç</th>
+                            <th>Ödenmiş Taksit</th>
+                            <th>Açıklama</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in payments %}
+                        <tr>
+                            <td>{{p.payment_number_of_debt + 1}}</td>
+                            <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=p.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=p.transaction_ref.id)}}">{{p.transaction_ref.id}}</a></td>
+                            <td>{{p.transaction_ref.transaction_date}}</td>
+                            <td>{{p.transaction_ref.amount}}₺</td>
+                            <td>{{p.paid_debt_so_far}}₺</td>
+                            <td>{{p.remaining_debt_so_far}}₺</td>
+                            <td>{{p.paid_installment_so_far}} / {{ p.debt_ref.number_of_installment}}</td>
+                            <td>{{p.transaction_ref.explanation}}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

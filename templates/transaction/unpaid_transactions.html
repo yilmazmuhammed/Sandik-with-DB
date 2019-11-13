@@ -1,67 +1,78 @@
 {% extends "layout.html" %}
 
+{% block extra_head %}
+
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-  <div class="row">
-      <div class="col-md-10 col-md-offset-1">
-{% for period, name in periods %}
-{% if contributions[period]|length %}
-<!--<p><b>ÖDENMEMİŞ "{{name}}" AİDATLARI</b></p>-->
-<table class="table table-bordered ">
-    <thead>
-<tr>
-<th colspan="2" class="text-center">"{{name}}" Aidatlarını Ödemeyenler</th>
-</tr>
-<!--<tr>-->
-<!--        <th>Period</th>-->
-<!--        <th>Üye ismi - Hissesi</th>-->
-<!--    </tr>-->
-    </thead>
-<tbody>
-{% for cont in contributions[period] %}
-<!--<p>{{name}}: {{cont[1]}} - {{cont[0].share_order_of_member}}</p>-->
-<tr>
-<!--<td >{{name}}</td>-->
-<td >{{cont[1]}} - {{cont[0].share_order_of_member}}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-<br>
-{% endif %}
-{% if payments[period]|length %}
-<!--<p><b>ÖDENMEMİŞ "{{name}}" BORÇ TAKSİTLERİ</b></p>-->
-<table class="table table-bordered" >
-    <thead>
-<tr>
-<th colspan="5" class="text-center">"{{name}}" Taksitleri</th>
-</tr>
-    <tr>
-<!--        <th>Period</th>-->
-        <th class="text-center">ID</th>
-        <th class="text-center">Üye ismi - Hissesi</th>
-        <th class="text-center">Borç Tipi</th>
-        <th class="text-center">Taksit tutarı</th>
-        <th class="text-center">Taksit</th>
-    </tr>
-    </thead>
-    <tbody>
-{% for debt in payments[period] %}
-<tr>
-<!--<td >{{name}}</td>-->
-<td class="text-center">{{debt.debt_id}}</td>
-<td >{{debt.name_surname_share}}</td>
-<td class="text-center">{{debt.debt_type}}</td>
-<td class="text-center">{{debt.installment_amount_of_this_period}}tl </td>
-<td  class="text-center">{{debt.order_of_installment}}/{{debt.number_of_installment}}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-<br>
-{% endif %}
-{% endfor %}
-      </div>
-  </div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <input class="form-control" id="myInput" type="text" placeholder="Search..">
+            <br>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+
+            {% for period, name in periods %}
+            {% if contributions[period]|length %}
+            <table class="table table-bordered" id="myFiltTable">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="text-center">"{{name}}" Aidatını Ödemeyenler</th>
+                    </tr>
+                </thead>
+                <tbody  id="myTable">
+                    {% for cont in contributions[period] %}
+                    <tr>
+                        <td >{{cont[1]}} - {{cont[0].share_order_of_member}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            {% endif %}
+            {% if payments[period]|length %}
+            <table class="table table-bordered" >
+                <thead>
+                    <tr>
+                        <th colspan="5" class="text-center">"{{name}}" Taksitleri</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">Üye ismi - Hissesi</th>
+                        <th class="text-center">Borç Tipi</th>
+                        <th class="text-center">Taksit tutarı</th>
+                        <th class="text-center">Taksit</th>
+                    </tr>
+                </thead>
+                <tbody  id="myTable">
+            {% for debt in payments[period] %}
+                    <tr>
+                        <td class="text-center">{{debt.debt_id}}</td>
+                        <td >{{debt.name_surname_share}}</td>
+                        <td class="text-center">{{debt.debt_type}}</td>
+                        <td class="text-center">{{debt.installment_amount_of_this_period}}tl </td>
+                        <td  class="text-center">{{debt.order_of_installment}}/{{debt.number_of_installment}}</td>
+                    </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}

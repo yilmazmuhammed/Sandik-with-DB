@@ -55,7 +55,6 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/remove_member",
                      view_func=sandik.remove_member_of_sandik_page, methods=["GET", "POST"])
 
-
     # Üyelerin sandıklarla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/cm/transactions",
                      view_func=transaction_page.member_transactions_in_sandik_page)
