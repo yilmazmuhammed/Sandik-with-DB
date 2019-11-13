@@ -111,34 +111,37 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Borca ait ödemeler</h3>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>ID</th>
-                            <th>Tarih</th>
-                            <th>Miktar</th>
-                            <th>Ödenen Borç</th>
-                            <th>Kalan Borç</th>
-                            <th>Ödenmiş Taksit</th>
-                            <th>Açıklama</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for p in payments %}
-                        <tr>
-                            <td>{{p.payment_number_of_debt + 1}}</td>
-                            <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=p.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=p.transaction_ref.id)}}">{{p.transaction_ref.id}}</a></td>
-                            <td>{{p.transaction_ref.transaction_date}}</td>
-                            <td>{{p.transaction_ref.amount}}₺</td>
-                            <td>{{p.paid_debt_so_far}}₺</td>
-                            <td>{{p.remaining_debt_so_far}}₺</td>
-                            <td>{{p.paid_installment_so_far}} / {{ p.debt_ref.number_of_installment}}</td>
-                            <td>{{p.transaction_ref.explanation}}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div  class="table table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ID</th>
+                                <th>Tarih</th>
+                                <th>Miktar</th>
+                                <th>Ödenen Borç</th>
+                                <th>Kalan Borç</th>
+                                <th>Ödenmiş Taksit</th>
+                                <th>Açıklama</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for p in payments %}
+                            <tr>
+                                <td>{{p.payment_number_of_debt + 1}}</td>
+                                <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=p.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=p.transaction_ref.id)}}">{{p.transaction_ref.id}}</a></td>
+                                <td>{{p.transaction_ref.transaction_date}}</td>
+                                <td>{{p.transaction_ref.amount}}₺</td>
+                                <td>{{p.paid_debt_so_far}}₺</td>
+                                <td>{{p.remaining_debt_so_far}}₺</td>
+                                <td>{{p.paid_installment_so_far}} / {{ p.debt_ref.number_of_installment}}</td>
+                                <td>{{p.transaction_ref.explanation}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
