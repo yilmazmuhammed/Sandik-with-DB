@@ -352,3 +352,11 @@ def delete_transaction(sandik_id, transaction_id):
 
             transaction.deleted_by = WebUser[current_user.username]
     return redirect(url_for('transactions_page', sandik_id=sandik_id))
+
+
+@authorization_to_the_sandik_required(is_admin=True)
+def confirm_transaction(sandik_id, transaction_id):
+    with db_session:
+        transaction = Transaction[transaction_id]
+        transaction.confirmed_by = WebUser[current_user.username]
+    return redirect(url_for('transactions_page', sandik_id=sandik_id))
