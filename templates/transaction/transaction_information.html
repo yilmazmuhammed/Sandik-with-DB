@@ -5,7 +5,15 @@
         <div class="col-md-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    İşlem bilgileri
+                    <div class="row">
+                        <div class="col-md-* col-xs-6">
+                            İşlem bilgileri
+                        </div>
+                        <div class="col-md-* col-xs-6 text-right">
+                            <a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a>
+                        </div>
+                    </div>
+
                 </div>
               <div class="panel-body">
                   <table>
@@ -43,6 +51,10 @@
                       </tr>
 
                       {% elif t.debt_ref %}
+                      <tr>
+                          <td>Kalan Borç: </td>
+                          <td>{{t.debt_ref.remaining_debt}}</td>
+                      </tr>
                       <tr>
                           <td>Ödeme Aralığı: </td>
                           <td>{{t.debt_ref.starting_period}} -> {{t.debt_ref.due_period}}</td>

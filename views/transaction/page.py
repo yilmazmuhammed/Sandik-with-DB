@@ -1,5 +1,6 @@
 import json
 from copy import copy
+from datetime import date
 
 from flask import abort, redirect, url_for, render_template, flash
 from flask_login import login_required, current_user
@@ -11,7 +12,7 @@ from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, Pay
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
-    member_choices, Period, UnpaidDebt
+    member_choices, Period, UnpaidDebt, local_name_surname
 from views.transaction.db import add_contribution
 
 
@@ -169,21 +170,25 @@ def add_custom_transaction_for_admin_page(sandik_id):
         if c_form.validate_on_submit():
             if insert_contribution(c_form.transaction_date.data, c_form.amount.data, c_form.share.data,
                                    c_form.explanation.data, c_form.contribution_period.data,
-                                   created_by_username=current_user.webuser.username):
+                                   created_by_username=current_user.webuser.username,
+                                   confirmed_by_username=current_user.webuser.username):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif d_form.validate_on_submit():
             insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.explanation.data,
                         d_form.debt_type.data, d_form.number_of_installment.data,
-                        created_by_username=current_user.webuser.username)
+                        created_by_username=current_user.webuser.username,
+                        confirmed_by_username=current_user.webuser.username)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif p_form.validate_on_submit():
             if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
                               created_by_username=current_user.webuser.username,
+                              confirmed_by_username=current_user.webuser.username,
                               debt_id=p_form.debt.data):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif o_form.validate_on_submit():
             insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
-                               o_form.explanation.data, created_by_username=current_user.webuser.username)
+                               o_form.explanation.data, created_by_username=current_user.webuser.username,
+                               confirmed_by_username=current_user.webuser.username)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
 
         forms = [c_form, d_form, p_form, o_form]
@@ -207,7 +212,8 @@ def transactions_page(sandik_id):
         sandik = Sandik[sandik_id]
 
         transactions = select(transaction for transaction in Transaction
-                              if transaction.share_ref.member_ref.sandik_ref == sandik).sort_by(desc(Transaction.id))[:]
+                              if transaction.share_ref.member_ref.sandik_ref == sandik and
+                              transaction.confirmed_by and not transaction.deleted_by).sort_by(desc(Transaction.id))[:]
         return render_template("transactions.html", layout_page=LayoutPageInfo("All Transactions of The Sandik"),
                                transactions=transactions)
 
@@ -219,13 +225,25 @@ def transaction_in_transactions_page(sandik_id, transaction_id):
         # TODO abort u değistir
         if transaction.share_ref.member_ref.sandik_ref.id != sandik_id:
             abort(404)
+
+        if transaction.deleted_by:
+            flash(u'Bu işlem %s (%s) tarafından silinmiştir...' % (
+                local_name_surname(webuser=transaction.deleted_by), transaction.deleted_by.username,), 'danger')
+        elif not transaction.confirmed_by:
+            flash(u'Bu işlem henüz onaylanmamış...', 'danger')
+
         payments = None
         if transaction.debt_ref:
-            payments = transaction.debt_ref.payments_index.sort_by(lambda p: p.id)
+            payments = transaction.debt_ref.payments_index.filter(
+                lambda p: bool(p.transaction_ref.confirmed_by) and not bool(p.transaction_ref.deleted_by)).sort_by(
+                lambda p: p.id)
         elif transaction.payment_ref:
-            payments = transaction.payment_ref.debt_ref.payments_index.sort_by(lambda p: p.id)
+            payments = transaction.payment_ref.debt_ref.payments_index.filter(
+                lambda p: bool(p.transaction_ref.confirmed_by) and not bool(p.transaction_ref.deleted_by)).sort_by(
+                lambda p: p.id)
 
-        return render_template("transaction/transaction_information.html", layout_page=LayoutPageInfo("Transaction information"),t=transaction, payments = payments)
+        return render_template("transaction/transaction_information.html",
+                               layout_page=LayoutPageInfo("Transaction information"), t=transaction, payments=payments)
 
 
 @login_required
@@ -236,7 +254,8 @@ def member_transactions_in_sandik_page(sandik_id):
 
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.webuser_ref == webuser
-                              and transaction.share_ref.member_ref.sandik_ref == sandik)[:]
+                              and transaction.share_ref.member_ref.sandik_ref == sandik
+                              and transaction.confirmed_by and not transaction.deleted_by)[:]
         return render_template("transactions.html", layout_page=LayoutPageInfo("My Transactions"),
                                transactions=transactions)
 
@@ -257,8 +276,9 @@ def unpaid_transactions_page(sandik_id):
                         unpaid_contributions[due[0]] = [(Share[share], name_surname(share_id=share))]
 
         unpaid_payments = {}
-        for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref.sandik_ref == sandik and
-                                                    debt.remaining_debt).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(d.transaction_ref.share_ref.share_order_of_member))[:]:
+        for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref.sandik_ref == sandik
+                                                    and debt.remaining_debt and debt.transaction_ref.confirmed_by
+                                                    and not debt.transaction_ref.deleted_by).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(d.transaction_ref.share_ref.share_order_of_member))[:]:
             unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
             add_debt = UnpaidDebt(debt)
             for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
@@ -287,3 +307,48 @@ def unpaid_transactions_page(sandik_id):
         return render_template("transaction/unpaid_transactions.html",
                                layout_page=LayoutPageInfo("Unpaid transactions"), periods=periods,
                                contributions=unpaid_contributions, payments=unpaid_payments)
+
+
+@authorization_to_the_sandik_required(is_admin=True)
+def delete_transaction(sandik_id, transaction_id):
+    with db_session:
+        transaction = Transaction[transaction_id]
+
+        if (date.today() - transaction.transaction_date).days > 1:
+            flash(u'1 günden eski işlemleri silmek için yönetici ile iletişime geçiniz..', 'danger')
+            return redirect(
+                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
+        elif select(t for t in Transaction if
+                    t.id >= transaction.id and t.share_ref.member_ref.sandik_ref.id == sandik_id).count() > 10:
+            flash(u'Son 10 işlemden öncesi silinemez..', 'danger')
+            return redirect(
+                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
+
+        if transaction.debt_ref and transaction.debt_ref.payments_index.select(
+                lambda p: not p.transaction_ref.deleted_by):
+            flash(u'Ödeme yapılmış bir borç silinemez..', 'danger')
+            return redirect(
+                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
+        elif transaction.payment_ref and max([pn.payment_number_of_debt for pn in
+                                              transaction.payment_ref.debt_ref.payments_index]) > transaction.payment_ref.payment_number_of_debt:
+            flash(u'Bir borcun son ödemesi dışındaki ödemeler silinemez...', 'danger')
+            return redirect(
+                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
+        elif transaction.deleted_by:
+            flash(u'Silinmiş bir işlem bir daha silinemez..', 'danger')
+            return redirect(
+                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
+        else:
+            if transaction.contribution_index:
+                pass
+            elif transaction.debt_ref:
+                pass
+            elif transaction.payment_ref:
+                debt = transaction.payment_ref.debt_ref
+                debt.paid_debt = debt.paid_debt - transaction.amount
+                debt.paid_installment = int(debt.paid_debt / debt.installment_amount)
+                debt.remaining_debt = debt.transaction_ref.amount - debt.paid_debt
+                debt.remaining_installment = debt.number_of_installment - debt.paid_installment
+
+            transaction.deleted_by = WebUser[current_user.username]
+    return redirect(url_for('transactions_page', sandik_id=sandik_id))

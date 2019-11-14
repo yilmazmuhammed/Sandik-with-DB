@@ -96,7 +96,7 @@ def export_all_datas():
 
             html += ";"
             html += "%s;" % (t.created_by.username,)
-            html += "%s;" % (t.confirmed_by.username if t.confirmed_by else ";",)
+            html += "%s;" % (t.confirmed_by.username if t.confirmed_by else "",)
             html += "%s" % (t.deleted_by.username if t.deleted_by else "",)
 
             html += '<br>'

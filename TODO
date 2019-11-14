@@ -10,9 +10,11 @@ TODO 26 Ödenmeyen taksit ve aidatların sayfasını düzenle
 TODO 28 Kişiyi çıkartırken hisseleri de False yap
 TODO 30 Onaylanmamış işlemler sayfası
 TODO 31 Onaylanmamış işlemleri hesaplamalara katma
-TODO 32 İşlem silme sayfası
 TODO 33 İşlem düzenleme sayfası
 TODO 34 dbtables (transactions) tablosunu hızlandır/değiştir
-TODO 35
+TODO 35 backup işlemini idlerle birlikte yap
+TODO 36
 
 FRONTEND 20! Sandıktaki bütün transaction toplamlarını göster
+
+DONE 32 İşlem silme sayfası
