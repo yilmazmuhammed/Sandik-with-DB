@@ -84,6 +84,7 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
                         is_from_import_data=False):
     # ..._by_username'ler None mı olsun yoksa "" mı?
     share = Share[share_id]
+    sandik = share.member_ref.sandik_ref
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
         confirmed_by = WebUser[confirmed_by_username]
@@ -95,20 +96,20 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
         deleted_by = None
 
     # TODO Conribution_amount değerini sandık kurallarından al
-    contribution_amount = 25
+    contribution_amount = sandik.contribution_amount
 
     # TODO bu geçici çözümü kaldırıp import-data daki satırları düzenle ya da hatalı veri tablosu için yeni fonksiyon ekle
     if not is_from_import_data:
         if amount % contribution_amount:
-            flash(u"Paid amount must be divided by 25.", 'danger')
+            flash(u"Paid amount must be divided by contribution amount (%s)." % contribution_amount, 'danger')
             return False
         elif amount / contribution_amount != len(periods):
-            flash(u"Paid amount must be 25 * <number_of_months>.", 'danger')
+            flash(u"Paid amount must be contribution amount (%s) * <number_of_months>." % contribution_amount, 'danger')
             flash(u"Fakat başlangıç aidatı sistemi yapılana kadar işlem eklendi.", 'danger')
             # return False
         for period in periods:
             if period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share)[:]:
-                flash(u"Paid amount must be divided by 25.", 'danger')
+                flash(u"Paid amount must be divided by contribution amount (%s)." % contribution_amount, 'danger')
                 return False
 
     transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
@@ -180,8 +181,8 @@ def insert_share(member_id, date_of_opening: date = date.today(), is_active: boo
 
 
 @db_session
-def insert_sandik(name, explanation, date_of_opening: date = date.today(), is_active: bool = True, ):
-    return Sandik(name=name, explanation=explanation, date_of_opening=date_of_opening, is_active=is_active)
+def insert_sandik(name, contribution_amount, explanation, date_of_opening: date = date.today(), is_active: bool = True, ):
+    return Sandik(name=name, contribution_amount=contribution_amount, explanation=explanation, date_of_opening=date_of_opening, is_active=is_active)
 
 
 @db_session

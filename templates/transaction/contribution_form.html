@@ -7,6 +7,16 @@
 <script>
 var periods_of = {{periods_of|safe}};
 var all_periods_of = {{all_periods_of|safe}};
+
+function ChangeAmount() {
+  cp = document.getElementById("contribution_period");
+  amount = document.getElementById("amount");
+  amount.value = {{contribution_amount}}*GetSelectValues(cp).length;
+}
+$(function () {
+  var cp = document.getElementById("contribution_period")
+  cp.onchange = ChangeAmount;
+});
 </script>
 {% endblock %}
 

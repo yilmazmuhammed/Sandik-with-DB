@@ -144,6 +144,14 @@ class SandikForm(FlaskForm):
                        validators=[InputRequired("Please enter name of new sandik"),
                                    Length(max=40, message="Sandik name cannot be longer than 40 character")],
                        id='name', render_kw={"placeholder": "Sandik name", "class": "form-control"})
+    date_of_opening = DateField("Date of opening:", default=date.today(),
+                                validators=[InputRequired("Please enter opening date of sandik ")],
+                                id='date_of_opening',
+                                render_kw={"placeholder": "Date of opening", "class": "form-control"})
+    contribution_amount = IntegerField("Contribution Amount:",
+                                       validators=[InputRequired("Please enter contribution amount of sandik")],
+                                       id='contribution_amount',
+                                       render_kw={"placeholder": "Contribution Amount", "class": "form-control"})
     explanation = TextAreaField("Explanation:",
                                 validators=[Optional(),
                                             Length(max=200, message="Explanation cannot be longer than 200 character")],
@@ -258,7 +266,7 @@ class ContributionForm(TransactionForm):
     close = form_close()
 
     amount = IntegerField("Amount:", validators=[InputRequired("Please enter amount of transaction")], id='amount',
-                          render_kw={"placeholder": "Amount", "class": "form-control", "value": 25, "readonly": ""})
+                          render_kw={"placeholder": "Amount", "class": "form-control", "readonly": ""})
 
     # value format: yyyy-mm
     contribution_period = \

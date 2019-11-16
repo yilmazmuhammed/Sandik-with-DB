@@ -22,7 +22,9 @@ def new_sandik_page():
     if form.validate_on_submit():
         with db_session:
             # Formdan alınan bilgilere göre sandık oluştur
-            new_sandik = Sandik(name=form.data['name'], explanation=form.data['explanation'])
+            # TODO insert_sandik
+            new_sandik = Sandik(name=form.data['name'], date_of_opening=form.date_of_opening.data,
+                                contribution_amount=form.contribution_amount.data, explanation=form.data['explanation'])
 
             # Varsayılan olarak sandık başkanı ve normal üye yetkisi oluştur
             admin_user = MemberAuthorityType(name='Sandık başkanı', max_number_of_members=1, sandik_ref=new_sandik,
@@ -31,7 +33,7 @@ def new_sandik_page():
 
             # Varsayılan olarak sandığı oluşturan kişiye sandık başkanı olarak üyelik oluşturulur.
             Member(webuser_ref=WebUser[current_user.webuser.username], sandik_ref=new_sandik,
-                   member_authority_type_ref=admin_user)
+                   member_authority_type_ref=admin_user, date_of_membership=form.date_of_opening.data)
 
             # TODO yeni sandık oluşturulunca sandıklarım/(yeni sandık ayarları) gibi bir sayfaya yönlendir
             return redirect(url_for('sandik_management_page', sandik_id=new_sandik.id))

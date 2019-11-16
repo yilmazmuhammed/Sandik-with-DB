@@ -45,7 +45,7 @@ def add_transaction_page(sandik_id):
 def add_contribution_page(sandik_id):
     with db_session:
         member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
-
+        sandik = Sandik[sandik_id]
         # If member is not in members of the sandik
         if not member:
             abort(404)
@@ -55,6 +55,7 @@ def add_contribution_page(sandik_id):
 
         # Add shares of member to form.share
         form.share.choices += share_choices(member)
+        form.amount.render_kw["value"] = sandik.contribution_amount
 
         if form.validate_on_submit():
             # TODO kontrolleri yap
@@ -64,7 +65,8 @@ def add_contribution_page(sandik_id):
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"),
                                info=info, periods_of=json.dumps(unpaid_dues_choices(member)),
-                               all_periods_of=json.dumps(unpaid_dues_choices(member, is_there_old=True)))
+                               all_periods_of=json.dumps(unpaid_dues_choices(member, is_there_old=True)),
+                               contribution_amount=sandik.contribution_amount)
 
 
 @login_required
@@ -160,6 +162,9 @@ def add_custom_transaction_for_admin_page(sandik_id):
             periods_of.update(unpaid_dues_choices(member))
             all_periods_of.update(unpaid_dues_choices(member, is_there_old=True))
 
+        # add contribution amount
+        c_form.amount.render_kw["value"] = sandik.contribution_amount
+
         # Add debt types of the sandik to d_form.debt_type
         d_form.debt_type.choices += debt_type_choices(sandik)
 
@@ -203,7 +208,8 @@ def add_custom_transaction_for_admin_page(sandik_id):
         return render_template("transaction/custom_transaction_form.html", forms=forms, errors=errors,
                                layout_page=LayoutPageInfo("Add Transaction"),
                                periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
-                               shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of))
+                               shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of),
+                               contribution_amount=sandik.contribution_amount)
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)
@@ -314,12 +320,12 @@ def delete_transaction(sandik_id, transaction_id):
     with db_session:
         transaction = Transaction[transaction_id]
 
-        if (date.today() - transaction.transaction_date).days > 1:
+        if (date.today() - transaction.transaction_date).days > 1 and not current_user.is_admin:
             flash(u'1 günden eski işlemleri silmek için yönetici ile iletişime geçiniz..', 'danger')
             return redirect(
                 url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
-        elif select(t for t in Transaction if
-                    t.id >= transaction.id and t.share_ref.member_ref.sandik_ref.id == sandik_id).count() > 10:
+        elif select(t for t in Transaction
+                    if t.id >= transaction.id and t.share_ref.member_ref.sandik_ref.id == sandik_id).count() > 10 and not current_user.is_admin:
             flash(u'Son 10 işlemden öncesi silinemez..', 'danger')
             return redirect(
                 url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))

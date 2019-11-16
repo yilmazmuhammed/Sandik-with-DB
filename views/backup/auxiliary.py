@@ -49,7 +49,8 @@ def add_sandiklar(sandiklar):
     with db_session:
         for s in sandiklar:
             date_of_opening = date(*(list(map(int, s[2].split('-')))))
-            insert_sandik(name=s[1], explanation=s[4], date_of_opening=date_of_opening, is_active=s[3])
+            insert_sandik(name=s[1], contribution_amount=s[3], explanation=s[5], date_of_opening=date_of_opening,
+                          is_active=s[4])
 
 
 def add_member_authority_types(member_authority_types):

@@ -14,6 +14,7 @@ class Sandik(db.Entity):
     members_index = Set('Member')
     member_authority_types_index = Set('MemberAuthorityType')
     debt_types_index = Set('DebtType')
+    contribution_amount = Required(int)
 
 
 class WebUser(db.Entity):

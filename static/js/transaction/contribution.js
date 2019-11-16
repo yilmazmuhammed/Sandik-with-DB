@@ -1,13 +1,3 @@
-
-
-
-function ChangeAmount() {
-  cp = document.getElementById("contribution_period");
-  amount = document.getElementById("amount");
-  amount.value = 25*GetSelectValues(cp).length;
-}
-
-
 function ChangeContPeriodSelectList(){
   var contSelect = document.getElementById("contribution_period");
 
@@ -27,9 +17,6 @@ function ChangeContPeriodSelectList(){
 
 
 $(function () {
-  var cp = document.getElementById("contribution_period")
-  cp.onchange = ChangeAmount;
-
   var share_select = document.getElementById("share");
   share_select.onchange = ChangeContPeriodSelectList;
 });
