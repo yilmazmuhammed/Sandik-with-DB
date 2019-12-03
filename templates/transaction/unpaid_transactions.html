@@ -30,7 +30,7 @@ $(document).ready(function(){
             <table class="table table-bordered" id="myFiltTable">
                 <thead>
                     <tr>
-                        <th colspan="2" class="text-center">"{{name}}" Aidatını Ödemeyenler</th>
+                        <th colspan="2" class="text-center">"{{name}}" {{translation.unpaid.unpaid_contributions}}</th>
                     </tr>
                 </thead>
                 <tbody  id="myTable">
@@ -47,14 +47,14 @@ $(document).ready(function(){
             <table class="table table-bordered" >
                 <thead>
                     <tr>
-                        <th colspan="5" class="text-center">"{{name}}" Taksitleri</th>
+                        <th colspan="5" class="text-center">"{{name}}" {{translation.unpaid.installments}}</th>
                     </tr>
                     <tr>
-                        <th class="text-center">ID</th>
-                        <th class="text-center">Üye ismi - Hissesi</th>
-                        <th class="text-center">Borç Tipi</th>
-                        <th class="text-center">Taksit tutarı</th>
-                        <th class="text-center">Taksit</th>
+                        <th class="text-center">{{translation.unpaid.id}}</th>
+                        <th class="text-center">{{translation.unpaid.member}}</th>
+                        <th class="text-center">{{translation.unpaid.debt_type}}</th>
+                        <th class="text-center">{{translation.unpaid.installment_amount}}</th>
+                        <th class="text-center">{{translation.unpaid.installment}}</th>
                     </tr>
                 </thead>
                 <tbody  id="myTable">

@@ -20,10 +20,10 @@
               <h3 class="panel-title">Yardımlaşma Sandığı</h3>
             </div>
             <div class="col col-xs-4 text-center">
-              <span class="btn btn-sm btn-success" id="btn-passive">Pasif üyeler</span>
+              <span class="btn btn-sm btn-success" id="btn-passive">{{translation.members.passive_members}}</span>
             </div>
             <div class="col col-xs-4 text-right">
-              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.sandik_id) }}" class="btn btn-sm btn-primary">Add New Member</a>
+              <a href="{{ url_for('add_member_to_sandik_page', sandik_id=sandik.sandik_id) }}" class="btn btn-sm btn-primary">{{translation.members.new_member}}</a>
             </div>
           </div>
         </div>
@@ -34,9 +34,9 @@
             <thead>
               <tr>
                 <th></th>
-                <th class="hidden-xs">ID</th>
-                <th>Username</th>
-                <th>Name</th>
+                <th class="hidden-xs"></th>
+                <th>{{translation.members.username}}</th>
+                <th>{{translation.members.name}}</th>
                 <!--
                 <th><em class="fa fa-cog"></em></th>
                 -->
@@ -67,12 +67,12 @@
                     <table class="table table-bordered table-sandik-shares">
                       <thead class="thead-dark">
                         <tr>
-                          <th>Share ID</th>
-                          <th>Paid contributions</th>
-                          <th>Debts received</th>
-                          <th>Paid installments</th>
-                          <th>Others</th>
-                          <th>Remaining debts</th>
+                          <th>{{translation.members.share_id}}</th>
+                          <th>{{translation.members.paid_contributions}}</th>
+                          <th>{{translation.members.debt_received}}</th>
+                          <th>{{translation.members.paid_installments}}</th>
+                          <th>{{translation.members.others}}</th>
+                          <th>{{translation.members.remaining_debt}}</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -121,11 +121,11 @@
               <thead class="thead-dark">
               <tr>
                 <th class="hidden"></th>
-                <th>Paid contributions</th>
-                <th>Debts received</th>
-                <th>Paid installments</th>
-                <th>Others</th>
-                <th>Final Situation</th>
+                <th>{{translation.members.paid_contributions}}</th>
+                <th>{{translation.members.debt_received}}</th>
+                <th>{{translation.members.paid_installments}}</th>
+                <th>{{translation.members.others}}</th>
+                <th>{{translation.members.final_situation}}</th>
               </tr>
               </thead>
               <tbody>

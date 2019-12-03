@@ -71,6 +71,9 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/cm/add-transaction",
                      view_func=transaction_page.add_transaction_page, methods=["GET", "POST"])
 
+    # Herkesin yapabileceği işlemler
+    app.add_url_rule("/set_language/<string:language>", view_func=others.set_language)
+
     lm.init_app(app)
     lm.login_view = "login_page"
     lm.login_message_category = 'danger'

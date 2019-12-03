@@ -2,7 +2,7 @@ import json
 from copy import copy
 from datetime import date
 
-from flask import abort, redirect, url_for, render_template, flash
+from flask import abort, redirect, url_for, render_template, flash, current_app
 from flask_login import login_required, current_user
 from pony.orm import db_session, select, desc
 

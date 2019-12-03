@@ -7,7 +7,7 @@
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-md-* col-xs-6">
-                            İşlem bilgileri
+                            {{translation.transaction.info_transaction}}
                         </div>
                         <div class="col-md-* col-xs-6 text-right">
                             <a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a>
@@ -19,30 +19,30 @@
                   <table>
                       <tbody>
                       <tr>
-                          <td>ID: </td>
+                          <td>{{translation.transaction.id}}: </td>
                           <td>{{t.id}}</td>
                       </tr>
                       <tr>
                           {% set share = t.share_ref.member_ref.webuser_ref.name + " " + t.share_ref.member_ref.webuser_ref.surname + " - " + t.share_ref.share_order_of_member|string %}
                           {% set share_link = url_for('transactions_page', sandik_id=t.share_ref.member_ref.sandik_ref.id) + "?share=" + share %}
-                          <td>Üye: </td>
+                          <td>{{translation.transaction.member}}: </td>
                           <td><a href="{{share_link}}">  {{ share }}</a></td>
                       </tr>
                       <tr>
-                          <td>Tarih: </td>
+                          <td>{{translation.transaction.date}}: </td>
                           <td>{{t.transaction_date}}</td>
                       </tr>
                       <tr>
-                          <td>Tür: </td>
+                          <td>{{translation.transaction.type}}: </td>
                           <td>{{t.type}} {% if t.debt_ref %}- {{t.debt_ref.debt_type_ref.name}}{%endif%}</td>
                       </tr>
                       <tr>
-                          <td>Miktar: </td>
+                          <td>{{translation.transaction.amount}}: </td>
                           <td>{{t.amount}}₺</td>
                       </tr>
                       {% if t.contribution_index %}
                       <tr>
-                          <td>Aidat Periyodu: </td>
+                          <td>{{translation.transaction.contribution_period}}: </td>
                           <td>
                           {% for c in t.contribution_index %}
                                   {{ c.contribution_period }}
@@ -52,21 +52,21 @@
 
                       {% elif t.debt_ref %}
                       <tr>
-                          <td>Kalan Borç: </td>
+                          <td>{{translation.transaction.remaining_debt}}: </td>
                           <td>{{t.debt_ref.remaining_debt}}</td>
                       </tr>
                       <tr>
-                          <td>Ödeme Aralığı: </td>
+                          <td>{{translation.transaction.payment_time}}: </td>
                           <td>{{t.debt_ref.starting_period}} -> {{t.debt_ref.due_period}}</td>
                       </tr>
                       <tr>
-                          <td>Ödeme durumu: </td>
+                          <td>{{translation.transaction.paid_installment}}: </td>
                           <td>{{t.debt_ref.paid_installment}} / {{t.debt_ref.number_of_installment}}</td>
                       </tr>
 
                       {% elif t.payment_ref %}
                       <tr>
-                          <td>Ödenmiş taksit: </td>
+                          <td>{{translation.transaction.paid_installment}}: </td>
                           <td>{{t.payment_ref.paid_installment_so_far}} / {{t.payment_ref.debt_ref.number_of_installment}}</td>
                       </tr>
                       {% endif %}
@@ -85,33 +85,33 @@
         <div class="col-md-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    Borç bilgileri
+                    {{translation.transaction.info_debt}}
                 </div>
               <div class="panel-body">
                   <table>
                       <tbody>
                       <tr>
-                          <td>ID: </td>
+                          <td>{{translation.transaction.id}}: </td>
                               <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=d.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=d.transaction_ref.id)}}">{{d.transaction_ref.id}}</a></td>
                       </tr>
                       <tr>
-                          <td>Tarih: </td>
+                          <td>{{translation.transaction.date}}: </td>
                           <td>{{d.transaction_ref.transaction_date}}</td>
                       </tr>
                       <tr>
-                          <td>Tür: </td>
+                          <td>{{translation.transaction.type}}: </td>
                           <td>{{d.debt_type_ref.name}}</td>
                       </tr>
                       <tr>
-                          <td>Miktar: </td>
+                          <td>{{translation.transaction.amount}}: </td>
                           <td>{{d.transaction_ref.amount}}₺</td>
                       </tr>
                       <tr>
-                          <td>Ödeme Aralığı: </td>
+                          <td>{{translation.transaction.payment_time}}: </td>
                           <td>{{d.starting_period}} / {{d.due_period}}</td>
                       </tr>
                       <tr>
-                          <td>Ödeme durumu: </td>
+                          <td>{{translation.transaction.paid_installment}}: </td>
                           <td>{{d.paid_installment}} / {{d.number_of_installment}}</td>
                       </tr>
                       </tbody>
@@ -126,20 +126,20 @@
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Borca ait ödemeler</h3>
+                    <h3 class="panel-title">{{translation.transaction.payments}}</h3>
                 </div>
                 <div  class="table table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>ID</th>
-                                <th>Tarih</th>
-                                <th>Miktar</th>
-                                <th>Ödenen Borç</th>
-                                <th>Kalan Borç</th>
-                                <th>Ödenmiş Taksit</th>
-                                <th>Açıklama</th>
+                                <th>{{translation.transaction.id}}</th>
+                                <th>{{translation.transaction.date}}</th>
+                                <th>{{translation.transaction.amount}}</th>
+                                <th>{{translation.transaction.paid_debt}}</th>
+                                <th>{{translation.transaction.remaining_debt}}</th>
+                                <th>{{translation.transaction.paid_installment}}</th>
+                                <th>{{translation.transaction.explanation}}</th>
                             </tr>
                         </thead>
 

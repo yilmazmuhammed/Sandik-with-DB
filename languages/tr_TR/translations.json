@@ -1,0 +1,193 @@
+{
+  "forms": {
+    "contribution": {
+      "amount": {
+        "label": "Miktar",
+        "required": "Lütfen işlem miktarını giriniz"
+      },
+      "contribution_period": {
+        "label": "Aidat dönemi",
+        "required": "Aidat dönemini seçiniz..."
+      },
+      "explanation": {
+        "label": "Açıklama",
+        "length": "Açıklama 200 karakterden fazla olamaz..."
+      },
+      "submit": {
+        "label": "Aidat Ekle"
+      }
+    },
+    "edit_webuser": {
+      "name": {
+        "label": "İsim",
+        "length": "İsim alanı 40  karakterden fazla olamaz..."
+      },
+      "new_password": {
+        "label": "Yeni parola",
+        "length": "Parola adı 20 karakterden fazla olamaz..."
+      },
+      "new_password_verify": {
+        "label": "Yeni parola (tekrar)",
+        "length": "Parola adı 20 karakterden fazla olamaz..."
+      },
+      "old_password": {
+        "label": "Parola",
+        "length": "Parola adı 20 karakterden fazla olamaz...",
+        "required": "Parolanızı giriniz..."
+      },
+      "submit": {
+        "label": "Yeni Kullanıcı Ekle"
+      },
+      "surname": {
+        "label": "Soyisim",
+        "length": "Soyisim alanı 40  karakterden fazla olamaz..."
+      },
+      "username": {
+        "label": "Kullanıcı adı",
+        "length": "Kullanıcı adı 20 karakterden fazla olamaz..."
+      }
+    },
+    "login": {
+      "password": {
+        "label": "Parola",
+        "required": "Parolanızı giriniz..."
+      },
+      "submit": {
+        "label": "Giriş yap"
+      },
+      "username": {
+        "label": "Kullanıcı adı",
+        "required": "Kullanıcı adı giriniz..."
+      }
+    },
+    "signup": {
+      "submit": {
+        "label": "Kaydol"
+      }
+    },
+    "webuser": {
+      "date_of_registration": {
+        "label": "Kayıt tarihi",
+        "required": "Kayıt tarihini giriniz..."
+      },
+      "is_admin": {
+        "label": "Yönetici mi"
+      },
+      "name": {
+        "label": "İsim",
+        "length": "İsim alanı 40  karakterden fazla olamaz...",
+        "required": "İsminizi giriniz..."
+      },
+      "password": {
+        "label": "Parola",
+        "length": "Parola adı 20 karakterden fazla olamaz...",
+        "required": "Parolanızı giriniz..."
+      },
+      "password_verify": {
+        "label": "Parola (tekrar)",
+        "length": "Parola adı 20 karakterden fazla olamaz...",
+        "required": "Parolanızı giriniz..."
+      },
+      "submit": {
+        "label": "Yeni Kullanıcı Ekle"
+      },
+      "surname": {
+        "label": "Soyisim",
+        "length": "Soyisim alanı 40  karakterden fazla olamaz...",
+        "required": "Soyisminizi giriniz..."
+      },
+      "username": {
+        "label": "Kullanıcı adı",
+        "length": "Kullanıcı adı 20 karakterden fazla olamaz...",
+        "required": "Kullanıcı adı giriniz..."
+      }
+    }
+  },
+  "layout": {
+    "navbar": {
+      "admin_panel": "Yönetici Paneli",
+      "final_situation": "Son mali durum",
+      "login": "Giriş Yap",
+      "logout": "Çıkış",
+      "management_panel": "Yönetim Paneli",
+      "members": "Üyeler",
+      "my_sandiks": "Sandıklarım",
+      "my_transactions": "İşlemlerim",
+      "profile": "Profil",
+      "signup": "Kaydol",
+      "update_profile": "Profilimi güncelle"
+    }
+  },
+  "management_panel": {
+    "debt_types": "Borç Tipleri",
+    "manage": "Yönet...",
+    "member": "Üye",
+    "member_authority_types": "Üye Yetki Türü",
+    "members": "Üyeler",
+    "share": "Hisse",
+    "this": "Yönetim Paneli",
+    "transactions": "İşlemler",
+    "unpaid1": "Ödenmemiş Aidat",
+    "unpaid2": "ve Taksitler",
+    "view": "Görüntüle..."
+  },
+  "members": {
+    "debt_received": "Alınan Borç",
+    "final_situation": "Son durum",
+    "id": "No",
+    "name": "İsim",
+    "new_member": "Yeni üye ekle",
+    "others": "Diğer",
+    "paid_contributions": "Ödenen aidatlar",
+    "paid_installments": "Ödenen Taksit",
+    "passive_members": "Pasif üyeler",
+    "remaining_debt": "Kalan Borç",
+    "share_id": "Hisse",
+    "username": "Kullanıcı Adı"
+  },
+  "profile": {
+    "debt_received": "Alınan Borç",
+    "my_accounts": "Hesaplarım",
+    "others": "Diğer",
+    "paid_contributions": "Ödenen aidatlar",
+    "paid_installments": "Ödenen Taksit",
+    "remaining_debt": "Kalan Borç",
+    "sandik_id": "Sandık No",
+    "sandik_name": "Sandık İsmi",
+    "share_id": "Hisse"
+  },
+  "transaction": {
+    "amount": "Miktar",
+    "contribution_period": "Aidat Dönemi",
+    "date": "Tarih",
+    "explanation": "Açıklama",
+    "id": "No",
+    "info_debt": "Borç bilgileri",
+    "info_transaction": "İşlem bilgileri",
+    "member": "Üye",
+    "paid_debt": "Ödenen Borç",
+    "paid_installment": "Ödenen Taksit",
+    "payment_time": "Ödeme Aralığı",
+    "payments": "Borca ait ödemeler",
+    "remaining_debt": "Kalan Borç",
+    "share": "Hisse",
+    "type": "İşlem Türü"
+  },
+  "transactions": {
+    "amount": "Miktar",
+    "date": "Tarih",
+    "explanation": "Açıklama",
+    "id": "No",
+    "share": "Hisse",
+    "type": "İşlem Türü"
+  },
+  "unpaid": {
+    "debt_type": "Borç Türü",
+    "id": "No",
+    "installment": "Taksit",
+    "installment_amount": "Taksit Tutarı",
+    "installments": "Taksitler",
+    "member": "Üye İsmi - Hissesi",
+    "unpaid_contributions": "Aidatını Ödemeyenler"
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "forms": {
+    "contribution": {
+      "amount": {
+        "label": "Amount",
+        "required": "Please enter amount of transaction"
+      },
+      "contribution_period": {
+        "label": "Contribution period",
+        "required": "Please select contribution period in list..."
+      },
+      "explanation": {
+        "label": "Explanation",
+        "length": "Explanation cannot be longer than 200 character..."
+      },
+      "submit": {
+        "label": "Add Contribution"
+      }
+    },
+    "edit_webuser": {
+      "name": {
+        "label": "Name",
+        "length": "Name field cannot be longer than 40 character"
+      },
+      "new_password": {
+        "label": "New password",
+        "length": "Password cannot be longer than 20 character"
+      },
+      "new_password_verify": {
+        "label": "New password (again)",
+        "length": "Password cannot be longer than 20 character"
+      },
+      "old_password": {
+        "label": "Password",
+        "length": "Password cannot be longer than 20 character",
+        "required": "Please enter your password"
+      },
+      "submit": {
+        "label": "Add New Webuser"
+      },
+      "surname": {
+        "label": "Surname",
+        "length": "Surname field cannot be longer than 40 character"
+      },
+      "username": {
+        "label": "Username",
+        "length": "Username cannot be longer than 20 character"
+      }
+    },
+    "login": {
+      "password": {
+        "label": "Password",
+        "required": "Please enter your password"
+      },
+      "submit": {
+        "label": "Login"
+      },
+      "username": {
+        "label": "Username",
+        "required": "Please enter your username"
+      }
+    },
+    "signup": {
+      "submit": {
+        "label": "Sign Up"
+      }
+    },
+    "webuser": {
+      "date_of_registration": {
+        "label": "Date of registration",
+        "required": "Please enter date of registration"
+      },
+      "is_admin": {
+        "label": "Is admin"
+      },
+      "name": {
+        "label": "Name",
+        "length": "Name field cannot be longer than 40 character",
+        "required": "Please enter your name"
+      },
+      "password": {
+        "label": "Password",
+        "length": "Password cannot be longer than 20 character",
+        "required": "Please enter your password"
+      },
+      "password_verify": {
+        "label": "Password (again)",
+        "length": "Password cannot be longer than 20 character",
+        "required": "Please enter your password"
+      },
+      "submit": {
+        "label": "Add New Webuser"
+      },
+      "surname": {
+        "label": "Surname",
+        "length": "Surname field cannot be longer than 40 character",
+        "required": "Please enter your surname"
+      },
+      "username": {
+        "label": "Username",
+        "length": "Username cannot be longer than 20 character",
+        "required": "Please enter your username"
+      }
+    }
+  },
+  "layout": {
+    "navbar": {
+      "admin_panel": "Admin Panel",
+      "final_situation": "Final Situation",
+      "login": "Login",
+      "logout": "Log Out",
+      "management_panel": "Management Panel",
+      "members": "Members",
+      "my_sandiks": "My Sandiks",
+      "my_transactions": "My transactions",
+      "profile": "Profile",
+      "signup": "Sign up",
+      "update_profile": "Update my profile"
+    }
+  },
+  "management_panel": {
+    "debt_types": "Debt Types",
+    "manage": "Manage...",
+    "member": "Member",
+    "member_authority_types": "Member Authority Types",
+    "members": "Members",
+    "share": "Share",
+    "this": "Management Panel",
+    "transactions": "Transactions",
+    "unpaid1": "Unpaid Contributions",
+    "unpaid2": "and Installments",
+    "view": "View..."
+  },
+  "members": {
+    "debt_received": "Debt received",
+    "final_situation": "Final situation",
+    "id": "ID",
+    "name": "Name",
+    "new_member": "Add new member",
+    "others": "Others",
+    "paid_contributions": "Paid contributions",
+    "paid_installments": "Paid installments",
+    "passive_members": "Passive members",
+    "remaining_debt": "Remaining Debt",
+    "share_id": "Share",
+    "username": "Username"
+  },
+  "profile": {
+    "debt_received": "Debt received",
+    "my_accounts": "My Accounts",
+    "others": "Others",
+    "paid_contributions": "Paid contributions",
+    "paid_installments": "Paid installments",
+    "remaining_debt": "Remaining Debt",
+    "sandik_id": "Sandik ID",
+    "sandik_name": "Sandik Name",
+    "share_id": "Share ID"
+  },
+  "transaction": {
+    "amount": "Amount",
+    "contribution_period": "Contribution period",
+    "date": "Date",
+    "explanation": "Explanation",
+    "id": "ID",
+    "info_debt": "Information of the debt",
+    "info_transaction": "Information of transaction",
+    "member": "Member",
+    "paid_debt": "Paid Debt",
+    "paid_installment": "Paid installment",
+    "payment_time": "Payment time",
+    "payments": "Payments of the debt",
+    "remaining_debt": "Remaining Debt",
+    "share": "Share",
+    "type": "Transaction Type"
+  },
+  "transactions": {
+    "amount": "Amount",
+    "date": "Date",
+    "explanation": "Explanation",
+    "id": "ID",
+    "share": "Share",
+    "type": "Transaction Type"
+  },
+  "unpaid": {
+    "debt_type": "Debt Type",
+    "id": "ID",
+    "installment": "Installment",
+    "installment_amount": "Installment Amount",
+    "installments": "Installments",
+    "member": "Member Name - Share"
+  }
+}

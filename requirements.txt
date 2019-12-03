@@ -8,3 +8,5 @@ WTForms>=2.2.1
 passlib>=1.7.1
 Flask-Admin>=1.5.2
 python-telegram-bot==11.1.0
+flask-session
+redis
