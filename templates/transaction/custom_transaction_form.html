@@ -11,6 +11,38 @@ var debts_of = {{debts_of|safe}};
 var periods_of = {{periods_of|safe}};
 var all_periods_of = {{all_periods_of|safe}};
 
+function getQueryVariable(variable)
+{
+   var query = window.location.search.substring(1);
+   var vars = query.split("&");
+   for (var i=0;i<vars.length;i++) {
+     var pair = vars[i].split("=");
+     if(pair[0] == variable){
+      var ret = pair[1];
+      while(ret.includes("%20")){
+        ret = ret.replace("%20"," ");
+      }
+      return ret;
+     }
+   }
+   return(false);
+}
+
+function getQueryVariables()
+{
+   var list = []
+   var query = window.location.search.substring(1);
+   var vars = query.split("&");
+   if(vars == ''){
+   return list;
+   }
+   for (var i=0;i<vars.length;i++) {
+     var pair = vars[i].split("=");
+     list.push(pair[0]);
+   }
+   return(list);
+}
+
 function ChangeAmount() {
   cp = document.getElementById("contribution_period");
   amount = document.getElementById("amount");
@@ -70,13 +102,26 @@ function SetOnchange(){
   c.setAttribute("onchange", "ChangeFormByType()");
 }
 
+function SetDefaultValues(){
+  var keys = getQueryVariables();
+  for(var i = 0; i < keys.length; i++){
+    if(getQueryVariable(keys[i])){
+      var elements = document.getElementById(keys[i]);
+      elements.value = getQueryVariable(keys[i]);
+    }
+  }
+}
+
 
 function Onload() {
   SetOnchange();
+  SetDefaultValues();
 
   ChangeShareSelectList();
   ChangeDebtSelectList();
   ChangeFormByType();
+
+  SetDefaultValues();
 }
 
 window.onload = Onload;

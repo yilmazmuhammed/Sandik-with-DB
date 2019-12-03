@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired, Length, Optional, NumberRange
 from wtforms.fields.html5 import DateField
 from datetime import date
 
-from views import LayoutPageInfo
+from views import LayoutPageInfo, get_translation
 
 
 # Normalde;
@@ -59,81 +59,92 @@ class FormPageInfo(LayoutPageInfo):
 
 
 class WebuserForm(FlaskForm):
+    t = get_translation()['forms']['webuser']
+
     open = form_open(form_name='webuser-form')
     close = form_close()
 
-    username = StringField("Username:",
-                           validators=[InputRequired("Please enter your username"),
-                                       Length(max=20, message="Username cannot be longer than 20 character")],
-                           id='username', render_kw={"placeholder": "Username", "class": "form-control"})
-    password = PasswordField("Password:",
-                             validators=[InputRequired("Please enter your password"),
-                                         Length(max=20, message="Password cannot be longer than 20 character")],
-                             id='password', render_kw={"placeholder": "Password", "class": "form-control"})
-    password_verify = PasswordField("Password (again):",
-                                    validators=[InputRequired("Please enter your password"),
-                                                Length(max=20, message="Password cannot be longer than 20 character")],
+    username = StringField("%s:" % t['username']['label'],
+                           validators=[InputRequired(t['username']['required']),
+                                       Length(max=20, message=t['username']['length'])],
+                           id='username', render_kw={"placeholder": t['username']['label'], "class": "form-control"})
+    password = PasswordField("%s:" % t['password']['label'],
+                             validators=[InputRequired(t['password']['required']),
+                                         Length(max=20, message=t['password']['length'])],
+                             id='password', render_kw={"placeholder": t['password']['label'], "class": "form-control"})
+    password_verify = PasswordField("%s:" % t['password_verify']['label'],
+                                    validators=[InputRequired(t['password_verify']['required']),
+                                                Length(max=20, message=t['password_verify']['length'])],
                                     id='password_verify',
-                                    render_kw={"placeholder": "Password (again)", "class": "form-control"})
-    name = StringField("Name:", validators=[InputRequired("Please enter your name"),
-                                            Length(max=40, message="Name field cannot be longer than 40 character")],
-                       id='name', render_kw={"placeholder": "Name", "class": "form-control"})
-    surname = StringField("Surname:",
-                          validators=[InputRequired("Please enter your name"),
-                                      Length(max=40, message="Surname field cannot be longer than 40 character")],
-                          id='surname', render_kw={"placeholder": "Surname", "class": "form-control"})
-    is_admin = BooleanField(label="Is admin:", id='is_admin',
+                                    render_kw={"placeholder": t['password_verify']['label'], "class": "form-control"})
+    name = StringField("%s:" % t['name']['label'], validators=[InputRequired(t['name']['required']),
+                                                               Length(max=40, message=t['name']['length'])],
+                       id='name', render_kw={"placeholder": t['name']['label'], "class": "form-control"})
+    surname = StringField("%s:" % t['surname']['label'],
+                          validators=[InputRequired(t['surname']['required']),
+                                      Length(max=40, message=t['surname']['length'])],
+                          id='surname', render_kw={"placeholder": t['surname']['label'], "class": "form-control"})
+    is_admin = BooleanField(label="%s:" % t['is_admin']['label'], id='is_admin',
                             render_kw={"class": "form-control", "data-toggle": "toggle", "data-onstyle": "success"})
-    date_of_registration = DateField("Date of registration:", default=date.today(),
-                                     validators=[InputRequired("Please enter date of registration")],
+    date_of_registration = DateField("%s:" % t['date_of_registration']['label'], default=date.today(),
+                                     validators=[InputRequired(t['date_of_registration']['required'])],
                                      id='date_of_registration',
-                                     render_kw={"placeholder": "Date of registration", "class": "form-control"})
-    submit = SubmitField("Add New Webuser", render_kw={"class": "btn btn-primary sandik-btn-form"})
+                                     render_kw={"placeholder": t['date_of_registration']['label'],
+                                                "class": "form-control"})
+    submit = SubmitField("%s:" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class SingUpForm(WebuserForm):
+    t = get_translation()['forms']['signup']
+
     open = form_open(form_name='signup-form')
     is_admin = None
     date_of_registration = None
-    submit = SubmitField("Sign Up", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    submit = SubmitField("%s:" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class EditWebUserForm(FlaskForm):
+    t = get_translation()['forms']['edit_webuser']
+
     open = form_open(form_name='edit-webuser-form')
     close = form_close()
 
-    username = StringField("Username:",
-                           validators=[Length(max=20, message="Username cannot be longer than 20 character")],
+    username = StringField("%s:" % t['username']['label'],
+                           validators=[Length(max=20, message=t['username']['length'])],
                            id='username', render_kw={"class": "form-control", "readonly": ""})
-    old_password = PasswordField("Old password:",
-                                 validators=[InputRequired("Please enter your password"),
-                                             Length(max=20, message="Password cannot be longer than 20 character")],
+    old_password = PasswordField("%s:" % t['old_password']['label'],
+                                 validators=[InputRequired(t['old_password']['required']),
+                                             Length(max=20, message=t['old_password']['length'])],
                                  id='old_password', render_kw={"class": "form-control"})
-    new_password = PasswordField("New password:",
-                                 validators=[Length(max=20, message="Password cannot be longer than 20 character")],
+    new_password = PasswordField("%s:" % t['new_password']['label'],
+                                 validators=[Length(max=20, message=t['new_password']['length'])],
                                  id='new_password', render_kw={"class": "form-control"})
-    new_password_verify = PasswordField("New password (again):",
+    new_password_verify = PasswordField("%s:" % t['new_password_verify']['label'],
                                         validators=[
-                                            Length(max=20, message="Password cannot be longer than 20 character")],
+                                            Length(max=20, message=t['new_password_verify']['length'])],
                                         id='new_password_verify',
                                         render_kw={"class": "form-control"})
-    name = StringField("Name:", validators=[Length(max=40, message="Name field cannot be longer than 40 character")],
+    name = StringField("%s:" % t['name']['label'], validators=[Length(max=40, message=t['name']['length'])],
                        id='name', render_kw={"class": "form-control"})
-    surname = StringField("Surname:",
-                          validators=[Length(max=40, message="Surname field cannot be longer than 40 character")],
+    surname = StringField("%s:" % t['surname']['label'],
+                          validators=[Length(max=40, message=t['surname']['length'])],
                           id='surname', render_kw={"class": "form-control"})
-    submit = SubmitField("Submit", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    submit = SubmitField("%s:" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class LoginForm(FlaskForm):
+    t = get_translation()['forms']['login']
+
     open = form_open(form_name='login-form')
     close = form_close()
 
-    username = StringField("Username:", validators=[InputRequired("Please enter your username")], id='username',
-                           render_kw={"placeholder": "Username", "class": "form-control"})
-    password = PasswordField("Password:", validators=[InputRequired("Please enter your password")], id='password',
-                             render_kw={"placeholder": "Password", "class": "form-control"})
-    submit = SubmitField("Login", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    username = StringField("%s:" % t['username']['label'], validators=[InputRequired(t['username']['required'])],
+                           id='username',
+                           render_kw={"placeholder": "%s:" % t['username']['label'], "class": "form-control"})
+    password = PasswordField("%s:" % t['password']['label'], validators=[InputRequired(t['password']['required'])],
+                             id='password',
+                             render_kw={"placeholder": "%s:" % t['password']['label'], "class": "form-control"})
+    submit = SubmitField("%s:" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class SandikForm(FlaskForm):
@@ -262,25 +273,27 @@ class TransactionForm(FlaskForm):
 
 
 class ContributionForm(TransactionForm):
+    t = get_translation()['forms']['contribution']
+
     open = form_open(form_name='contribution-form')
     close = form_close()
-
-    amount = IntegerField("Amount:", validators=[InputRequired("Please enter amount of transaction")], id='amount',
-                          render_kw={"placeholder": "Amount", "class": "form-control", "readonly": ""})
+    amount = IntegerField("%s:" % t['amount']['label'], validators=[InputRequired(t['amount']['required'])],
+                          id='amount',
+                          render_kw={"placeholder": t['amount']['label'], "class": "form-control", "readonly": ""})
 
     # value format: yyyy-mm
-    contribution_period = \
-        DynamicSelectMultipleField(label="Contribution period:",
-                                   validators=[InputRequired("Please select contribution period in list")],
-                                   coerce=str, choices=[], id='contribution_period',
-                                   render_kw={"class": "form-control"})
+    contribution_period = DynamicSelectMultipleField(label="%s:" % t['contribution_period']['label'],
+                                                     validators=[InputRequired(t['contribution_period']['required'])],
+                                                     coerce=str, choices=[], id='contribution_period',
+                                                     render_kw={"class": "form-control"})
     # TODO use super()
-    explanation = TextAreaField("Explanation:",
+    explanation = TextAreaField("%s:" % t['explanation']['label'],
                                 validators=[Optional(),
-                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
+                                            Length(max=200, message=t['explanation']['length'])],
+                                id='explanation',
+                                render_kw={"placeholder": t['explanation']['label'], "class": "form-control"})
     # TODO use super()
-    submit = SubmitField("Add Contribution", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class DebtForm(TransactionForm):
@@ -358,7 +371,7 @@ def select_form(form_name, tag, coerce, choices, id, submit_tag):
         open = form_open(form_name=form_name)
         close = form_close()
 
-        member = SelectField("%s:"%tag, validators=[InputRequired("Please select from the list")], choices=choices,
+        member = SelectField("%s:" % tag, validators=[InputRequired("Please select from the list")], choices=choices,
                              id=id, coerce=coerce, render_kw={"class": "form-control"})
         submit = SubmitField(submit_tag, render_kw={"class": "btn btn-primary sandik-btn-form"})
 

@@ -13,8 +13,8 @@ TODO 31 Onaylanmamış işlemleri hesaplamalara katma
 TODO 33 İşlem düzenleme sayfası
 TODO 34 dbtables (transactions) tablosunu hızlandır/değiştir
 TODO 35 backup işlemini idlerle birlikte yap
-TODO 36
+TODO 37
 
 FRONTEND 20! Sandıktaki bütün transaction toplamlarını göster
 
-DONE 32 İşlem silme sayfası
+TODO 36 İşlem ayrıntıları sayfasına ödeme yapma butonu ekleme

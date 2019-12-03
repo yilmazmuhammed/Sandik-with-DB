@@ -10,7 +10,7 @@ from database.auxiliary import insert_contribution, insert_debt, insert_payment,
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views import LayoutPageInfo
-from views.authorizations import authorization_to_the_sandik_required
+from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices, Period, UnpaidDebt, local_name_surname
 from views.transaction.db import add_contribution
@@ -224,13 +224,19 @@ def transactions_page(sandik_id):
                                transactions=transactions)
 
 
-@authorization_to_the_sandik_required(reading_transaction=True)
+@login_required
 def transaction_in_transactions_page(sandik_id, transaction_id):
     with db_session:
         transaction = Transaction[transaction_id]
         # TODO abort u değistir
         if transaction.share_ref.member_ref.sandik_ref.id != sandik_id:
             abort(404)
+        elif is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True):
+            # Yöneticinin yetkisi var
+            pass
+        elif not transaction.share_ref.member_ref.webuser_ref.username != current_user.webuser.username:
+            flash(u"Bu sayfaya giriş yetkiniz yok.", 'danger')
+            return current_app.login_manager.unauthorized()
 
         if transaction.deleted_by:
             flash(u'Bu işlem %s (%s) tarafından silinmiştir...' % (

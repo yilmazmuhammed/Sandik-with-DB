@@ -72,6 +72,11 @@
                       {% endif %}
                       </tbody>
                   </table>
+                  <div class="col-md-* col-xs-12 text-right">
+                    <a href="{{ url_for('add_custom_transaction_for_admin_page', sandik_id=t.share_ref.member_ref.sandik_ref.id) }}?type=payment&member={{t.share_ref.member_ref.id}}&debt={{t.debt_ref.id}}" class="btn btn-xs btn-success">Ödeme ekle</a>
+                  </div>
+
+
               </div>
             </div>
         </div>

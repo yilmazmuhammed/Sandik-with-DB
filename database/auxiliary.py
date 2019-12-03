@@ -57,6 +57,7 @@ def insert_payment(in_date, amount, explanation,
         flash(u"Paid amount cannot be more than the remaining debt", 'danger')
         return None
     else:  # There is no problem
+        # TODO pnod = p.debt_ref.payment_index
         pnod = count(select(p for p in Payment if p.debt_ref == debt))
         pdsf = debt.paid_debt + amount
         pisf = int(pdsf / debt.installment_amount)
@@ -69,6 +70,7 @@ def insert_payment(in_date, amount, explanation,
                                                 confirmed_by=confirmed_by, deleted_by=deleted_by
                                                 )
                     )
+        # TODO onaylanmayan işlemde borç bilgilerini değiştirme, onaylarken değiştir
         debt.paid_debt = pdsf
         debt.paid_installment = pisf
         debt.remaining_debt = rdsf
