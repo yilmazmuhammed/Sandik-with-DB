@@ -49,14 +49,14 @@ def add_sandiklar(sandiklar):
     with db_session:
         for s in sandiklar:
             date_of_opening = date(*(list(map(int, s[2].split('-')))))
-            insert_sandik(name=s[1], contribution_amount=s[3], explanation=s[5], date_of_opening=date_of_opening,
+            insert_sandik(id=s[0], name=s[1], contribution_amount=s[3], explanation=s[5], date_of_opening=date_of_opening,
                           is_active=s[4])
 
 
 def add_member_authority_types(member_authority_types):
     with db_session:
         for mat in member_authority_types:
-            insert_member_authority_type(name=mat[1], capacity=mat[2], sandik_id=mat[3], is_admin=mat[4],
+            insert_member_authority_type(id=mat[0], name=mat[1], capacity=mat[2], sandik_id=mat[3], is_admin=mat[4],
                                          reading_transaction=mat[5], writing_transaction=mat[6],
                                          adding_member=mat[7], throwing_member=mat[8])
 
@@ -65,20 +65,20 @@ def add_members(members):
     with db_session:
         for m in members:
             date_of_membership = date(*(list(map(int, m[3].split('-')))))
-            insert_member(m[1], m[2], m[5], date_of_membership, m[4])
+            insert_member(m[1], m[2], m[5], date_of_membership, m[4], id=m[0])
 
 
 def add_shares(shares):
     with db_session:
         for s in shares:
             date_of_opening = date(*(list(map(int, s[3].split('-')))))
-            insert_share(s[1], date_of_opening, s[4], s[2])
+            insert_share(s[1], date_of_opening, s[4], s[2], id=s[0])
 
 
 def add_debt_types(debt_types):
     with db_session:
         for dt in debt_types:
-            insert_debt_type(sandik_id=dt[1], name=dt[2], explanation=dt[3], max_number_of_instalments=dt[4],
+            insert_debt_type(id=dt[0], sandik_id=dt[1], name=dt[2], explanation=dt[3], max_number_of_instalments=dt[4],
                              max_amount=dt[5], min_installment_amount=dt[6])
 
 
@@ -92,14 +92,14 @@ def add_transactions(transactions):
             if t[4] in debt:
                 insert_debt(transaction_date, t[2], t[3], t[5],
                             DebtType.get(name=t[4], sandik_ref=Share[t[3]].member_ref.sandik_ref).id, t[6],
-                            created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9])
+                            created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9], id=t[0])
             elif t[4] in payment:
                 insert_payment(transaction_date, t[2], t[5], created_by_username=t[7], confirmed_by_username=t[8],
-                               deleted_by_username=t[9], transaction_id=t[6])
+                               deleted_by_username=t[9], transaction_id=t[6], id=t[0])
             elif t[4] == 'Aidat':
                 insert_contribution(transaction_date, t[2], t[3], t[5], t[6].split(" "),
                                     created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9],
-                                    is_from_import_data=True)
+                                    is_from_import_data=True, id=t[0])
             elif t[4] == 'Diğer':
                 insert_transaction(transaction_date, t[2], t[3], t[5],
-                                   created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9])
+                                   created_by_username=t[7], confirmed_by_username=t[8], deleted_by_username=t[9], id=t[0])

@@ -10,7 +10,7 @@ from views.transaction.auxiliary import Period
 
 @db_session
 def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst,
-                created_by_username, confirmed_by_username=None, deleted_by_username=None):
+                created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None):
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
         confirmed_by = WebUser[confirmed_by_username]
@@ -26,7 +26,8 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
     ia = int(ia) if ia % 1 == 0 else int(ia) + 1
     return Debt(
         transaction_ref=Transaction(
-            share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Debt', explanation=explanation,
+            id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Debt',
+            explanation=explanation,
             created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by),
         debt_type_ref=DebtType[type_id], number_of_installment=num_of_inst, installment_amount=ia,
         paid_debt=0, paid_installment=0, remaining_debt=amount, remaining_installment=num_of_inst,
@@ -36,7 +37,7 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
 @db_session
 def insert_payment(in_date, amount, explanation,
                    created_by_username, confirmed_by_username=None, deleted_by_username=None,
-                   debt_id=None, transaction_id=None):
+                   debt_id=None, transaction_id=None, id=None):
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref
     created_by = WebUser[created_by_username]
@@ -65,7 +66,7 @@ def insert_payment(in_date, amount, explanation,
         risf = debt.number_of_installment - pisf
         p = Payment(debt_ref=debt, payment_number_of_debt=pnod, paid_debt_so_far=pdsf, paid_installment_so_far=pisf,
                     remaining_debt_so_far=rdsf, remaining_installment_so_far=risf,
-                    transaction_ref=Transaction(share_ref=share, transaction_date=in_date, amount=amount,
+                    transaction_ref=Transaction(id=id, share_ref=share, transaction_date=in_date, amount=amount,
                                                 type='Payment', explanation=explanation, created_by=created_by,
                                                 confirmed_by=confirmed_by, deleted_by=deleted_by
                                                 )
@@ -83,7 +84,7 @@ def insert_payment(in_date, amount, explanation,
 @db_session
 def insert_contribution(in_date: date, amount, share_id, explanation, periods: list,
                         created_by_username, confirmed_by_username=None, deleted_by_username=None,
-                        is_from_import_data=False):
+                        is_from_import_data=False, id=None):
     # ..._by_username'ler None mı olsun yoksa "" mı?
     share = Share[share_id]
     sandik = share.member_ref.sandik_ref
@@ -114,7 +115,7 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
                 flash(u"Paid amount must be divided by contribution amount (%s)." % contribution_amount, 'danger')
                 return False
 
-    transaction_ref = Transaction(share_ref=share, transaction_date=in_date,
+    transaction_ref = Transaction(id=id, share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation,
                                   created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
@@ -126,7 +127,7 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
 
 @db_session
 def insert_transaction(in_date, amount, share_id, explanation,
-                       created_by_username, confirmed_by_username=None, deleted_by_username=None):
+                       created_by_username, confirmed_by_username=None, deleted_by_username=None, id=id):
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
         confirmed_by = WebUser[confirmed_by_username]
@@ -137,7 +138,7 @@ def insert_transaction(in_date, amount, share_id, explanation,
     else:
         deleted_by = None
 
-    return Transaction(share_ref=Share[share_id], transaction_date=in_date, amount=amount,
+    return Transaction(id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount,
                        type='Other', explanation=explanation,
                        created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
@@ -150,7 +151,8 @@ def insert_webuser(username, password_hash, date_of_registration: date = date.to
 
 
 @db_session
-def insert_member(username, sandik_id, authority_id, date_of_membership: date = date.today(), is_active: bool = True):
+def insert_member(username, sandik_id, authority_id, date_of_membership: date = date.today(), is_active: bool = True,
+                  id=None):
     sandik = Sandik[sandik_id]
 
     # TODO Use exception
@@ -159,13 +161,14 @@ def insert_member(username, sandik_id, authority_id, date_of_membership: date = 
     elif date_of_membership < sandik.date_of_opening:
         return None
 
-    return Member(webuser_ref=WebUser[username], sandik_ref=Sandik[sandik_id],
+    return Member(id=id, webuser_ref=WebUser[username], sandik_ref=Sandik[sandik_id],
                   member_authority_type_ref=MemberAuthorityType[authority_id], date_of_membership=date_of_membership,
                   is_active=is_active)
 
 
 @db_session
-def insert_share(member_id, date_of_opening: date = date.today(), is_active: bool = True, share_order_of_member=None):
+def insert_share(member_id, date_of_opening: date = date.today(), is_active: bool = True, share_order_of_member=None,
+                 id=None):
     member = Member[member_id]
 
     # TODO Use exception
@@ -178,29 +181,32 @@ def insert_share(member_id, date_of_opening: date = date.today(), is_active: boo
         else:
             share_order_of_member = 1
 
-    return Share(member_ref=member, share_order_of_member=share_order_of_member, date_of_opening=date_of_opening,
+    return Share(id=id, member_ref=member, share_order_of_member=share_order_of_member, date_of_opening=date_of_opening,
                  is_active=is_active)
 
 
 @db_session
-def insert_sandik(name, contribution_amount, explanation, date_of_opening: date = date.today(), is_active: bool = True, ):
-    return Sandik(name=name, contribution_amount=contribution_amount, explanation=explanation, date_of_opening=date_of_opening, is_active=is_active)
+def insert_sandik(name, contribution_amount, explanation, date_of_opening: date = date.today(), is_active: bool = True,
+                  id=None):
+    return Sandik(id=id, name=name, contribution_amount=contribution_amount, explanation=explanation,
+                  date_of_opening=date_of_opening, is_active=is_active)
 
 
 @db_session
 def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, reading_transaction=False,
                                  writing_transaction: bool = False, adding_member: bool = False,
-                                 throwing_member: bool = False):
+                                 throwing_member: bool = False, id=None):
     sandik = Sandik[sandik_id]
-    return MemberAuthorityType(name=name, max_number_of_members=capacity, sandik_ref=sandik, is_admin=is_admin,
+    return MemberAuthorityType(id=id, name=name, max_number_of_members=capacity, sandik_ref=sandik, is_admin=is_admin,
                                reading_transaction=reading_transaction, writing_transaction=writing_transaction,
                                adding_member=adding_member, throwing_member=throwing_member)
 
 
 @db_session
-def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, max_amount=0, min_installment_amount=0):
+def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, max_amount=0, min_installment_amount=0,
+                     id=None):
     sandik = Sandik[sandik_id]
-    return DebtType(sandik_ref=sandik, name=name, explanation=explanation,
+    return DebtType(id=id, sandik_ref=sandik, name=name, explanation=explanation,
                     max_number_of_installments=max_number_of_instalments, max_amount=max_amount,
                     min_installment_amount=min_installment_amount)
 

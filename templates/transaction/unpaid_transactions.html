@@ -60,7 +60,7 @@ $(document).ready(function(){
                 <tbody  id="myTable">
             {% for debt in payments[period] %}
                     <tr>
-                        <td class="text-center"><a href="{{url_for('transaction_in_transactions_page', sandik_id=debt.debt.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=debt.debt.transaction_ref.id)}}">{{debt.debt_id}}</a></td>
+                        <td class="text-center"><a href="{{url_for('transaction_in_transactions_page', sandik_id=debt.debt.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=debt.debt.transaction_ref.id)}}">{{debt.debt.transaction_ref.id}}</a></td>
                         <td >{{debt.name_surname_share}}</td>
                         <td class="text-center">{{debt.debt_type}}</td>
                         <td class="text-center">{{debt.installment_amount_of_this_period}}tl </td>
