@@ -136,6 +136,7 @@ def add_payment_page(sandik_id):
 @authorization_to_the_sandik_required(writing_transaction=True)
 def add_custom_transaction_for_admin_page(sandik_id):
     with db_session:
+        max = select(t.id for t in Transaction).max()+1
         sandik = Sandik[sandik_id]
         # member = Member.get(sandik_ref=sandik, webuser_ref=WebUser[current_user.username])
 
