@@ -177,24 +177,24 @@ def add_custom_transaction_for_admin_page(sandik_id):
             if insert_contribution(c_form.transaction_date.data, c_form.amount.data, c_form.share.data,
                                    c_form.explanation.data, c_form.contribution_period.data,
                                    created_by_username=current_user.webuser.username,
-                                   confirmed_by_username=current_user.webuser.username):
+                                   confirmed_by_username=current_user.webuser.username, id=max):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif d_form.validate_on_submit():
             insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.explanation.data,
                         d_form.debt_type.data, d_form.number_of_installment.data,
                         created_by_username=current_user.webuser.username,
-                        confirmed_by_username=current_user.webuser.username)
+                        confirmed_by_username=current_user.webuser.username, id=max)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif p_form.validate_on_submit():
             if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
                               created_by_username=current_user.webuser.username,
                               confirmed_by_username=current_user.webuser.username,
-                              debt_id=p_form.debt.data):
+                              debt_id=p_form.debt.data, id=max):
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif o_form.validate_on_submit():
             insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
                                o_form.explanation.data, created_by_username=current_user.webuser.username,
-                               confirmed_by_username=current_user.webuser.username)
+                               confirmed_by_username=current_user.webuser.username, id=max)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
 
         forms = [c_form, d_form, p_form, o_form]
