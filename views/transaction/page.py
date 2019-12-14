@@ -13,7 +13,7 @@ from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices, Period, UnpaidDebt, local_name_surname
-from views.transaction.db import add_contribution
+from views.transaction.db import add_contribution, remove_transaction_vw
 
 
 @login_required
@@ -322,48 +322,12 @@ def unpaid_transactions_page(sandik_id):
                                contributions=unpaid_contributions, payments=unpaid_payments)
 
 
+# TODO işlem, sandığın işlemi olmak zorunda
 @authorization_to_the_sandik_required(is_admin=True)
 def delete_transaction(sandik_id, transaction_id):
     with db_session:
-        transaction = Transaction[transaction_id]
-
-        if (date.today() - transaction.transaction_date).days > 1 and not current_user.is_admin:
-            flash(u'1 günden eski işlemleri silmek için yönetici ile iletişime geçiniz..', 'danger')
-            return redirect(
-                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
-        elif select(t for t in Transaction
-                    if t.id >= transaction.id and t.share_ref.member_ref.sandik_ref.id == sandik_id).count() > 10 and not current_user.is_admin:
-            flash(u'Son 10 işlemden öncesi silinemez..', 'danger')
-            return redirect(
-                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
-
-        if transaction.debt_ref and transaction.debt_ref.payments_index.select(
-                lambda p: not p.transaction_ref.deleted_by):
-            flash(u'Ödeme yapılmış bir borç silinemez..', 'danger')
-            return redirect(
-                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
-        elif transaction.payment_ref and max([pn.payment_number_of_debt for pn in
-                                              transaction.payment_ref.debt_ref.payments_index]) > transaction.payment_ref.payment_number_of_debt:
-            flash(u'Bir borcun son ödemesi dışındaki ödemeler silinemez...', 'danger')
-            return redirect(
-                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
-        elif transaction.deleted_by:
-            flash(u'Silinmiş bir işlem bir daha silinemez..', 'danger')
-            return redirect(
-                url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
-        else:
-            if transaction.contribution_index:
-                pass
-            elif transaction.debt_ref:
-                pass
-            elif transaction.payment_ref:
-                debt = transaction.payment_ref.debt_ref
-                debt.paid_debt = debt.paid_debt - transaction.amount
-                debt.paid_installment = int(debt.paid_debt / debt.installment_amount)
-                debt.remaining_debt = debt.transaction_ref.amount - debt.paid_debt
-                debt.remaining_installment = debt.number_of_installment - debt.paid_installment
-
-            transaction.deleted_by = WebUser[current_user.username]
+        if not remove_transaction_vw(transaction_id):
+            return redirect(url_for('transaction_in_transactions_page', sandik_id=sandik_id, transaction_id=transaction_id))
     return redirect(url_for('transactions_page', sandik_id=sandik_id))
 
 

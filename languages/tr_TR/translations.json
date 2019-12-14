@@ -1,4 +1,9 @@
 {
+  "exceptions": {
+    "deleted_transaction": "Silinmiş bir borç tekrar silinemez.",
+    "not_last_payment": "Bir borcun yapılan son ödemesi dışındaki ödemeler silinemez.",
+    "there_is_payment": "Ödeme yapılmış bir borç silinemez."
+  },
   "forms": {
     "contribution": {
       "amount": {

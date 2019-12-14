@@ -5,6 +5,8 @@ from pony.orm import db_session, count, select
 
 from database.dbinit import (Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik,
                              MemberAuthorityType, Member, )
+from database.exceptions import OutstandingDebt, ThereIsPayment, NotLastPayment, DeletedTransaction
+from views import get_translation
 from views.transaction.auxiliary import Period
 
 
@@ -231,14 +233,6 @@ def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share = 
         return webuser.name + " " + webuser.surname
 
 
-class RemoveShareError(Exception):
-    pass
-
-
-class OutstandingDebt(RemoveShareError):
-    pass
-
-
 @db_session
 def remove_share(share_id):
     share = Share[share_id]
@@ -260,4 +254,35 @@ def remove_member(member_id):
         member.is_active = False
         return member
     except OutstandingDebt:
-        raise OutstandingDebt("Hissenin ödenmemiş borcu var.")
+        raise OutstandingDebt("Üyenin ödenmemiş borcu var.")
+
+
+@db_session
+def remove_transaction(transaction_id, deleted_by_username):
+    t = Transaction[transaction_id]
+
+    # if t.debt_ref.payment_index
+    if t.deleted_by:
+        raise DeletedTransaction(get_translation()["exceptions"]["deleted_transaction"])
+
+    if t.contribution_index:
+        pass
+    elif t.debt_ref:
+        if t.debt_ref.payments_index.select(lambda p: not p.transaction_ref.deleted_by):
+            raise ThereIsPayment(get_translation()["exceptions"]["there_is_payment"])
+        pass
+    elif t.payment_ref:
+        if t.payment_ref.payment_number_of_debt != max([p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index]):
+            raise NotLastPayment(get_translation()["exceptions"]["not_last_payment"])
+
+        debt = t.payment_ref.debt_ref
+        debt.paid_debt = debt.paid_debt - t.amount
+        debt.paid_installment = int(debt.paid_debt / debt.installment_amount)
+        debt.remaining_debt = debt.transaction_ref.amount - debt.paid_debt
+        debt.remaining_installment = debt.number_of_installment - debt.paid_installment
+        pass
+    else:
+        pass
+
+    t.deleted_by = WebUser[deleted_by_username]
+

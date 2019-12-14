@@ -1,4 +1,9 @@
 {
+  "exceptions": {
+    "deleted_transaction": "A deleted debt cannot be deleted again.",
+    "not_last_payment": "Payments other than the last payment of a debt cannot be deleted.",
+    "there_is_payment": "A debt with a payment cannot be deleted."
+  },
   "forms": {
     "contribution": {
       "amount": {
