@@ -3,7 +3,7 @@ from datetime import date
 from pony.orm import db_session
 
 from database.auxiliary import insert_debt, insert_payment, insert_contribution, insert_transaction, insert_member, \
-    insert_share, insert_webuser, insert_sandik, insert_member_authority_type, insert_debt_type
+    insert_share, insert_webuser, insert_sandik, insert_member_authority_type, insert_debt_type, remove_transaction
 from database.dbinit import DebtType, Share
 
 
