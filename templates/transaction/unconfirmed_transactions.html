@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{translation['unconfirmed']['unconfirmed_transactions']}}</h3>
+                </div>
+                <div  class="table table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{translation['transactions']['id']}}</th>
+                                <th>{{translation['transactions']['date']}}</th>
+                                <th>{{translation['transactions']['amount']}}</th>
+                                <th>{{translation['transactions']['share']}}</th>
+                                <th>{{translation['transactions']['type']}}</th>
+                                <th>{{translation['transactions']['explanation']}}</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for t in unconfirmed_transactions %}
+                            <tr>
+                                <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}">{{t.id}}</a></td>
+                                <td>{{ t.transaction_date }}</td>
+                                <td>{{ t.amount }}</td>
+                                <td>{{ t.share_ref.member_ref.webuser_ref.name }} {{ t.share_ref.member_ref.webuser_ref.surname }} - {{ t.share_ref.share_order_of_member }}</td>
+                                <td>{{ t.type.capitalize() }} {% if t.debt_ref %} - {{ t.debt_ref.debt_type_ref.name }}{% endif %} </td>
+                                <td>{{ t.explanation }}</td>
+                                <td><a href="{{url_for('confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a></td>
+                                <td><a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -132,6 +132,7 @@
     "share": "Hisse",
     "this": "Yönetim Paneli",
     "transactions": "İşlemler",
+    "unconfirmed": "Onaylanmamış İşlemler",
     "unpaid1": "Ödenmemiş Aidat",
     "unpaid2": "ve Taksitler",
     "view": "Görüntüle..."
@@ -185,6 +186,12 @@
     "id": "No",
     "share": "Hisse",
     "type": "İşlem Türü"
+  },
+  "unconfirmed": {
+    "confirm": "Onayla",
+    "delete": "Sil",
+    "not_first_transaction": "Hissenin daha önce eklenmiş ve onaylanmamış işlemi var.",
+    "unconfirmed_transactions": "Onaylanmamış İşlemler"
   },
   "unpaid": {
     "debt_type": "Borç Türü",

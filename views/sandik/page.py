@@ -220,7 +220,7 @@ def remove_member_of_sandik_page(sandik_id):
         try:
             with db_session:
                 member = Member[form.member.data]
-                remove_member_from_sandik(member.id)
+                remove_member_from_sandik(member.id, current_user.username)
             return redirect(url_for('members_page', sandik_id=sandik_id))
         except ObjectNotFound:
             flash(u"Member not found.", 'danger')

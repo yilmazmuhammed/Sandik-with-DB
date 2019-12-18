@@ -37,5 +37,5 @@ def add_debt_type_to_sandik(form: DebtTypeForm, sandik_id):
                             form.max_amount.data, form.min_installment_amount.data)
 
 
-def remove_member_from_sandik(member_id):
-    return remove_member(member_id)
+def remove_member_from_sandik(member_id, remover_username):
+    return remove_member(member_id, remover_username)

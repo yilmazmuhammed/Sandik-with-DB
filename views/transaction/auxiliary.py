@@ -32,9 +32,9 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
         else:
             share_list = Period.all_months_from_date(share.date_of_opening)
 
-        for period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share
-                                                                            and c.transaction_ref.confirmed_by
-                                                                            and not c.transaction_ref.deleted_by):
+        for period in select(c.contribution_period for c in Contribution
+                             if c.transaction_ref.share_ref == share
+                             and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by):
             if period in share_list:
                 share_list.remove(period)
 
@@ -61,12 +61,15 @@ def member_choices(sandik_id, only_active_member=True):
 
 
 def debt_choices(member):
-    debts = select(debt for debt in Debt if
-                   debt.transaction_ref.share_ref.member_ref == member and debt.remaining_debt and debt.transaction_ref.confirmed_by and not debt.transaction_ref.deleted_by)
+    debts = select(debt for debt in Debt
+                   if debt.transaction_ref.share_ref.member_ref == member and debt.remaining_debt
+                   and debt.transaction_ref.confirmed_by and not debt.transaction_ref.deleted_by)
     ret = [(debt.id, "%s (%s): H-%s -> %stl - %s/%s" % (
-        debt.transaction_ref.id, Period.period_name(Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)),
+        debt.transaction_ref.id,
+        Period.period_name(Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)),
         debt.transaction_ref.share_ref.share_order_of_member,
-        debt.remaining_debt - (debt.remaining_installment - 1) * debt.installment_amount, debt.paid_installment + 1, debt.number_of_installment)) for debt in debts]
+        debt.remaining_debt - (debt.remaining_installment - 1) * debt.installment_amount, debt.paid_installment + 1,
+        debt.number_of_installment)) for debt in debts]
     return ret if len(ret) > 0 else [("", "Ödenmemiş borcunuz bulunmamaktadır...")]
 
 

@@ -91,7 +91,7 @@ def profile():
     with db_session:
         webuser = WebUser[current_user.username]
         members = []
-        for member in webuser.members_index:
+        for member in webuser.members_index.sort_by(lambda m: m.sandik_ref.id):
             members.append(MemberInfo(member))
         return render_template("webuser/profile.html", layout_page=LayoutPageInfo("Profile"), user=webuser,
                                members=members)

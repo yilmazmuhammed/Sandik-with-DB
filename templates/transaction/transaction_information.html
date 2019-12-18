@@ -10,7 +10,12 @@
                             {{translation.transaction.info_transaction}}
                         </div>
                         <div class="col-md-* col-xs-6 text-right">
+                            {% if not t.confirmed_by and not t.deleted_by %}
+                            <a href="{{url_for('confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a>
+                            {% endif %}
+                            {% if not t.deleted_by %}
                             <a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a>
+                            {% endif %}
                         </div>
                     </div>
 

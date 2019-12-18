@@ -9,11 +9,11 @@ from pony.orm import db_session, select, desc
 from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction, name_surname
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
-from views import LayoutPageInfo
+from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices, Period, UnpaidDebt, local_name_surname
-from views.transaction.db import add_contribution, remove_transaction_vw
+from views.transaction.db import add_contribution, remove_transaction_vw, update_values_to_confirm_payment
 
 
 @login_required
@@ -35,7 +35,7 @@ def add_transaction_page(sandik_id):
             insert_transaction(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
                                created_by_username=current_user.webuser.username)
 
-            return redirect(url_for('member_transactions_in_sandik_page', sandik_id=sandik_id))
+            return redirect(url_for('profile', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Transaction")
         return render_template("form.html", layout_page=LayoutPageInfo("Add Transaction"), info=info)
@@ -60,7 +60,7 @@ def add_contribution_page(sandik_id):
         if form.validate_on_submit():
             # TODO kontrolleri yap
             if add_contribution(form):
-                return redirect(url_for('transactions_in_sandik', sandik_id=sandik_id))
+                return redirect(url_for('profile', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"),
@@ -101,7 +101,7 @@ def add_debt_page(sandik_id):
                         form.debt_type.data, form.number_of_installment.data,
                         created_by_username=current_user.webuser.username)
 
-            return redirect(url_for('member_transactions_in_sandik_page', sandik_id=sandik_id))
+            return redirect(url_for('profile', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Take Debt")
         return render_template('form.html', layout_page=LayoutPageInfo("Take Debt"), info=info)
@@ -127,7 +127,7 @@ def add_payment_page(sandik_id):
                 flash(u'Başka birisinin borcunu ödeyemezsiniz. Yöneticiye başvurunuz.', 'danger')
             elif insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data,
                                 created_by_username=current_user.webuser.username, debt_id=form.debt.data):
-                return redirect(url_for('member_transactions_in_sandik_page', sandik_id=sandik_id))
+                return redirect(url_for('profile', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title="Add payment")
         return render_template('form.html', layout_page=LayoutPageInfo("Add payment"), info=info)
@@ -136,7 +136,7 @@ def add_payment_page(sandik_id):
 @authorization_to_the_sandik_required(writing_transaction=True)
 def add_custom_transaction_for_admin_page(sandik_id):
     with db_session:
-        max = select(t.id for t in Transaction).max()+1
+        max = select(t.id for t in Transaction).max() + 1
         sandik = Sandik[sandik_id]
         # member = Member.get(sandik_ref=sandik, webuser_ref=WebUser[current_user.username])
 
@@ -235,23 +235,20 @@ def transaction_in_transactions_page(sandik_id, transaction_id):
         elif is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True):
             # Yöneticinin yetkisi var
             pass
-        elif not transaction.share_ref.member_ref.webuser_ref.username != current_user.webuser.username:
+        elif transaction.share_ref.member_ref.webuser_ref.username != current_user.webuser.username:
             flash(u"Bu sayfaya giriş yetkiniz yok.", 'danger')
             return current_app.login_manager.unauthorized()
 
         if transaction.deleted_by:
             flash(u'Bu işlem %s (%s) tarafından silinmiştir...' % (
                 local_name_surname(webuser=transaction.deleted_by), transaction.deleted_by.username,), 'danger')
-        elif not transaction.confirmed_by:
+        if not transaction.confirmed_by:
             flash(u'Bu işlem henüz onaylanmamış...', 'danger')
 
         payments = None
-        if transaction.debt_ref:
-            payments = transaction.debt_ref.payments_index.filter(
-                lambda p: bool(p.transaction_ref.confirmed_by) and not bool(p.transaction_ref.deleted_by)).sort_by(
-                lambda p: p.id)
-        elif transaction.payment_ref:
-            payments = transaction.payment_ref.debt_ref.payments_index.filter(
+        if transaction.debt_ref or transaction.payment_ref:
+            debt = transaction.debt_ref or transaction.payment_ref.debt_ref
+            payments = debt.payments_index.filter(
                 lambda p: bool(p.transaction_ref.confirmed_by) and not bool(p.transaction_ref.deleted_by)).sort_by(
                 lambda p: p.id)
 
@@ -291,7 +288,8 @@ def unpaid_transactions_page(sandik_id):
         unpaid_payments = {}
         for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref.sandik_ref == sandik
                                                     and debt.remaining_debt and debt.transaction_ref.confirmed_by
-                                                    and not debt.transaction_ref.deleted_by).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(d.transaction_ref.share_ref.share_order_of_member))[:]:
+                                                    and not debt.transaction_ref.deleted_by).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(
+            d.transaction_ref.share_ref.share_order_of_member))[:]:
             unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
             add_debt = UnpaidDebt(debt)
             for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
@@ -331,9 +329,33 @@ def delete_transaction(sandik_id, transaction_id):
     return redirect(url_for('transactions_page', sandik_id=sandik_id))
 
 
+def unconfirmed_transactions_page(sandik_id):
+    with db_session:
+        unconfirmed_transactions = select(t for t in Transaction if
+                                          t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by and not t.deleted_by)
+        return render_template("transaction/unconfirmed_transactions.html",
+                               layout_page=LayoutPageInfo("Unpaid transactions"),
+                               unconfirmed_transactions=unconfirmed_transactions)
+
+
+# TODO islem sandıkta mı diye kontrol et
 @authorization_to_the_sandik_required(is_admin=True)
 def confirm_transaction(sandik_id, transaction_id):
     with db_session:
         transaction = Transaction[transaction_id]
+        if transaction.id != select(t.id for t in Transaction if t.share_ref.member_ref.sandik_ref.id == sandik_id
+                                    and not t.confirmed_by and not t.deleted_by and t.share_ref == transaction.share_ref).min():
+            flash(u"%s" % get_translation()['unconfirmed']['not_first_transaction'], 'danger')
+            return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
+        if transaction.payment_ref:
+            payment = transaction.payment_ref
+            debt = payment.debt_ref
+
+            if transaction.amount > debt.remaining_debt:  # If new paid amount is bigger than remaining amount of the debt
+                flash(u"Paid amount cannot be more than the remaining debt", 'danger')
+                return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
+
+            update_values_to_confirm_payment(transaction)
+
         transaction.confirmed_by = WebUser[current_user.username]
-    return redirect(url_for('transactions_page', sandik_id=sandik_id))
+    return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))

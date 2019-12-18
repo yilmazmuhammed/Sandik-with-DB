@@ -98,6 +98,27 @@
       <div class="panel panel-warning">
         <div class="panel-heading">
           <div class="row">
+
+            <div class="col-xs-12 text-right">
+              <div class="huge">{{sandik.number_of_unconfirmed_transactions}}</div>
+              <div class="huge">{{translation.management_panel["unconfirmed"]}}</div>
+            </div>
+          </div>
+        </div>
+        <a href="{{ url_for('unconfirmed_transactions_page', sandik_id=sandik.id) }}">
+          <div class="panel-footer">
+            <span class="pull-left">{{translation.management_panel.view}}</span>
+            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+            <div class="clearfix"></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <div class="row">
             <div class="col-xs-3">
               <a href="{{ url_for('add_member_authority_type_to_sandik_page', sandik_id=sandik.id) }}" class="btn btn-xs btn-warning"><em class="glyphicon glyphicon-plus"></em></a>
             </div>

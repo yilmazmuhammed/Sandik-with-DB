@@ -132,6 +132,7 @@
     "share": "Share",
     "this": "Management Panel",
     "transactions": "Transactions",
+    "unconfirmed": "Unconfirmed Transactions",
     "unpaid1": "Unpaid Contributions",
     "unpaid2": "and Installments",
     "view": "View..."
@@ -185,6 +186,12 @@
     "id": "ID",
     "share": "Share",
     "type": "Transaction Type"
+  },
+  "unconfirmed": {
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "not_first_transaction": "There is transaction",
+    "unconfirmed_transactions": "Unconfirmed Transaction"
   },
   "unpaid": {
     "debt_type": "Debt Type",

@@ -13,6 +13,7 @@ from views.transaction.auxiliary import Period
 @db_session
 def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst,
                 created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None):
+    id = id if id is not None else select(t.id for t in Transaction).max() + 1
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
         confirmed_by = WebUser[confirmed_by_username]
@@ -40,6 +41,7 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
 def insert_payment(in_date, amount, explanation,
                    created_by_username, confirmed_by_username=None, deleted_by_username=None,
                    debt_id=None, transaction_id=None, id=None):
+    id = id if id is not None else select(t.id for t in Transaction).max() + 1
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref
     created_by = WebUser[created_by_username]
@@ -61,7 +63,8 @@ def insert_payment(in_date, amount, explanation,
         return None
     else:  # There is no problem
         # TODO pnod = p.debt_ref.payment_index
-        pnod = count(select(p for p in Payment if p.debt_ref == debt))
+        pnod = count(select(p for p in Payment if p.debt_ref == debt
+                            and p.transaction_ref.confirmed_by and not p.transaction_ref.deleted_by))
         pdsf = debt.paid_debt + amount
         pisf = int(pdsf / debt.installment_amount)
         rdsf = debt.remaining_debt - amount
@@ -73,11 +76,11 @@ def insert_payment(in_date, amount, explanation,
                                                 confirmed_by=confirmed_by, deleted_by=deleted_by
                                                 )
                     )
-        # TODO onaylanmayan işlemde borç bilgilerini değiştirme, onaylarken değiştir
-        debt.paid_debt = pdsf
-        debt.paid_installment = pisf
-        debt.remaining_debt = rdsf
-        debt.remaining_installment = risf
+        if confirmed_by:
+            debt.paid_debt = pdsf
+            debt.paid_installment = pisf
+            debt.remaining_debt = rdsf
+            debt.remaining_installment = risf
         return p
 
 
@@ -87,6 +90,7 @@ def insert_payment(in_date, amount, explanation,
 def insert_contribution(in_date: date, amount, share_id, explanation, periods: list,
                         created_by_username, confirmed_by_username=None, deleted_by_username=None,
                         is_from_import_data=False, id=None):
+    id = id if id is not None else select(t.id for t in Transaction).max() + 1
     # ..._by_username'ler None mı olsun yoksa "" mı?
     share = Share[share_id]
     sandik = share.member_ref.sandik_ref
@@ -129,7 +133,8 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
 
 @db_session
 def insert_transaction(in_date, amount, share_id, explanation,
-                       created_by_username, confirmed_by_username=None, deleted_by_username=None, id=id):
+                       created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None):
+    id = id if id is not None else select(t.id for t in Transaction).max() + 1
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
         confirmed_by = WebUser[confirmed_by_username]
@@ -234,23 +239,25 @@ def name_surname(webuser_id=None, member_id=None, share_id=None, share: Share = 
 
 
 @db_session
-def remove_share(share_id):
+def remove_share(share_id, remover_username):
     share = Share[share_id]
-    remaining_debts = sum(t.debt_ref.remaining_debt for t in share.transactions_index if t.debt_ref)
+    remaining_debts = sum(t.debt_ref.remaining_debt for t in share.transactions_index
+                          if t.debt_ref and t.confirmed_by and not t.deleted_by)
     if remaining_debts > 0:
         raise OutstandingDebt("Hissenin ödenmemiş borcu var.")
-    paid_contributions = sum(t.amount for t in share.transactions_index if t.contribution_index)
-    transaction_ref = Transaction(share_ref=share, transaction_date=date.today(),
-                                  amount=-paid_contributions, type='Contribution', explanation="Üye ayrılması")
-    return Contribution(transaction_ref=transaction_ref, contribution_period='0-0')
+    paid_contributions = sum(t.amount for t in share.transactions_index
+                             if t.contribution_index and t.confirmed_by and not t.deleted_by)
+    contributions = insert_contribution(date.today(), -paid_contributions, share_id, "Üye ayrılması", ['0-0'],
+                                        remover_username, is_from_import_data=True)
+    return contributions[0]
 
 
 @db_session
-def remove_member(member_id):
+def remove_member(member_id, remover_username):
     member = Member[member_id]
     try:
-        for share in member.shares_index:
-            remove_share(share.id)
+        for share in member.shares_index.select(lambda s: s.is_active):
+            remove_share(share.id, remover_username)
         member.is_active = False
         return member
     except OutstandingDebt:
@@ -261,28 +268,28 @@ def remove_member(member_id):
 def remove_transaction(transaction_id, deleted_by_username):
     t = Transaction[transaction_id]
 
-    # if t.debt_ref.payment_index
-    if t.deleted_by:
-        raise DeletedTransaction(get_translation()["exceptions"]["deleted_transaction"])
+    if t.confirmed_by:
+        # if t.debt_ref.payment_index
+        if t.deleted_by:
+            raise DeletedTransaction(get_translation()["exceptions"]["deleted_transaction"])
 
-    if t.contribution_index:
-        pass
-    elif t.debt_ref:
-        if t.debt_ref.payments_index.select(lambda p: not p.transaction_ref.deleted_by):
-            raise ThereIsPayment(get_translation()["exceptions"]["there_is_payment"])
-        pass
-    elif t.payment_ref:
-        if t.payment_ref.payment_number_of_debt != max([p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index]):
-            raise NotLastPayment(get_translation()["exceptions"]["not_last_payment"])
+        if t.contribution_index:
+            pass
+        elif t.debt_ref:
+            if t.debt_ref.payments_index.select(lambda p: not p.transaction_ref.deleted_by):
+                raise ThereIsPayment(get_translation()["exceptions"]["there_is_payment"])
+            pass
+        elif t.payment_ref:
+            if t.payment_ref.payment_number_of_debt != int((select(p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index if not bool(t.deleted_by) and bool(t.confirmed_by))).max() or 0):
+                raise NotLastPayment(get_translation()["exceptions"]["not_last_payment"])
 
-        debt = t.payment_ref.debt_ref
-        debt.paid_debt = debt.paid_debt - t.amount
-        debt.paid_installment = int(debt.paid_debt / debt.installment_amount)
-        debt.remaining_debt = debt.transaction_ref.amount - debt.paid_debt
-        debt.remaining_installment = debt.number_of_installment - debt.paid_installment
-        pass
-    else:
-        pass
+            debt = t.payment_ref.debt_ref
+            debt.paid_debt = debt.paid_debt - t.amount
+            debt.paid_installment = int(debt.paid_debt / debt.installment_amount)
+            debt.remaining_debt = debt.transaction_ref.amount - debt.paid_debt
+            debt.remaining_installment = debt.number_of_installment - debt.paid_installment
+            pass
+        else:
+            pass
 
     t.deleted_by = WebUser[deleted_by_username]
-
