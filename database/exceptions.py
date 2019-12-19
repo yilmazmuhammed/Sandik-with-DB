@@ -28,3 +28,19 @@ class ThereIsPayment(RemoveDebtError):
 
 class DeletedTransaction(RemoveTransactionError):
     pass
+
+
+class ConfirmTransactionError(Exception):
+    pass
+
+
+class NegativeTransaction(ConfirmTransactionError):
+    pass
+
+
+class DuplicateContributionPeriod(ConfirmTransactionError):
+    pass
+
+
+class Overpayment(ConfirmTransactionError):
+    pass

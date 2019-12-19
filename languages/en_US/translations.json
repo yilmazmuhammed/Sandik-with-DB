@@ -1,7 +1,10 @@
 {
   "exceptions": {
     "deleted_transaction": "A deleted debt cannot be deleted again.",
+    "duplicate_contribution_period": "Previously paid dues cannot be re-paid.",
+    "negative_other": "Other transaction cannot be smaller than zero.",
     "not_last_payment": "Payments other than the last payment of a debt cannot be deleted.",
+    "overpayment": "Paid amount cannot be more than the remaining debt",
     "there_is_payment": "A debt with a payment cannot be deleted."
   },
   "forms": {

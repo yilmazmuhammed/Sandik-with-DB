@@ -5,7 +5,8 @@ from pony.orm import db_session, count, select
 
 from database.dbinit import (Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik,
                              MemberAuthorityType, Member, )
-from database.exceptions import OutstandingDebt, ThereIsPayment, NotLastPayment, DeletedTransaction
+from database.exceptions import OutstandingDebt, ThereIsPayment, NotLastPayment, DeletedTransaction, \
+    NegativeTransaction, DuplicateContributionPeriod, Overpayment
 from views import get_translation
 from views.transaction.auxiliary import Period
 
@@ -44,6 +45,7 @@ def insert_payment(in_date, amount, explanation,
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref
+
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
         confirmed_by = WebUser[confirmed_by_username]
@@ -87,7 +89,7 @@ def insert_payment(in_date, amount, explanation,
 # TODO flash yerine exception kullan, fonksiyonun kullanıdığı yerlerde exceptionları yakalayarak flash ile gerekli
 #  mesajı yazdır
 @db_session
-def insert_contribution(in_date: date, amount, share_id, explanation, periods: list,
+def insert_contribution(in_date: date, amount, share_id, explanation, new_periods: list,
                         created_by_username, confirmed_by_username=None, deleted_by_username=None,
                         is_from_import_data=False, id=None):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
@@ -112,22 +114,25 @@ def insert_contribution(in_date: date, amount, share_id, explanation, periods: l
         if amount % contribution_amount:
             flash(u"Paid amount must be divided by contribution amount (%s)." % contribution_amount, 'danger')
             return False
-        elif amount / contribution_amount != len(periods):
+        elif amount / contribution_amount != len(new_periods):
             flash(u"Paid amount must be contribution amount (%s) * <number_of_months>." % contribution_amount, 'danger')
             flash(u"Fakat başlangıç aidatı sistemi yapılana kadar işlem eklendi.", 'danger')
             # return False
-        for period in periods:
-            if period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share)[:]:
-                flash(u"Paid amount must be divided by contribution amount (%s)." % contribution_amount, 'danger')
-                return False
+
+        old_periods = select(c.contribution_period for c in Contribution
+                             if c.transaction_ref.share_ref == share
+                             and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by)[:]
+        for new_period in new_periods:
+            if new_period in old_periods:
+                raise DuplicateContributionPeriod(get_translation()['exceptions']['duplicate_contribution_period'])
 
     transaction_ref = Transaction(id=id, share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Contribution', explanation=explanation,
                                   created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
     contributions = []
-    for period in periods:
-        contributions.append(Contribution(transaction_ref=transaction_ref, contribution_period=period))
+    for new_period in new_periods:
+        contributions.append(Contribution(transaction_ref=transaction_ref, contribution_period=new_period))
     return contributions
 
 
@@ -280,7 +285,9 @@ def remove_transaction(transaction_id, deleted_by_username):
                 raise ThereIsPayment(get_translation()["exceptions"]["there_is_payment"])
             pass
         elif t.payment_ref:
-            if t.payment_ref.payment_number_of_debt != int((select(p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index if not bool(t.deleted_by) and bool(t.confirmed_by))).max() or 0):
+            if t.payment_ref.payment_number_of_debt != int((select(
+                    p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index if
+                    not bool(t.deleted_by) and bool(t.confirmed_by))).max() or 0):
                 raise NotLastPayment(get_translation()["exceptions"]["not_last_payment"])
 
             debt = t.payment_ref.debt_ref
@@ -293,3 +300,69 @@ def remove_transaction(transaction_id, deleted_by_username):
             pass
 
     t.deleted_by = WebUser[deleted_by_username]
+
+
+def confirm_other_transaction(t_id, confirmed_by_username):
+    t = Transaction[t_id]
+    share = t.share_ref
+    sum_of_other = select(t.amount for t in share.transactions_index
+                          if not t.contribution_index and not t.debt_ref and not t.payment_ref
+                          and t.confirmed_by and not t.deleted_by).sum()
+
+    if sum_of_other + t.amount < 0:
+        raise NegativeTransaction(get_translation()['exceptions']['negative_other'])
+
+    t.confirmed_by = WebUser[confirmed_by_username]
+
+    return True
+
+
+def confirm_debt(t_id, confirmed_by_username):
+    t = Transaction[t_id]
+
+    t.confirmed_by = WebUser[confirmed_by_username]
+
+    return True
+
+
+def confirm_contributions(t_id, confirmed_by_username):
+    t = Transaction[t_id]
+    share = t.share_ref
+    periods = select(c.contribution_period for c in t.contribution_index)[:]
+
+    for period in periods:
+        if period in select(c.contribution_period for c in Contribution
+                            if c.transaction_ref.share_ref == share
+                               and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by)[:]:
+            raise DuplicateContributionPeriod(get_translation()['exceptions']['duplicate_contribution_period'])
+
+    t.confirmed_by = WebUser[confirmed_by_username]
+
+    return True
+
+
+def confirm_payment(t_id, confirmed_by_username):
+    t = Transaction[t_id]
+    p = t.payment_ref
+    d = p.debt_ref
+
+    if t.amount > d.remaining_debt:  # If new paid amount is bigger than remaining amount of the debt
+        raise Overpayment(get_translation()['exceptions']['overpayment'])
+
+    # update_values_to_confirm_payment
+    p.payment_number_of_debt = count(select(p for p in Payment if p.debt_ref == d and
+                                            p.transaction_ref.confirmed_by and not p.transaction_ref.deleted_by))
+    p.paid_debt_so_far = d.paid_debt + t.amount
+    p.paid_installment_so_far = int(p.paid_debt_so_far / d.installment_amount)
+    p.remaining_debt_so_far = d.remaining_debt - t.amount
+    p.remaining_installment_so_far = d.number_of_installment - p.paid_installment_so_far
+
+    d.paid_debt = p.paid_debt_so_far
+    d.paid_installment = p.paid_installment_so_far
+    d.remaining_debt = p.remaining_debt_so_far
+    d.remaining_installment = p.remaining_installment_so_far
+
+    # Confirm
+    t.confirmed_by = WebUser[confirmed_by_username]
+
+    return True

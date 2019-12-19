@@ -13,7 +13,9 @@ TODO 31 Onaylanmamış işlemleri hesaplamalara katma
 TODO 33 İşlem düzenleme sayfası
 TODO 34 dbtables (transactions) tablosunu hızlandır/değiştir
 TODO 37 Diğer 0'dan az olamaz
-TODO 38
+TODO 38 Silinen işlem onaylanamaz
+TODO 39 Payment onaylama değerlerin güncellenmesi doğru çalışıyor mu?
+TODO 40
 
 FRONTEND 20! Sandıktaki bütün transaction toplamlarını göster
 

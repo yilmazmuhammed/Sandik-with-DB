@@ -1,19 +1,21 @@
 import json
 from copy import copy
-from datetime import date
 
 from flask import abort, redirect, url_for, render_template, flash, current_app
 from flask_login import login_required, current_user
 from pony.orm import db_session, select, desc
 
-from database.auxiliary import insert_contribution, insert_debt, insert_payment, insert_transaction, name_surname
+import database.auxiliary as db_aux
+from database.auxiliary import name_surname
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
+from database.exceptions import NegativeTransaction, DuplicateContributionPeriod, Overpayment
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices, Period, UnpaidDebt, local_name_surname
-from views.transaction.db import add_contribution, remove_transaction_vw, update_values_to_confirm_payment
+from views.transaction.db import remove_transaction_vw
+import views.transaction.db as transaction_db
 
 
 @login_required
@@ -32,10 +34,11 @@ def add_transaction_page(sandik_id):
         form.share.choices += share_choices(member)
 
         if form.validate_on_submit():
-            insert_transaction(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
-                               created_by_username=current_user.webuser.username)
-
-            return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+            try:
+                transaction_db.add_other_transaction(form, current_user.username)
+                return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+            except NegativeTransaction as nt:
+                flash(u'%s' % nt, 'danger')
 
         info = FormPageInfo(form=form, title="Add Transaction")
         return render_template("form.html", layout_page=LayoutPageInfo("Add Transaction"), info=info)
@@ -59,8 +62,11 @@ def add_contribution_page(sandik_id):
 
         if form.validate_on_submit():
             # TODO kontrolleri yap
-            if add_contribution(form):
+            try:
+                transaction_db.add_contributions(form, current_user.username)
                 return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+            except DuplicateContributionPeriod as dcp:
+                flash(u'%s' % dcp, 'danger')
 
         info = FormPageInfo(form=form, title="Add Contribution")
         return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"),
@@ -97,9 +103,7 @@ def add_debt_page(sandik_id):
         if form.validate_on_submit():
             # TODO kontrolleri yap, (borcu varsa bir daha alamaz[sayfaya giriş de engellenebilir], en fazla taksit,
             #  parasına göre en fazla borç)
-            insert_debt(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
-                        form.debt_type.data, form.number_of_installment.data,
-                        created_by_username=current_user.webuser.username)
+            transaction_db.add_debt(form, current_user.username)
 
             return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
 
@@ -125,9 +129,12 @@ def add_payment_page(sandik_id):
         if form.validate_on_submit():
             if Debt[form.debt.data].transaction_ref.share_ref.member_ref.webuser_ref.username != current_user.webuser.username:
                 flash(u'Başka birisinin borcunu ödeyemezsiniz. Yöneticiye başvurunuz.', 'danger')
-            elif insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data,
-                                created_by_username=current_user.webuser.username, debt_id=form.debt.data):
-                return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+            else:
+                try:
+                    transaction_db.add_payment(form, current_user.username)
+                    return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+                except Overpayment as op:
+                    flash(u'%s' % op, 'danger')
 
         info = FormPageInfo(form=form, title="Add payment")
         return render_template('form.html', layout_page=LayoutPageInfo("Add payment"), info=info)
@@ -174,28 +181,26 @@ def add_custom_transaction_for_admin_page(sandik_id):
         d_form.number_of_installment.choices += [(i, i) for i in range(1, 13)]
 
         if c_form.validate_on_submit():
-            if insert_contribution(c_form.transaction_date.data, c_form.amount.data, c_form.share.data,
-                                   c_form.explanation.data, c_form.contribution_period.data,
-                                   created_by_username=current_user.webuser.username,
-                                   confirmed_by_username=current_user.webuser.username, id=max_id):
+            try:
+                transaction_db.add_contributions(c_form, current_user.username, is_confirmed=True)
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
+            except DuplicateContributionPeriod as dcp:
+                flash(u'%s' % dcp, 'danger')
         elif d_form.validate_on_submit():
-            insert_debt(d_form.transaction_date.data, d_form.amount.data, d_form.share.data, d_form.explanation.data,
-                        d_form.debt_type.data, d_form.number_of_installment.data,
-                        created_by_username=current_user.webuser.username,
-                        confirmed_by_username=current_user.webuser.username, id=max_id)
+            transaction_db.add_debt(d_form, current_user.username, is_confirmed=True)
             return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
         elif p_form.validate_on_submit():
-            if insert_payment(p_form.transaction_date.data, p_form.amount.data, p_form.explanation.data,
-                              created_by_username=current_user.webuser.username,
-                              confirmed_by_username=current_user.webuser.username,
-                              debt_id=p_form.debt.data, id=max_id):
+            try:
+                transaction_db.add_payment(p_form, current_user.username, is_confirmed=True)
                 return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
+            except Overpayment as op:
+                flash(u'%s' % op, 'danger')
         elif o_form.validate_on_submit():
-            insert_transaction(o_form.transaction_date.data, o_form.amount.data, o_form.share.data,
-                               o_form.explanation.data, created_by_username=current_user.webuser.username,
-                               confirmed_by_username=current_user.webuser.username, id=max_id)
-            return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
+            try:
+                transaction_db.add_other_transaction(o_form, current_user.username, is_confirmed=True)
+                return redirect(url_for('add_custom_transaction_for_admin_page', sandik_id=sandik_id))
+            except NegativeTransaction as nt:
+                flash(u'%s' % nt, 'danger')
 
         forms = [c_form, d_form, p_form, o_form]
         errors = []
@@ -334,7 +339,7 @@ def unpaid_transactions_page(sandik_id):
 def delete_transaction(sandik_id, transaction_id):
     with db_session:
         if not remove_transaction_vw(transaction_id):
-            return redirect(url_for('transaction_in_transactions_page',
+            return redirect(url_for('transaction_information_page',
                                     sandik_id=sandik_id, transaction_id=transaction_id))
     return redirect(url_for('transactions_page', sandik_id=sandik_id))
 
@@ -343,7 +348,7 @@ def delete_transaction(sandik_id, transaction_id):
 def unconfirmed_transactions_page(sandik_id):
     with db_session:
         unconfirmed_transactions = select(t for t in Transaction if
-                                          t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by and not t.deleted_by)
+                                          t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by and not t.deleted_by).sort_by(lambda t: t.id)
         return render_template("transaction/unconfirmed_transactions.html",
                                layout_page=LayoutPageInfo("Unpaid transactions"),
                                unconfirmed_transactions=unconfirmed_transactions, is_authorized=True)
@@ -358,7 +363,7 @@ def member_unconfirmed_transactions_page(sandik_id):
         unconfirmed_transactions = select(t for t in Transaction
                                           if t.share_ref.member_ref.webuser_ref.username == current_user.username
                                           and t.share_ref.member_ref.sandik_ref.id == sandik_id
-                                          and not t.confirmed_by and not t.deleted_by)
+                                          and not t.confirmed_by and not t.deleted_by).sort_by(lambda t: t.id)
         return render_template("transaction/unconfirmed_transactions.html",
                                layout_page=LayoutPageInfo("Unpaid transactions"),
                                unconfirmed_transactions=unconfirmed_transactions, is_authorized=False)
@@ -369,19 +374,29 @@ def member_unconfirmed_transactions_page(sandik_id):
 def confirm_transaction(sandik_id, transaction_id):
     with db_session:
         transaction = Transaction[transaction_id]
+
         if transaction.id != select(t.id for t in Transaction if t.share_ref.member_ref.sandik_ref.id == sandik_id
                                     and not t.confirmed_by and not t.deleted_by and t.share_ref == transaction.share_ref).min():
             flash(u"%s" % get_translation()['unconfirmed']['not_first_transaction'], 'danger')
             return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
+
         if transaction.payment_ref:
-            payment = transaction.payment_ref
-            debt = payment.debt_ref
+            try:
+                db_aux.confirm_payment(transaction_id, current_user.username)
+            except Overpayment as op:
+                flash(u"%s" % op, 'danger')
+        elif transaction.debt_ref:
+            db_aux.confirm_debt(t_id=transaction_id, confirmed_by_username=current_user.username)
+            pass
+        elif transaction.contribution_index:
+            try:
+                db_aux.confirm_contributions(transaction_id, current_user.username)
+            except DuplicateContributionPeriod as dcp:
+                flash(u'%s' % dcp, 'danger')
+        else:
+            try:
+                db_aux.confirm_other_transaction(t_id=transaction_id, confirmed_by_username=current_user.username)
+            except NegativeTransaction as nt:
+                flash(u'%s' % nt, 'danger')
 
-            if transaction.amount > debt.remaining_debt:  # If new paid amount is bigger than remaining amount of the debt
-                flash(u"Paid amount cannot be more than the remaining debt", 'danger')
-                return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
-
-            update_values_to_confirm_payment(transaction)
-
-        transaction.confirmed_by = WebUser[current_user.username]
     return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))

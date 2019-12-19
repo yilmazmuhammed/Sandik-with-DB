@@ -1,7 +1,10 @@
 {
   "exceptions": {
     "deleted_transaction": "Silinmiş bir borç tekrar silinemez.",
+    "duplicate_contribution_period": "Daha önce ödenmiş aidat tekrar ödenemez.",
+    "negative_other": "Diğer işlemler 0'dan küçük olamaz.",
     "not_last_payment": "Bir borcun yapılan son ödemesi dışındaki ödemeler silinemez.",
+    "overpayment": "Ödeme miktarı, kalan borçtan fazla olamaz.",
     "there_is_payment": "Ödeme yapılmış bir borç silinemez."
   },
   "forms": {

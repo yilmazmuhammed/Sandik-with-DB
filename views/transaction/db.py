@@ -5,27 +5,10 @@ from flask_login import current_user
 from pony.orm import select, db_session, count
 
 import database.auxiliary as db_aux
-from database.dbinit import Share, Contribution, Transaction, Payment
-from database.exceptions import RemoveTransactionError
-from forms import ContributionForm
-
-
-def add_contribution(form: ContributionForm):
-    share = Share[form.share.data]
-    periods = form.contribution_period.data
-
-    for period in periods:
-        if period in select(c.contribution_period for c in Contribution
-                            if c.transaction_ref.share_ref == share
-                               and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by)[:]:
-            flash(u"Daha önce ödenmiş aidat tekrar ödenemez.", 'danger')
-            return False
-
-    if db_aux.insert_contribution(form.transaction_date.data, form.amount.data, share.share_id,
-                                  form.explanation.data, periods, created_by_username=current_user.webuser.username):
-        return True
-
-    return False
+from database.dbinit import Share, Contribution, Transaction, Debt
+from database.exceptions import RemoveTransactionError, NegativeTransaction, DuplicateContributionPeriod, Overpayment
+from forms import ContributionForm, TransactionForm, DebtForm, PaymentForm
+from views import get_translation
 
 
 # TODO Flash'a çeviri ekle
@@ -50,19 +33,71 @@ def remove_transaction_vw(transaction_id):
 
 
 @db_session
-def update_values_to_confirm_payment(transaction: Transaction):
-    payment = transaction.payment_ref
-    debt = payment.debt_ref
+def add_other_transaction(form: TransactionForm, username, is_confirmed=False):
+    share = Share[form.share.data]
+    sum_of_other = select(t.amount for t in share.transactions_index
+                          if not t.contribution_index and not t.debt_ref and not t.payment_ref
+                          and t.confirmed_by and not t.deleted_by).sum()
+    if sum_of_other + form.amount.data < 0:
+        raise NegativeTransaction(get_translation()['exceptions']['negative_other'])
 
-    payment.payment_number_of_debt = count(select(p for p in Payment if p.debt_ref == debt and
-                                                  p.transaction_ref.confirmed_by and not p.transaction_ref.deleted_by))
-    payment.paid_debt_so_far = debt.paid_debt + transaction.amount
-    payment.paid_installment_so_far = int(payment.paid_debt_so_far / debt.installment_amount)
-    payment.remaining_debt_so_far = debt.remaining_debt - transaction.amount
-    payment.remaining_installment_so_far = debt.number_of_installment - payment.paid_installment_so_far
+    t = db_aux.insert_transaction(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
+                                  created_by_username=username)
 
-    debt.paid_debt = payment.paid_debt_so_far
-    debt.paid_installment = payment.paid_installment_so_far
-    debt.remaining_debt = payment.remaining_debt_so_far
-    debt.remaining_installment = payment.remaining_installment_so_far
+    if is_confirmed:
+        db_aux.confirm_other_transaction(t_id=t.id, confirmed_by_username=username)
+
+    return True
+
+
+@db_session
+def add_debt(form: DebtForm, username, is_confirmed=False):
+    d = db_aux.insert_debt(form.transaction_date.data, form.amount.data, form.share.data, form.explanation.data,
+                           form.debt_type.data, form.number_of_installment.data,
+                           created_by_username=username)
+
+    if is_confirmed:
+        db_aux.confirm_debt(t_id=d.transaction_ref.id, confirmed_by_username=username)
+
+    return True
+
+
+@db_session
+def add_contributions(form: ContributionForm, username, is_confirmed=False):
+    share = Share[form.share.data]
+    new_periods = form.contribution_period.data
+
+    old_periods = select(c.contribution_period for c in Contribution
+                         if c.transaction_ref.share_ref == share
+                         and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by)[:]
+
+    for new_period in new_periods:
+        if new_period in old_periods:
+            raise DuplicateContributionPeriod(get_translation()['exceptions']['duplicate_contribution_period'])
+
+    contributions = db_aux.insert_contribution(form.transaction_date.data, form.amount.data, share.id,
+                                               form.explanation.data, new_periods, created_by_username=username)
+
+    if not contributions:
+        return False
+
+    if is_confirmed:
+        db_aux.confirm_contributions(t_id=contributions[0].transaction_ref.id, confirmed_by_username=username)
+
+    return True
+
+
+@db_session
+def add_payment(form: PaymentForm, username, is_confirmed=False):
+    debt = Debt[form.debt.data]
+
+    if form.amount.data > debt.remaining_debt:
+        raise Overpayment(get_translation()['exceptions']['overpayment'])
+
+    p = db_aux.insert_payment(form.transaction_date.data, form.amount.data, form.explanation.data,
+                              created_by_username=username, debt_id=form.debt.data)
+
+    if is_confirmed:
+        db_aux.confirm_payment(t_id=p.transaction_ref.id, confirmed_by_username=username)
+
     return True
