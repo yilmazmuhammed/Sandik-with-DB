@@ -47,7 +47,7 @@ def create_sandik_app():
                      view_func=transaction_page.add_custom_transaction_for_admin_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/transactions", view_func=transaction_page.transactions_page)
     app.add_url_rule("/sandik/<int:sandik_id>/transactions/<int:transaction_id>",
-                     view_func=transaction_page.transaction_in_transactions_page)
+                     view_func=transaction_page.transaction_information_page)
     app.add_url_rule("/sandik/<int:sandik_id>/add-member-authority-type",
                      view_func=sandik.add_member_authority_type_to_sandik_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/add-debt-type",
@@ -71,6 +71,8 @@ def create_sandik_app():
                      view_func=transaction_page.add_payment_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/cm/add-transaction",
                      view_func=transaction_page.add_transaction_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/cm/unconfirmed-transactions",
+                     view_func=transaction_page.member_unconfirmed_transactions_page)
 
     # Herkesin yapabileceği işlemler
     app.add_url_rule("/set_language/<string:language>", view_func=others.set_language)

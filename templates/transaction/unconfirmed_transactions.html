@@ -18,21 +18,25 @@
                                 <th>{{translation['transactions']['share']}}</th>
                                 <th>{{translation['transactions']['type']}}</th>
                                 <th>{{translation['transactions']['explanation']}}</th>
+                                {% if is_authorized %}
                                 <th></th>
                                 <th></th>
-                            </tr>
+                                {% endif %}
+                           </tr>
                         </thead>
                         <tbody>
                         {% for t in unconfirmed_transactions %}
                             <tr>
-                                <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}">{{t.id}}</a></td>
+                                <td><a href="{{url_for('transaction_information_page', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}">{{t.id}}</a></td>
                                 <td>{{ t.transaction_date }}</td>
                                 <td>{{ t.amount }}</td>
                                 <td>{{ t.share_ref.member_ref.webuser_ref.name }} {{ t.share_ref.member_ref.webuser_ref.surname }} - {{ t.share_ref.share_order_of_member }}</td>
                                 <td>{{ t.type.capitalize() }} {% if t.debt_ref %} - {{ t.debt_ref.debt_type_ref.name }}{% endif %} </td>
                                 <td>{{ t.explanation }}</td>
+                                {% if is_authorized %}
                                 <td><a href="{{url_for('confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a></td>
                                 <td><a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a></td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>

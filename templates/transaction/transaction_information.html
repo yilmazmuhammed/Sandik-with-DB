@@ -10,10 +10,10 @@
                             {{translation.transaction.info_transaction}}
                         </div>
                         <div class="col-md-* col-xs-6 text-right">
-                            {% if not t.confirmed_by and not t.deleted_by %}
+                            {% if is_authorized and not t.confirmed_by and not t.deleted_by %}
                             <a href="{{url_for('confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a>
                             {% endif %}
-                            {% if not t.deleted_by %}
+                            {% if is_authorized and not t.deleted_by %}
                             <a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a>
                             {% endif %}
                         </div>
@@ -82,7 +82,9 @@
                       </tbody>
                   </table>
                   <div class="col-md-* col-xs-12 text-right">
-                    <a href="{{ url_for('add_custom_transaction_for_admin_page', sandik_id=t.share_ref.member_ref.sandik_ref.id) }}?type=payment&member={{t.share_ref.member_ref.id}}&debt={{t.debt_ref.id}}" class="btn btn-xs btn-success">Ödeme ekle</a>
+                      {% if is_authorized %}
+                      <a href="{{ url_for('add_custom_transaction_for_admin_page', sandik_id=t.share_ref.member_ref.sandik_ref.id) }}?type=payment&member={{t.share_ref.member_ref.id}}&debt={{t.debt_ref.id}}" class="btn btn-xs btn-success">Ödeme ekle</a>
+                      {% endif %}
                   </div>
 
 
@@ -101,7 +103,7 @@
                       <tbody>
                       <tr>
                           <td>{{translation.transaction.id}}: </td>
-                              <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=d.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=d.transaction_ref.id)}}">{{d.transaction_ref.id}}</a></td>
+                              <td><a href="{{url_for('transaction_information_page', sandik_id=d.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=d.transaction_ref.id)}}">{{d.transaction_ref.id}}</a></td>
                       </tr>
                       <tr>
                           <td>{{translation.transaction.date}}: </td>
@@ -160,7 +162,7 @@
                         {% for p in payments %}
                             <tr>
                                 <td>{{p.payment_number_of_debt + 1}}</td>
-                                <td><a href="{{url_for('transaction_in_transactions_page', sandik_id=p.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=p.transaction_ref.id)}}">{{p.transaction_ref.id}}</a></td>
+                                <td><a href="{{url_for('transaction_information_page', sandik_id=p.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=p.transaction_ref.id)}}">{{p.transaction_ref.id}}</a></td>
                                 <td>{{p.transaction_ref.transaction_date}}</td>
                                 <td>{{p.transaction_ref.amount}}₺</td>
                                 <td>{{p.paid_debt_so_far}}₺</td>
