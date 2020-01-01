@@ -3,8 +3,8 @@ from datetime import date
 from flask import flash
 from pony.orm import db_session, count, select
 
-from database.dbinit import (Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik,
-                             MemberAuthorityType, Member, )
+from database.dbinit import Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik, \
+    MemberAuthorityType, Member
 from database.exceptions import OutstandingDebt, ThereIsPayment, NotLastPayment, DeletedTransaction, \
     NegativeTransaction, DuplicateContributionPeriod, Overpayment
 from views import get_translation
@@ -165,6 +165,7 @@ def insert_webuser(username, password_hash, date_of_registration: date = date.to
 @db_session
 def insert_member(username, sandik_id, authority_id, date_of_membership: date = date.today(), is_active: bool = True,
                   id=None):
+    id = id if id is not None else select(m.id for m in Member).max() + 1
     sandik = Sandik[sandik_id]
 
     # TODO Use exception
@@ -181,6 +182,7 @@ def insert_member(username, sandik_id, authority_id, date_of_membership: date = 
 @db_session
 def insert_share(member_id, date_of_opening: date = date.today(), is_active: bool = True, share_order_of_member=None,
                  id=None):
+    id = id if id is not None else select(m.id for m in Share).max() + 1
     member = Member[member_id]
 
     # TODO Use exception
@@ -200,6 +202,7 @@ def insert_share(member_id, date_of_opening: date = date.today(), is_active: boo
 @db_session
 def insert_sandik(name, contribution_amount, explanation, date_of_opening: date = date.today(), is_active: bool = True,
                   id=None):
+    id = id if id is not None else select(m.id for m in Sandik).max() + 1
     return Sandik(id=id, name=name, contribution_amount=contribution_amount, explanation=explanation,
                   date_of_opening=date_of_opening, is_active=is_active)
 
@@ -208,6 +211,7 @@ def insert_sandik(name, contribution_amount, explanation, date_of_opening: date 
 def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, reading_transaction=False,
                                  writing_transaction: bool = False, adding_member: bool = False,
                                  throwing_member: bool = False, id=None):
+    id = id if id is not None else select(m.id for m in MemberAuthorityType).max() + 1
     sandik = Sandik[sandik_id]
     return MemberAuthorityType(id=id, name=name, max_number_of_members=capacity, sandik_ref=sandik, is_admin=is_admin,
                                reading_transaction=reading_transaction, writing_transaction=writing_transaction,
@@ -217,6 +221,7 @@ def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, read
 @db_session
 def insert_debt_type(sandik_id, name, explanation, max_number_of_instalments=0, max_amount=0, min_installment_amount=0,
                      id=None):
+    id = id if id is not None else select(m.id for m in DebtType).max() + 1
     sandik = Sandik[sandik_id]
     return DebtType(id=id, sandik_ref=sandik, name=name, explanation=explanation,
                     max_number_of_installments=max_number_of_instalments, max_amount=max_amount,
