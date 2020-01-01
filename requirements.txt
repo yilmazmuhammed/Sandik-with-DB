@@ -1,4 +1,4 @@
-pony>=0.7.9
+pony>=0.7.11
 Flask>=1.0
 psycopg2-binary>=2.7
 gunicorn>=19.9
