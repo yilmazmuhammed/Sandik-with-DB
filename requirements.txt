@@ -10,3 +10,4 @@ Flask-Admin>=1.5.2
 python-telegram-bot==11.1.0
 flask-session
 redis
+schedule

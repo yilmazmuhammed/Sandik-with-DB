@@ -41,6 +41,7 @@ class Member(db.Entity):
     is_active = Required(bool, default=True)
     member_authority_type_ref = Required('MemberAuthorityType')
     shares_index = Set('Share')
+    # PrimaryKey(webuser_ref, sandik_ref)   # TODO
     composite_key(webuser_ref, sandik_ref)
 
 
