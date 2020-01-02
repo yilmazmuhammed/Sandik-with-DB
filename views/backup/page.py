@@ -1,6 +1,5 @@
 from flask import render_template, flash
 
-from bots.mail import send_mail_all_data
 from forms import FormPageInfo, ImportAllDataForm
 from views import LayoutPageInfo
 from views.authorizations import admin_required
