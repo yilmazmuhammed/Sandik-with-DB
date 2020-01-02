@@ -11,7 +11,6 @@ from views.backup.auxiliary import add_transactions, add_members, add_shares, ad
 @admin_required
 def export_all_datas():
     html = "<br>".join(csv_list_backup.all_data_list()) + "<br>"
-    send_mail_all_data()
     return html
 
 
