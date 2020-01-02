@@ -247,9 +247,9 @@ def transaction_information_page(sandik_id, transaction_id):
 
         if transaction.deleted_by:
             flash(u'Bu işlem %s (%s) tarafından silinmiştir...' % (
-                local_name_surname(webuser=transaction.deleted_by), transaction.deleted_by.username,), 'danger')
+                local_name_surname(webuser=transaction.deleted_by), transaction.deleted_by.username,), 'warning')
         if not transaction.confirmed_by:
-            flash(u'Bu işlem henüz onaylanmamış...', 'danger')
+            flash(u'Bu işlem henüz onaylanmamış...', 'warning')
 
         payments = None
         if transaction.debt_ref or transaction.payment_ref:
@@ -286,7 +286,7 @@ def unpaid_transactions_page(sandik_id):
         if not member:
             flash(u"Bu sandığın üyesi değilsiniz.", 'danger')
             return current_app.login_manager.unauthorized()
-        is_autrorized=is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True)
+        is_autrorized = is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True)
         member_list = sandik.members_index.sort_by(lambda m: m.webuser_ref.name + " " + m.webuser_ref.surname) if is_autrorized else [member]
 
         unpaid_contributions = {}
@@ -302,7 +302,8 @@ def unpaid_transactions_page(sandik_id):
         unpaid_payments = {}
         for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref in member_list
                                                     and debt.remaining_debt and debt.transaction_ref.confirmed_by
-                                                    and not debt.transaction_ref.deleted_by).sort_by(lambda d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(
+                                                    and not debt.transaction_ref.deleted_by).sort_by(lambda
+                                                                                                             d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(
             d.transaction_ref.share_ref.share_order_of_member))[:]:
             unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
             add_debt = UnpaidDebt(debt)
@@ -375,8 +376,12 @@ def confirm_transaction(sandik_id, transaction_id):
     with db_session:
         transaction = Transaction[transaction_id]
 
-        if transaction.id != select(t.id for t in Transaction if t.share_ref.member_ref.sandik_ref.id == sandik_id
-                                    and not t.confirmed_by and not t.deleted_by and t.share_ref == transaction.share_ref).min():
+        if transaction.deleted_by:
+            flash(u"%s" % get_translation()['unconfirmed']['deleted'], 'danger')
+            return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+        elif transaction.id != select(t.id for t in Transaction
+                                      if t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by
+                                      and not t.deleted_by and t.share_ref == transaction.share_ref).min():
             flash(u"%s" % get_translation()['unconfirmed']['not_first_transaction'], 'danger')
             return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
 

@@ -28,8 +28,8 @@ def create_sandik_app():
 
     # Site yöneticisinin işlemleri
     app.add_url_rule("/add-webuser", view_func=webuser.add_webuser_page, methods=["GET", "POST"])
-    app.add_url_rule("/export-all-datas", view_func=backup.export_all_datas)
-    app.add_url_rule("/import-all-datas", view_func=backup.import_all_datas, methods=["GET", "POST"])
+    app.add_url_rule("/export-all-data", view_func=backup.export_all_datas)
+    app.add_url_rule("/import-all-data", view_func=backup.import_all_datas, methods=["GET", "POST"])
 
     # Sandık yöneticilerinin sandıkla ilgili işlemleri
     app.add_url_rule("/sandik/<int:sandik_id>/unconfirmed-transactions", view_func=transaction_page.unconfirmed_transactions_page)

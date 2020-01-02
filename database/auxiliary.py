@@ -278,10 +278,11 @@ def remove_member(member_id, remover_username):
 def remove_transaction(transaction_id, deleted_by_username):
     t = Transaction[transaction_id]
 
+    if t.deleted_by:
+        raise DeletedTransaction(get_translation()["exceptions"]["deleted_transaction"])
+
     if t.confirmed_by:
         # if t.debt_ref.payment_index
-        if t.deleted_by:
-            raise DeletedTransaction(get_translation()["exceptions"]["deleted_transaction"])
 
         if t.contribution_index:
             pass

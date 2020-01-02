@@ -193,6 +193,7 @@
   "unconfirmed": {
     "confirm": "Confirm",
     "delete": "Delete",
+    "deleted": "Deleted transaction cannot be confirmed.",
     "not_first_transaction": "There is transaction",
     "unconfirmed_transactions": "Unconfirmed Transaction"
   },
