@@ -31,11 +31,12 @@ def send_mail_all_data():
               message="\n".join(csv_list_backup.all_data_list()))
 
 
-import schedule
-import time  # to make system sleep after avery call.
+# import schedule
+# import time  # to make system sleep after avery call.
 
 if __name__ == "__main__":
-    schedule.every(1).minutes.do(send_mail_all_data)
-    while True:
-        schedule.run_pending()
-        time.sleep(2)  # System will rest for 2 seconds
+    send_mail_all_data()
+    # schedule.every(1).weeks.do(send_mail_all_data)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(2)  # System will rest for 2 seconds
