@@ -8,6 +8,19 @@
     "there_is_payment": "Ödeme yapılmış bir borç silinemez."
   },
   "forms": {
+    "adding_share": {
+      "date_of_opening": {
+        "label": "Hissenin açılma tarihi",
+        "required": "Lütfen hissenin açılma tarihini seçiniz"
+      },
+      "member": {
+        "label": "Üye",
+        "required": "Lütfen listeden bir üye seçin"
+      },
+      "submit": {
+        "label": "Hisse ekle"
+      }
+    },
     "contribution": {
       "amount": {
         "label": "Miktar",
@@ -24,6 +37,20 @@
       "page_name": "Aidat ekle",
       "submit": {
         "label": "Aidat Ekle"
+      }
+    },
+    "custom_transactin": {
+      "member": {
+        "label": "Üye"
+      },
+      "type": {
+        "label": "İşlem tipi"
+      },
+      "types": {
+        "contribution": "Aidat",
+        "debt": "Borç",
+        "payment": "Ödeme",
+        "simple_transaction": "Diğer"
       }
     },
     "debt": {

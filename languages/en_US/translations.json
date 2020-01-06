@@ -8,6 +8,19 @@
     "there_is_payment": "A debt with a payment cannot be deleted."
   },
   "forms": {
+    "adding_share": {
+      "date_of_opening": {
+        "label": "Date of opening of share",
+        "required": "Please enter date of membership"
+      },
+      "member": {
+        "label": "Member",
+        "required": "Please select a member in list"
+      },
+      "submit": {
+        "label": "Add Share"
+      }
+    },
     "contribution": {
       "amount": {
         "label": "Amount",
@@ -24,6 +37,20 @@
       "page_name": "Add contribution",
       "submit": {
         "label": "Add Contribution"
+      }
+    },
+    "custom_transactin": {
+      "member": {
+        "label": "Member"
+      },
+      "type": {
+        "label": "Transaction type"
+      },
+      "types": {
+        "contribution": "Contribution",
+        "debt": "Debt",
+        "payment": "Payment",
+        "simple_transaction": "Other"
       }
     },
     "debt": {

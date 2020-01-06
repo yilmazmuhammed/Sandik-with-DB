@@ -345,13 +345,15 @@ class PaymentForm(TransactionForm):
 
 
 class CustomTransactionSelectForm(FlaskForm):
+    t = get_translation()['forms']['custom_transactin']
+
     open = form_open(form_name='custom-transaction-select-form')
     close = form_close()
 
-    member = SelectField("Member:", choices=[], id='member', render_kw={"class": "form-control"})
-    type_choices = [("contribution", "Contribution"), ("debt", "Debt"), ("payment", "Payment"),
-                    ("transaction", "Other")]
-    type = SelectField("Type:", choices=type_choices, id='type', render_kw={"class": "form-control"})
+    member = SelectField("%s:" % t['member']['label'], choices=[], id='member', render_kw={"class": "form-control"})
+    type_choices = [("contribution", t['types']['contribution']), ("debt", t['types']['debt']),
+                    ("payment", t['types']['payment']), ("transaction", t['types']['simple_transaction'])]
+    type = SelectField("%s:" % t['type']['label'], choices=type_choices, id='type', render_kw={"class": "form-control"})
 
 
 class ImportAllDataForm(FlaskForm):
@@ -366,15 +368,17 @@ class ImportAllDataForm(FlaskForm):
 
 
 class AddingShareForm(FlaskForm):
+    t = get_translation()['forms']['adding_share']
+
     open = form_open(form_name='adding-share-form')
     close = form_close()
 
-    member = SelectField("Member:", validators=[InputRequired("Please select a member in list")], choices=[],
+    member = SelectField("%s:" % t['member']['label'], validators=[InputRequired(t['member']['required'])], choices=[],
                          id='member', coerce=int, render_kw={"class": "form-control"})
-    date_of_opening = DateField("Date of opening:", default=date.today(),
-                                validators=[InputRequired("Please enter date of membership")], id='date_of_opening',
-                                render_kw={"placeholder": "Date of opening", "class": "form-control"})
-    submit = SubmitField("Add Share", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    date_of_opening = DateField("%s:" % t['date_of_opening']['label'], default=date.today(),
+                                validators=[InputRequired(t['date_of_opening']['required'])], id='date_of_opening',
+                                render_kw={"placeholder": t['date_of_opening']['label'], "class": "form-control"})
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 def select_form(form_name, tag, coerce, choices, id, submit_tag):
