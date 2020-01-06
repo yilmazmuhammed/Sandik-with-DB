@@ -255,21 +255,26 @@ class DebtTypeForm(FlaskForm):
 
 
 class TransactionForm(FlaskForm):
+    t = get_translation()['forms']['transaction']
+
     open = form_open(form_name='transaction-form')
     close = form_close()
 
-    share = DynamicSelectField("Share:", validators=[InputRequired("Please select your share for transactionin list")],
+    share = DynamicSelectField("%s:" % t['share']['label'], validators=[InputRequired(t['share']['required'])],
                                coerce=int, choices=[], id='share', render_kw={"class": "form-control"})
-    transaction_date = DateField("Transaction date:", default=date.today(),
-                                 validators=[InputRequired("Please enter transaction date")],
+    transaction_date = DateField("%s:" % t['date']['label'], default=date.today(),
+                                 validators=[InputRequired("%s" % t['date']['required'])],
                                  id='transaction_date', render_kw={"class": "form-control"})
-    amount = IntegerField("Amount:", validators=[InputRequired("Please enter amount of transaction")], id='amount',
-                          render_kw={"placeholder": "Amount", "class": "form-control"})
-    explanation = TextAreaField("Explanation:",
+    amount = IntegerField("%s:" % t['amount']['label'], validators=[InputRequired(t['amount']['required'])],
+                          id='amount',
+                          render_kw={"placeholder": t['amount']['label'], "class": "form-control", "readonly": ""})
+    explanation = TextAreaField("%s:" % t['explanation']['label'],
                                 validators=[Optional(),
-                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
-    submit = SubmitField("Add Transaction", render_kw={"class": "btn btn-primary sandik-btn-form"})
+                                            Length(max=200, message=t['explanation']['length'])],
+                                id='explanation',
+                                render_kw={"placeholder": t['explanation']['label'], "class": "form-control"})
+    # TODO use super()
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class ContributionForm(TransactionForm):
@@ -297,40 +302,46 @@ class ContributionForm(TransactionForm):
 
 
 class DebtForm(TransactionForm):
+    t = get_translation()['forms']['debt']
+
     open = form_open(form_name='debt-form', id="debt-form")
     close = form_close()
 
-    debt_type = SelectField("Debt type:", validators=[InputRequired("Please select debt type from the list")],
+    debt_type = SelectField("%s:" % t['debt_type']['label'], validators=[InputRequired(t['debt_type']['required'])],
                             coerce=int, choices=[], id='debt_type', render_kw={"class": "form-control"})
 
-    number_of_installment = SelectField("Number of installment:",
-                                        validators=[InputRequired("Please select number of installment from the list")],
+    number_of_installment = SelectField("%s:" % t['number_of_installment']['label'],
+                                        validators=[InputRequired(t['number_of_installment']['required'])],
                                         coerce=int, choices=[], id='number_of_installment',
                                         render_kw={"class": "form-control"})
     # TODO use super()
-    explanation = TextAreaField("Explanation:",
+    explanation = TextAreaField("%s:" % t['explanation']['label'],
                                 validators=[Optional(),
-                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
+                                            Length(max=200, message=t['explanation']['length'])],
+                                id='explanation',
+                                render_kw={"placeholder": t['explanation']['label'], "class": "form-control"})
     # TODO use super()
-    submit = SubmitField("Take Debt", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class PaymentForm(TransactionForm):
+    t = get_translation()['forms']['payment']
+
     open = form_open(form_name='payment-form')
     close = form_close()
 
     share = None
-    debt = DynamicSelectField("Debt:", validators=[InputRequired("Please select the debt from list")], coerce=int,
+    debt = DynamicSelectField("%s:" % t['debt']['label'], validators=[InputRequired(t['debt']['required'])], coerce=int,
                               choices=[], id='debt', render_kw={"class": "form-control"})
 
     # TODO use super()
-    explanation = TextAreaField("Explanation:",
+    explanation = TextAreaField("%s:" % t['explanation']['label'],
                                 validators=[Optional(),
-                                            Length(max=200, message="Explanation cannot be longer than 200 character")],
-                                id='explanation', render_kw={"placeholder": "Explanation", "class": "form-control"})
+                                            Length(max=200, message=t['explanation']['length'])],
+                                id='explanation',
+                                render_kw={"placeholder": t['explanation']['label'], "class": "form-control"})
     # TODO use super()
-    submit = SubmitField("Pay Debt", render_kw={"class": "btn btn-primary sandik-btn-form"})
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class CustomTransactionSelectForm(FlaskForm):

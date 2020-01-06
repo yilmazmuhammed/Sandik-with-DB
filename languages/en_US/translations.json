@@ -21,8 +21,27 @@
         "label": "Explanation",
         "length": "Explanation cannot be longer than 200 character..."
       },
+      "page_name": "Add contribution",
       "submit": {
         "label": "Add Contribution"
+      }
+    },
+    "debt": {
+      "debt_type": {
+        "label": "Debt type",
+        "required": "Please select debt type from the list"
+      },
+      "explanation": {
+        "label": "Explanation",
+        "length": "Explanation cannot be longer than 200 character..."
+      },
+      "number_of_installment": {
+        "label": "Number of installment",
+        "required": "Please select number of installment from the list"
+      },
+      "page_name": "Add Debt",
+      "submit": {
+        "label": "Add Debt"
       }
     },
     "edit_webuser": {
@@ -68,9 +87,49 @@
         "required": "Please enter your username"
       }
     },
+    "payment": {
+      "debt": {
+        "label": "Debt to be paid",
+        "required": "Please select debt to be paid"
+      },
+      "explanation": {
+        "label": "Explanation",
+        "length": "Explanation cannot be longer than 200 character..."
+      },
+      "page_name": "Add payment",
+      "share": {
+        "label": "Share",
+        "required": "Please select your share for transaction in list"
+      },
+      "submit": {
+        "label": "Add Payment"
+      }
+    },
     "signup": {
       "submit": {
         "label": "Sign Up"
+      }
+    },
+    "transaction": {
+      "amount": {
+        "label": "Amount",
+        "required": "Please enter amount of transaction"
+      },
+      "date": {
+        "label": "Transaction date",
+        "required": "Please enter transaction date"
+      },
+      "explanation": {
+        "label": "Explanation",
+        "length": "Explanation cannot be longer than 200 character..."
+      },
+      "page_name": "Add other transaction",
+      "share": {
+        "label": "Share",
+        "required": "Please select your share for transaction in list"
+      },
+      "submit": {
+        "label": "Add Other Transaction"
       }
     },
     "webuser": {
@@ -113,6 +172,13 @@
   },
   "layout": {
     "navbar": {
+      "add_transaction": {
+        "contribution": "Add contribution",
+        "debt": "Add debt",
+        "init": "Add transaction",
+        "other": "Add other transaction",
+        "payment": "Add payment"
+      },
       "admin_panel": "Admin Panel",
       "final_situation": "Final Situation",
       "login": "Login",

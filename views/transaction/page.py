@@ -40,8 +40,8 @@ def add_transaction_page(sandik_id):
             except NegativeTransaction as nt:
                 flash(u'%s' % nt, 'danger')
 
-        info = FormPageInfo(form=form, title="Add Transaction")
-        return render_template("form.html", layout_page=LayoutPageInfo("Add Transaction"), info=info)
+        info = FormPageInfo(form=form, title=get_translation()['forms']['transaction']["page_name"])
+        return render_template("form.html", layout_page=LayoutPageInfo(get_translation()['forms']['transaction']["page_name"]), info=info)
 
 
 @login_required
@@ -68,8 +68,9 @@ def add_contribution_page(sandik_id):
             except DuplicateContributionPeriod as dcp:
                 flash(u'%s' % dcp, 'danger')
 
-        info = FormPageInfo(form=form, title="Add Contribution")
-        return render_template("transaction/contribution_form.html", layout_page=LayoutPageInfo("Add Contribution"),
+        info = FormPageInfo(form=form, title=get_translation()['forms']['contribution']["page_name"])
+        return render_template("transaction/contribution_form.html",
+                               layout_page=LayoutPageInfo(get_translation()['forms']['contribution']["page_name"]),
                                info=info, periods_of=json.dumps(unpaid_dues_choices(member)),
                                all_periods_of=json.dumps(unpaid_dues_choices(member, is_there_old=True)),
                                contribution_amount=sandik.contribution_amount)
@@ -107,8 +108,9 @@ def add_debt_page(sandik_id):
 
             return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
 
-        info = FormPageInfo(form=form, title="Take Debt")
-        return render_template('form.html', layout_page=LayoutPageInfo("Take Debt"), info=info)
+        info = FormPageInfo(form=form, title=get_translation()['forms']['debt']["page_name"])
+        return render_template('form.html',
+                               layout_page=LayoutPageInfo(get_translation()['forms']['debt']["page_name"]),  info=info)
 
 
 @login_required
@@ -136,8 +138,8 @@ def add_payment_page(sandik_id):
                 except Overpayment as op:
                     flash(u'%s' % op, 'danger')
 
-        info = FormPageInfo(form=form, title="Add payment")
-        return render_template('form.html', layout_page=LayoutPageInfo("Add payment"), info=info)
+        info = FormPageInfo(form=form, title=get_translation()['forms']['payment']["page_name"])
+        return render_template('form.html', layout_page=LayoutPageInfo(get_translation()['forms']['payment']["page_name"]), info=info)
 
 
 @authorization_to_the_sandik_required(writing_transaction=True)
@@ -212,7 +214,7 @@ def add_custom_transaction_for_admin_page(sandik_id):
         select_form.member.choices += member_choices(sandik.id)
         forms.insert(0, select_form)
         return render_template("transaction/custom_transaction_form.html", forms=forms, errors=errors,
-                               layout_page=LayoutPageInfo("Add Transaction"),
+                               layout_page=LayoutPageInfo(get_translation()['forms']['transaction']["page_name"]),
                                periods_of=json.dumps(periods_of), all_periods_of=json.dumps(all_periods_of),
                                shares_of=json.dumps(shares_of), debts_of=json.dumps(debts_of),
                                contribution_amount=sandik.contribution_amount)

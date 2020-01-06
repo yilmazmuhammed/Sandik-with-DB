@@ -34,7 +34,9 @@
             <thead>
               <tr>
                 <th></th>
+                {% if member_authority %}
                 <th class="hidden-xs"></th>
+                {% endif %}
                 <th>{{translation.members.username}}</th>
                 <th>{{translation.members.name}}</th>
                 <!--
@@ -47,9 +49,11 @@
               {% for member in sandik.members %}
               {% set transaction_page_url = url_for('transactions_page', sandik_id=sandik.sandik_id) + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname %}
               <tr class="member {% if not member.is_active %}passive-member{% endif %}">
+                {% if member_authority %}
                 <td align="center">
                   <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                 </td>
+                {% endif %}
                 <td class="hidden-xs">{{ member.dbTable.member_id }}</td>
                 <td>{{ member.dbTable.webuser_ref.username }}</td>
                 <td>{{ member.dbTable.webuser_ref.name }} {{ member.dbTable.webuser_ref.surname }}</td>

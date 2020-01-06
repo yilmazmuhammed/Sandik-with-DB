@@ -1,5 +1,5 @@
 import smtplib
-
+import os
 from views.backup import csv_list_backup
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 
 def sendemail(from_addr, to_addr_list,
               subject, message,
-              login='yardimlasmasandigi@yaani.com', password='Yardimlasma01',
+              login='yardimlasmasandigi@yaani.com', password=os.environ.get("MAIL_PASSWORD"),
               smtpserver='smtp.yaanimail.com:587'):
     msg = MIMEMultipart()
     msg["From"] = from_addr
@@ -31,12 +31,5 @@ def send_mail_all_data():
               message="\n".join(csv_list_backup.all_data_list()))
 
 
-# import schedule
-# import time  # to make system sleep after avery call.
-
 if __name__ == "__main__":
     send_mail_all_data()
-    # schedule.every(1).weeks.do(send_mail_all_data)
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(2)  # System will rest for 2 seconds

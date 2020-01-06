@@ -21,8 +21,27 @@
         "label": "Açıklama",
         "length": "Açıklama 200 karakterden fazla olamaz..."
       },
+      "page_name": "Aidat ekle",
       "submit": {
         "label": "Aidat Ekle"
+      }
+    },
+    "debt": {
+      "debt_type": {
+        "label": "Borç tipi",
+        "required": "Lütfen listeden borç tipi seçiniz"
+      },
+      "explanation": {
+        "label": "Açıklama",
+        "length": "Açıklama 200 karakterden fazla olamaz..."
+      },
+      "number_of_installment": {
+        "label": "Taksit sayısı",
+        "required": "Lütfen listeden taksit sayısını seçiniz"
+      },
+      "page_name": "Borç Ekle",
+      "submit": {
+        "label": "Borç Ekle"
       }
     },
     "edit_webuser": {
@@ -68,9 +87,49 @@
         "required": "Kullanıcı adı giriniz..."
       }
     },
+    "payment": {
+      "debt": {
+        "label": "Ödenecek borç",
+        "required": "Lütfen ödenecek borcu seçiniz"
+      },
+      "explanation": {
+        "label": "Açıklama",
+        "length": "Açıklama 200 karakterden fazla olamaz..."
+      },
+      "page_name": "Ödeme ekle",
+      "share": {
+        "label": "Hisse",
+        "required": "Lütfen listeden hissenizi seçin"
+      },
+      "submit": {
+        "label": "Ödeme Ekle"
+      }
+    },
     "signup": {
       "submit": {
         "label": "Kaydol"
+      }
+    },
+    "transaction": {
+      "amount": {
+        "label": "Miktar",
+        "required": "Lütfen işlem miktarını giriniz"
+      },
+      "date": {
+        "label": "İşlem tarihi",
+        "required": "Lütfen işlem tarihini seçiniz"
+      },
+      "explanation": {
+        "label": "Açıklama",
+        "length": "Açıklama 200 karakterden fazla olamaz..."
+      },
+      "page_name": "Diğer işlem ekle",
+      "share": {
+        "label": "Hisse",
+        "required": "Lütfen listeden hissenizi seçin"
+      },
+      "submit": {
+        "label": "Diğer İşlem Ekle"
       }
     },
     "webuser": {
@@ -113,6 +172,13 @@
   },
   "layout": {
     "navbar": {
+      "add_transaction": {
+        "contribution": "Aidat ekle",
+        "debt": "Borç iste",
+        "init": "İşlem ekle",
+        "other": "Diğer işlem ekle",
+        "payment": "Ödeme ekle"
+      },
       "admin_panel": "Yönetici Paneli",
       "final_situation": "Son mali durum",
       "login": "Giriş Yap",
