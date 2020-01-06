@@ -267,7 +267,7 @@ class TransactionForm(FlaskForm):
                                  id='transaction_date', render_kw={"class": "form-control"})
     amount = IntegerField("%s:" % t['amount']['label'], validators=[InputRequired(t['amount']['required'])],
                           id='amount',
-                          render_kw={"placeholder": t['amount']['label'], "class": "form-control", "readonly": ""})
+                          render_kw={"placeholder": t['amount']['label'], "class": "form-control"})
     explanation = TextAreaField("%s:" % t['explanation']['label'],
                                 validators=[Optional(),
                                             Length(max=200, message=t['explanation']['length'])],
