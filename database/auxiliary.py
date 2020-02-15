@@ -30,7 +30,7 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
     ia = int(ia) if ia % 1 == 0 else int(ia) + 1
     return Debt(
         transaction_ref=Transaction(
-            id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Debt',
+            id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Borç',
             explanation=explanation,
             created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by),
         debt_type_ref=DebtType[type_id], number_of_installment=num_of_inst, installment_amount=ia,
@@ -74,7 +74,7 @@ def insert_payment(in_date, amount, explanation,
         p = Payment(debt_ref=debt, payment_number_of_debt=pnod, paid_debt_so_far=pdsf, paid_installment_so_far=pisf,
                     remaining_debt_so_far=rdsf, remaining_installment_so_far=risf,
                     transaction_ref=Transaction(id=id, share_ref=share, transaction_date=in_date, amount=amount,
-                                                type='Payment', explanation=explanation, created_by=created_by,
+                                                type='Ödeme', explanation=explanation, created_by=created_by,
                                                 confirmed_by=confirmed_by, deleted_by=deleted_by
                                                 )
                     )
@@ -127,7 +127,7 @@ def insert_contribution(in_date: date, amount, share_id, explanation, new_period
                 raise DuplicateContributionPeriod(get_translation()['exceptions']['duplicate_contribution_period'])
 
     transaction_ref = Transaction(id=id, share_ref=share, transaction_date=in_date,
-                                  amount=amount, type='Contribution', explanation=explanation,
+                                  amount=amount, type='Aidat', explanation=explanation,
                                   created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
     contributions = []
@@ -151,7 +151,7 @@ def insert_transaction(in_date, amount, share_id, explanation,
         deleted_by = None
 
     return Transaction(id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount,
-                       type='Other', explanation=explanation,
+                       type='Diğer', explanation=explanation,
                        created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
 
 
