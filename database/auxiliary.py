@@ -208,12 +208,13 @@ def insert_sandik(name, contribution_amount, explanation, date_of_opening: date 
 
 
 @db_session
-def insert_member_authority_type(name, capacity, sandik_id, is_admin=False, reading_transaction=False,
+def insert_member_authority_type(name, sandik_id, max_number_of_members=0, is_admin=False, reading_transaction=False,
                                  writing_transaction: bool = False, adding_member: bool = False,
                                  throwing_member: bool = False, id=None):
     id = id if id is not None else select(m.id for m in MemberAuthorityType).max() + 1
     sandik = Sandik[sandik_id]
-    return MemberAuthorityType(id=id, name=name, max_number_of_members=capacity, sandik_ref=sandik, is_admin=is_admin,
+    return MemberAuthorityType(id=id, name=name, max_number_of_members=max_number_of_members, sandik_ref=sandik,
+                               is_admin=is_admin,
                                reading_transaction=reading_transaction, writing_transaction=writing_transaction,
                                adding_member=adding_member, throwing_member=throwing_member)
 
@@ -258,7 +259,9 @@ def remove_share(share_id, remover_username):
     paid_contributions = sum(t.amount for t in share.transactions_index
                              if t.contribution_index and t.confirmed_by and not t.deleted_by)
     contributions = insert_contribution(date.today(), -paid_contributions, share_id, "Üye ayrılması", ['0-0'],
-                                        remover_username, is_from_import_data=True)
+                                        remover_username, is_from_import_data=True,
+                                        confirmed_by_username=remover_username)
+    share.is_active = False
     return contributions[0]
 
 

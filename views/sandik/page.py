@@ -2,7 +2,7 @@ from flask import redirect, url_for, render_template, abort, flash
 from flask_login import login_required, current_user
 from pony.orm import db_session, ObjectNotFound
 
-from database.auxiliary import insert_share, OutstandingDebt
+from database.auxiliary import insert_share, OutstandingDebt, insert_sandik, insert_member_authority_type, insert_member
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm, \
     select_form
@@ -22,18 +22,18 @@ def new_sandik_page():
     if form.validate_on_submit():
         with db_session:
             # Formdan alınan bilgilere göre sandık oluştur
-            # TODO insert_sandik
-            new_sandik = Sandik(name=form.data['name'], date_of_opening=form.date_of_opening.data,
-                                contribution_amount=form.contribution_amount.data, explanation=form.data['explanation'])
-
+            new_sandik = insert_sandik(name=form.data['name'], date_of_opening=form.date_of_opening.data,
+                                       contribution_amount=form.contribution_amount.data,
+                                       explanation=form.data['explanation'])
             # Varsayılan olarak sandık başkanı ve normal üye yetkisi oluştur
-            admin_user = MemberAuthorityType(name='Sandık başkanı', max_number_of_members=1, sandik_ref=new_sandik,
-                                             is_admin=True)
-            MemberAuthorityType(name='Normal üye', max_number_of_members=0, sandik_ref=new_sandik)
+            admin_user = insert_member_authority_type(name='Sandık başkanı', max_number_of_members=1,
+                                                      sandik_id=new_sandik.id, is_admin=True)
+            insert_member_authority_type(name='Normal üye', max_number_of_members=0, sandik_id=new_sandik.id,
+                                         id=admin_user.id+1)
 
             # Varsayılan olarak sandığı oluşturan kişiye sandık başkanı olarak üyelik oluşturulur.
-            Member(webuser_ref=WebUser[current_user.webuser.username], sandik_ref=new_sandik,
-                   member_authority_type_ref=admin_user, date_of_membership=form.date_of_opening.data)
+            insert_member(username=current_user.webuser.username, sandik_id=new_sandik.id, authority_id=admin_user.id,
+                          date_of_membership=form.date_of_opening.data)
 
             # TODO yeni sandık oluşturulunca sandıklarım/(yeni sandık ayarları) gibi bir sayfaya yönlendir
             return redirect(url_for('sandik_management_page', sandik_id=new_sandik.id))

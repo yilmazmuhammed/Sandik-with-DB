@@ -275,6 +275,12 @@
     "share": "Share",
     "type": "Transaction Type"
   },
+  "transaction_types": {
+    "contribution": "Contribution",
+    "debt": "Debt",
+    "payment": "Payment",
+    "simple_transaction": "Other"
+  },
   "transactions": {
     "amount": "Amount",
     "date": "Date",

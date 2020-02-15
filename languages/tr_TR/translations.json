@@ -275,6 +275,12 @@
     "share": "Hisse",
     "type": "İşlem Türü"
   },
+  "transaction_types": {
+    "contribution": "Aidat",
+    "debt": "Borç",
+    "payment": "Ödeme",
+    "simple_transaction": "Diğer"
+  },
   "transactions": {
     "amount": "Miktar",
     "date": "Tarih",

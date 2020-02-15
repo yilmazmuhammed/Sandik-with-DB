@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from pony.orm import db_session
 
-from database.dbinit import WebUser, Share
+from database.dbinit import WebUser, Share, select
 
 
 class FlaskUser(UserMixin):
@@ -60,14 +60,14 @@ class ShareInfo:
         self.is_active = share.is_active
         self.share_order_of_member = share.share_order_of_member
 
-        self.paid_contributions = sum(t.amount for t in share.transactions_index
-                                      if t.contribution_index and t.confirmed_by and not t.deleted_by)
-        self.debts_received = sum(t.amount for t in share.transactions_index
-                                  if t.debt_ref and t.confirmed_by and not t.deleted_by)
-        self.paid_installments = sum(t.amount for t in share.transactions_index
-                                     if t.payment_ref and t.confirmed_by and not t.deleted_by)
-        self.others = sum(t.amount for t in share.transactions_index
-                          if not t.contribution_index and not t.debt_ref and not t.payment_ref
-                          and t.confirmed_by and not t.deleted_by)
-        self.remaining_debts = sum(t.debt_ref.remaining_debt for t in share.transactions_index
-                                   if t.debt_ref and t.confirmed_by and not t.deleted_by)
+        self.paid_contributions = select(t.amount for t in share.transactions_index
+                                         if t.contribution_index and t.confirmed_by and not t.deleted_by).sum()
+        self.debts_received = select(t.amount for t in share.transactions_index
+                                     if t.debt_ref and t.confirmed_by and not t.deleted_by).sum()
+        self.paid_installments = select(t.amount for t in share.transactions_index
+                                        if t.payment_ref and t.confirmed_by and not t.deleted_by).sum()
+        self.others = select(t.amount for t in share.transactions_index
+                             if not t.contribution_index and not t.debt_ref and not t.payment_ref
+                             and t.confirmed_by and not t.deleted_by).sum()
+        self.remaining_debts = select(t.debt_ref.remaining_debt for t in share.transactions_index
+                                      if t.debt_ref and t.confirmed_by and not t.deleted_by).sum()
