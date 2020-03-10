@@ -71,6 +71,11 @@
         "label": "Borç Ekle"
       }
     },
+    "edit_member_form": {
+      "submit": {
+        "label": "Üyeyi düzenle"
+      }
+    },
     "edit_webuser": {
       "name": {
         "label": "İsim",

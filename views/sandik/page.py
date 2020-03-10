@@ -1,11 +1,11 @@
-from flask import redirect, url_for, render_template, abort, flash
+from flask import redirect, url_for, render_template, abort, flash, request
 from flask_login import login_required, current_user
 from pony.orm import db_session, ObjectNotFound
 
 from database.auxiliary import insert_share, OutstandingDebt, insert_sandik, insert_member_authority_type, insert_member
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm, \
-    select_form
+    select_form, EditMemberForm
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
@@ -65,24 +65,11 @@ def members_page(sandik_id):
 
 @authorization_to_the_sandik_required(adding_member=True)
 def add_member_to_sandik_page(sandik_id):
-    form = MemberForm()
-
-    with db_session:
-        sandik = Sandik[sandik_id]
-        authorities = sandik.member_authority_types_index
-        for authority in authorities:
-            form.authority.choices.append((authority.id, authority.name))
+    form = MemberForm(sandik_id=sandik_id)
 
     if form.validate_on_submit():
         try:
             with db_session:
-                # user = WebUser[form.username.data]
-                # authority = MemberAuthorityType[form.data['authority']]
-                # f_date = form.data['date_of_membership']
-                #
-                # # TODO authory_id mi gelmeli, direk authority mi?
-                # add_member_to_sandik2(sandik_id, user.username, authority.id, f_date)
-
                 if add_member_to_sandik(form, sandik_id):
                     return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
                 else:
@@ -99,48 +86,28 @@ def add_member_to_sandik_page(sandik_id):
 
 @authorization_to_the_sandik_required(adding_member=True)
 def edit_member_of_sandik_page(sandik_id, username):
-    form = MemberForm()
-    selected_dict = None
-    selected_ids = None
-    with db_session:
-        sandik = Sandik[sandik_id]
-        authorities = sandik.member_authority_types_index.sort_by(lambda a: a.id)
-        for authority in authorities:
-            form.authority.choices.append((authority.id, authority.name))
-
-        try:
-            webuser = WebUser[username]
-            member = Member.get(sandik_ref=sandik, webuser_ref=webuser)
-            form.username.data = webuser.username
-            form.username.render_kw["readonly"] = ""
-            selected_dict = {form.authority.id: str(member.member_authority_type_ref.id)}
-            selected_ids = [form.authority.id]
-            form.date_of_membership.render_kw["value"] = member.date_of_membership
-            form.submit.label.text = "Save"
-        except ObjectNotFound:
-            flash(u"Member not found.", 'danger')
-            return abort(404)
+    try:
+        form = EditMemberForm(username=username, sandik_id=sandik_id)
+    except ObjectNotFound:
+        flash(u"Member not found.", 'danger')
+        return abort(404)
 
     if form.validate_on_submit():
         try:
             with db_session:
-                print(form.username.data)
                 if username != form.username.data:
                     flash(u"Kullanıcı adı değiştirilemez", 'danger')
                 else:
-                    print(member.member_authority_type_ref, member.date_of_membership)
-                    print(form.authority.data, form.date_of_membership.data)
                     member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[username])
-                    member.member_authority_type_ref = MemberAuthorityType[form.authority.data]
-                    member.date_of_membership = form.date_of_membership.data
+                    member.member_authority_type_ref = MemberAuthorityType[request.form["authority"]]
+                    member.date_of_membership = request.form["date_of_membership"]
                     return redirect(url_for('sandik_management_page', sandik_id=sandik_id))
         # TODO Authority ve User bulunamamasına karşın iki farklı sorgu yap
         except Exception as exc:
             flash(u"Exception: %s." % exc, 'danger')
 
     info = FormPageInfo(form=form, title='Edit member of sandik')
-    return render_template("form.html", layout_page=LayoutPageInfo("Edit member of sandik"), info=info,
-                           selected_dict=selected_dict, selected_ids=selected_ids)
+    return render_template("form.html", layout_page=LayoutPageInfo("Edit member of sandik"), info=info)
 
 
 @authorization_to_the_sandik_required(adding_member=True)

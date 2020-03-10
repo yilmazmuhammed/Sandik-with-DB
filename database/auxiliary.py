@@ -258,6 +258,8 @@ def remove_share(share_id, remover_username):
         raise OutstandingDebt("Hissenin ödenmemiş borcu var.")
     paid_contributions = sum(t.amount for t in share.transactions_index
                              if t.contribution_index and t.confirmed_by and not t.deleted_by)
+    # TODO Ayrılma işlemi eklenmiyor.
+    # TODO Ayrılırken other'a da bak.
     contributions = insert_contribution(date.today(), -paid_contributions, share_id, "Üye ayrılması", ['0-0'],
                                         remover_username, is_from_import_data=True,
                                         confirmed_by_username=remover_username)

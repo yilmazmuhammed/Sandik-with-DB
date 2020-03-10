@@ -1,11 +1,13 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from pony.orm import db_session
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField, \
     SelectMultipleField
 from wtforms.validators import InputRequired, Length, Optional, NumberRange
 from wtforms.fields.html5 import DateField
 from datetime import date
 
+from database.dbinit import Member, Sandik, WebUser
 from views import LayoutPageInfo, get_translation
 
 
@@ -186,6 +188,35 @@ class MemberForm(FlaskForm):
                                    id='date_of_membership',
                                    render_kw={"placeholder": "Date of membership", "class": "form-control"})
     submit = SubmitField("Add Member", render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+    @db_session
+    def __init__(self, sandik_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.username.render_kw.pop("readonly", None)
+        sandik = Sandik[sandik_id]
+        authorities = sandik.member_authority_types_index.sort_by(lambda a: a.id)
+        for authority in authorities:
+            self.authority.choices.append((authority.id, authority.name))
+
+
+class EditMemberForm(MemberForm):
+    t = get_translation()['forms']['edit_member_form']
+
+    open = form_open(form_name='form-edit_member')
+    close = form_close()
+
+    submit = SubmitField("%s" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+    @db_session
+    def __init__(self, username, sandik_id, *args, **kwargs):
+        super().__init__(sandik_id, *args, **kwargs)
+        sandik = Sandik[sandik_id]
+        webuser = WebUser[username]
+        member = Member.get(sandik_ref=sandik, webuser_ref=webuser)
+        self.username.data = member.webuser_ref.username
+        self.username.render_kw["readonly"] = ""
+        self.authority.data = member.member_authority_type_ref.id
+        self.date_of_membership.data = member.date_of_membership
 
 
 class MemberAuthorityTypeForm(FlaskForm):

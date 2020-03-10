@@ -71,6 +71,11 @@
         "label": "Add Debt"
       }
     },
+    "edit_member_form": {
+      "submit": {
+        "label": "Edit Member"
+      }
+    },
     "edit_webuser": {
       "name": {
         "label": "Name",
