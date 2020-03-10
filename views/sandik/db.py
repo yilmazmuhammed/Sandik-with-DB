@@ -26,7 +26,7 @@ def add_member_to_sandik(form: MemberForm, sandik_id):
 
 
 def add_member_authority_type_to_sandik(form, sandik_id):
-    return insert_member_authority_type(form.name.data, form.capacity.data, sandik_id,
+    return insert_member_authority_type(form.name.data, sandik_id, form.capacity.data,
                                         form.is_admin.data if form.is_admin else False,
                                         form.reading_transaction.data, form.writing_transaction.data,
                                         form.adding_member.data, form.throwing_member.data)
