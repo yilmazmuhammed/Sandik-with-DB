@@ -17,3 +17,4 @@ class LayoutPageInfo:
                     is_there_authorizations = mat.is_admin or mat.reading_transaction or mat.writing_transaction or mat.adding_member or mat.throwing_member
                     self.my_sandiks.append({"id": sandik.id, "name": sandik.name,
                                             "is_there_authorizations": is_there_authorizations, 'mat': mat})
+                self.my_sandiks.sort(key=lambda sandik: sandik['name'].lower())
