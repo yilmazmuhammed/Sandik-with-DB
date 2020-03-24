@@ -43,7 +43,7 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
 
 
 def share_choices(member, only_active_shares=True):
-    return [(share.id, "Share %s" % (share.share_order_of_member,))
+    return [(share.id, "%s. Hisse" % (share.share_order_of_member,))
             for share in member.shares_index.filter(lambda share: share.is_active == only_active_shares).sort_by(
             Share.share_order_of_member)]
 
