@@ -6,13 +6,14 @@ from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session
 from database.dbinit import WebUser
 from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm, EditWebUserForm
 from bots.telegram_bot import sandik_bot, admin_chat_id
-from views import LayoutPageInfo
+from views import LayoutPageInfo, get_translation
 from views.authorizations import admin_required
 from views.webuser.auxiliary import FlaskUser, MemberInfo
 from views.webuser.db import add_webuser
 
 
 def signup_page():
+    t = get_translation()['views']['webuser']['signup_page']
     if current_user.is_authenticated:
         return redirect(url_for('profile'))
 
@@ -20,15 +21,15 @@ def signup_page():
 
     if form.validate_on_submit():
         if form.data["password"] != form.data["password_verify"]:
-            flash(u"Passwords are not same.", 'danger')
+            flash(u"%s" % t['passwords_not_same'], 'danger')
         else:
             try:
                 add_webuser(form, is_admin=form.data["username"] in current_app.config["ADMIN_USERS"])
                 return redirect(url_for("home_page"))
             except TransactionIntegrityError:  # If username already exists in database
-                flash(u"'%s' username already exists." % (form.data["username"],), 'danger')
+                flash(u"'%s' %s" % (form.data["username"], t['username_exists'],), 'danger')
             except Exception as e:  # If there is another exception
-                flash(u"Unexpected exception:\n%s %s" % (type(e), e,), 'danger')
+                flash(u"%s:\n%s %s" % (t['unexpected_exception'], type(e), e,), 'danger')
 
     info = FormPageInfo(form=form, title="Sign Up")
 
@@ -37,19 +38,20 @@ def signup_page():
 
 @admin_required
 def add_webuser_page():
+    t = get_translation()['views']['webuser']['add_webuser_page']
     form = WebuserForm()
 
     if form.validate_on_submit():
         if form.data["password"] != form.data["password_verify"]:
-            flash(u"Passwords are not same.", 'danger')
+            flash(u"%s" % t['passwords_not_same'], 'danger')
         else:
             try:
                 add_webuser(form)
                 return redirect(url_for("home_page"))
             except TransactionIntegrityError:  # If username already exists in database
-                flash(u"'%s' username already exists." % (form.data["username"],), 'danger')
+                flash(u"'%s' %s" % (form.data["username"], t['username_exists'],), 'danger')
             except Exception as e:  # If there is another exception
-                flash(u"Unexpected exception:\n%s %s" % (type(e), e,), 'danger')
+                flash(u"%s:\n%s %s" % (t['unexpected_exception'], type(e), e,), 'danger')
 
     info = FormPageInfo(form=form, title="Sign Up")
 
@@ -57,6 +59,8 @@ def add_webuser_page():
 
 
 def login_page():
+    t = get_translation()['views']['webuser']['login_page']
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -66,13 +70,13 @@ def login_page():
                 telegram_message = "%s %s giriş yaptı." % (user.webuser.name, user.webuser.surname)
                 sandik_bot.sendMessage(admin_chat_id, telegram_message)
                 login_user(user)
-                flash("You have logged in.", 'success')
+                flash("%s" % t['success'], 'success')
                 next_page = request.args.get("next", url_for("home_page"))
                 return redirect(next_page)
             else:  # If password is incorrect
-                flash(u"Username or password is incorrect.", 'danger')
+                flash(u"%s" % t['unsuccess'], 'danger')
         except ObjectNotFound:  # If username already exists in database
-            flash(u"Username or password is incorrect.", 'danger')
+            flash(u"%s" % t['unsuccess'], 'danger')
 
     info = FormPageInfo(title='Login', form=form)
 
@@ -81,8 +85,9 @@ def login_page():
 
 @login_required
 def logout():
+    t = get_translation()['views']['webuser']['logout']
     logout_user()
-    flash(u"You have logged out.", 'success')
+    flash(u"%s" % t['success'], 'success')
     return redirect(url_for("home_page"))
 
 
@@ -100,6 +105,7 @@ def profile():
 @login_required
 @db_session
 def edit_webuser_info_page():
+    t = get_translation()['views']['webuser']['edit_webuser_info_page']
     webuser = WebUser[current_user.username]
 
     form = EditWebUserForm()
@@ -110,10 +116,10 @@ def edit_webuser_info_page():
 
     if form.validate_on_submit():
         if not hasher.verify(form.old_password.data, webuser.password_hash):
-            flash(u"Your old password is not correct.", 'danger')
+            flash(u"%s" % t['old_password_not_correct'], 'danger')
         elif form.new_password.data != form.new_password_verify.data:
             print(form.new_password, form.new_password_verify)
-            flash(u"New passwords are not same.", 'danger')
+            flash(u"%s" % t['new_passwords_not_same'], 'danger')
         else:
             try:
                 if form.username.data:
@@ -128,7 +134,7 @@ def edit_webuser_info_page():
             except TransactionIntegrityError:  # If username already exists in database
                 flash(u"'%s' username already exists." % (form.data["username"],), 'danger')
             except Exception as e:  # If there is another exception
-                flash(u"Unexpected exception:\n%s %s" % (type(e), e,), 'danger')
+                flash(u"%s:\n%s %s" % (t['unexpected_exception'], type(e), e,), 'danger')
 
     info = FormPageInfo(form=form, title="Edit User's Info Page")
     flash(u'Değiştirmek istemediğiniz alanları boş bırakabilirsiniz.', 'info')

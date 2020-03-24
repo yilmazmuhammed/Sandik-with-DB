@@ -309,5 +309,32 @@
     "installments": "Taksitler",
     "member": "Üye İsmi - Hissesi",
     "unpaid_contributions": "Aidatını Ödemeyenler"
+  },
+  "views": {
+    "webuser": {
+      "add_webuser_page": {
+        "passwords_not_same": "Parolanız ve parola doğrulamanız eşleşmiyor.",
+        "unexpected_exception": "Bilinmeyen hata",
+        "username_exists": "kullanıcı adı daha önce alınmış."
+      },
+      "edit_webuser_info_page": {
+        "new_passwords_not_same": "Yeni parolanız ve parola doğrulamanız eşleşmiyor.",
+        "old_password_not_correct": "Eski şifrenizi yanlış girdiniz.",
+        "unexpected_exception": "Bilinmeyen hata"
+      },
+      "login_page": {
+        "login_message": "Lütfen giriş yapın.",
+        "success": "Giriş başarılı.",
+        "unsuccess": "Kullanıcı adı ve ya parola yanlış."
+      },
+      "logout": {
+        "success": "Çıkış başarılı."
+      },
+      "signup_page": {
+        "passwords_not_same": "Parolanız ve parola doğrulamanız eşleşmiyor.",
+        "unexpected_exception": "Bilinmeyen hata",
+        "username_exists": "kullanıcı adı daha önce alınmış."
+      }
+    }
   }
 }

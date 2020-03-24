@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from views import others, sandik, webuser, backup
+from views import others, sandik, webuser, backup, get_translation
 from views.webuser.auxiliary import FlaskUser
 import views.transaction.page as transaction_page
 
@@ -79,6 +79,7 @@ def create_sandik_app():
 
     lm.init_app(app)
     lm.login_view = "login_page"
+    lm.login_message = get_translation()['views']['webuser']['login_page']['login_message']
     lm.login_message_category = 'danger'
 
     return app

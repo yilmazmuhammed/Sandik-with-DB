@@ -307,6 +307,33 @@
     "installment": "Installment",
     "installment_amount": "Installment Amount",
     "installments": "Installments",
-    "member": "Member Name - Share"
+    "member": "Member Name - Share",
+    "unpaid_contributions": "Who has unpaid contribution"
+  },
+  "views": {
+    "webuser": {
+      "add_webuser_page": {
+        "passwords_not_same": "Passwords are not same.",
+        "unexpected_exception": "Unexpected exception",
+        "username_exists": "username already exists"
+      },
+      "edit_webuser_info_page": {
+        "new_passwords_not_same": "New passwords are not same.",
+        "old_password_not_correct": "Your old password is not correct.",
+        "unexpected_exception": "Unexpected exception"
+      },
+      "login_page": {
+        "success": "You have logged in.",
+        "unsuccess": "Username or password is incorrect."
+      },
+      "logout": {
+        "success": "You have logged out."
+      },
+      "signup_page": {
+        "passwords_not_same": "Passwords are not same.",
+        "unexpected_exception": "Unexpected exception",
+        "username_exists": "username already exists"
+      }
+    }
   }
 }
