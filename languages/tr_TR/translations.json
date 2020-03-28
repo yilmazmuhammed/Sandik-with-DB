@@ -5,6 +5,9 @@
     "negative_other": "Diğer işlemler 0'dan küçük olamaz.",
     "not_last_payment": "Bir borcun yapılan son ödemesi dışındaki ödemeler silinemez.",
     "overpayment": "Ödeme miktarı, kalan borçtan fazla olamaz.",
+    "there_is_not_member": "Böyle bir üye bulunamadı.",
+    "there_is_not_sandik": "Böyle bir sandık bulunamadı.",
+    "there_is_not_share": "Böyle bir hisse bulunamadı.",
     "there_is_payment": "Ödeme yapılmış bir borç silinemez."
   },
   "forms": {
@@ -137,6 +140,20 @@
         "label": "Ödeme Ekle"
       }
     },
+    "remove_share": {
+      "member": {
+        "label": "Üye",
+        "required": "Lütfen listeden bir üye seçin",
+        "select_choice": "Üye seç..."
+      },
+      "share": {
+        "label": "Hisse",
+        "required": "Lütfen listeden bir hisse seçin"
+      },
+      "submit": {
+        "label": "Hisseyi sil"
+      }
+    },
     "signup": {
       "submit": {
         "label": "Kaydol"
@@ -221,6 +238,7 @@
       "my_transactions": "İşlemlerim",
       "profile": "Profil",
       "signup": "Kaydol",
+      "unpaid": "Ödemelerim",
       "update_profile": "Profilimi güncelle"
     }
   },
@@ -255,12 +273,14 @@
   "profile": {
     "debt_received": "Alınan Borç",
     "my_accounts": "Hesaplarım",
+    "my_passive_shares": "Pasif hisseler",
     "others": "Diğer",
     "paid_contributions": "Ödenen aidatlar",
     "paid_installments": "Ödenen Taksit",
     "remaining_debt": "Kalan Borç",
-    "sandik_id": "Sandık No",
+    "sandik_id": "#",
     "sandik_name": "Sandık İsmi",
+    "sandik_unpaid": "Ödemelerim",
     "share_id": "Hisse"
   },
   "transaction": {
@@ -311,6 +331,16 @@
     "unpaid_contributions": "Aidatını Ödemeyenler"
   },
   "views": {
+    "sandik": {
+      "auxiliary": {
+        "member_choices": {
+          "share": "Hisse"
+        }
+      },
+      "remove_share_of_member_page": {
+        "title": "Hisse sil"
+      }
+    },
     "webuser": {
       "add_webuser_page": {
         "passwords_not_same": "Parolanız ve parola doğrulamanız eşleşmiyor.",

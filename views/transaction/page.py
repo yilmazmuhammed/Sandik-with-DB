@@ -1,5 +1,6 @@
 import json
 from copy import copy
+from datetime import date
 
 from flask import abort, redirect, url_for, render_template, flash, current_app
 from flask_login import login_required, current_user
@@ -285,7 +286,7 @@ def unpaid_transactions_page(sandik_id):
         sandik = Sandik[sandik_id]
         webuser = WebUser[current_user.username]
         member = Member.get(webuser_ref=webuser, sandik_ref=sandik)
-        if not member:
+        if not (member or current_user.is_admin):
             flash(u"Bu sandığın üyesi değilsiniz.", 'danger')
             return current_app.login_manager.unauthorized()
         is_autrorized = is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True)
@@ -337,6 +338,60 @@ def unpaid_transactions_page(sandik_id):
                                contributions=unpaid_contributions, payments=unpaid_payments)
 
 
+@login_required
+def unpaid_transactions_of_member_page(sandik_id):
+    sandik = Sandik[sandik_id]
+    webuser = WebUser[current_user.username]
+    member = Member.get(webuser_ref=webuser, sandik_ref=sandik)
+    if not member:
+        flash(u"Bu sandığın üyesi değilsiniz.", 'danger')
+        return current_app.login_manager.unauthorized()
+    member_list = [member]
+
+    unpaid_contributions = {}
+    unpaid_dues = unpaid_dues_choices(member)
+    for share in unpaid_dues:
+        for due in unpaid_dues[share]:
+            if unpaid_contributions.get(due[0]):
+                unpaid_contributions[due[0]].append((Share[share], name_surname(share_id=share)))
+            else:
+                unpaid_contributions[due[0]] = [(Share[share], name_surname(share_id=share))]
+
+    unpaid_payments = {}
+    for debt in select(debt for debt in Debt
+                       if debt.transaction_ref.share_ref.member_ref == member and debt.remaining_debt and
+                          debt.transaction_ref.is_valid()
+                       ).sort_by(lambda d: d.transaction_ref.share_ref.name_surname_share())[:]:
+        unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
+        add_debt = UnpaidDebt(debt)
+        for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
+            add_debt.order_of_installment += 1
+            x = copy(add_debt)
+            add_debt.installment_amount_of_this_period = add_debt.debt.installment_amount
+            if unpaid_payments.get(period):
+                unpaid_payments[period].append(x)
+            else:
+                unpaid_payments[period] = [x]
+
+    periods = []
+    for ekle in list(set(list(unpaid_contributions.keys()) + list(unpaid_payments.keys()))):
+        if len(periods) == 0:
+            periods.append((ekle, Period.period_name(ekle),))
+        else:
+            eklendi = False
+            for i in range(len(periods)):
+                if Period.compare(after=periods[i][0], before=ekle):
+                    periods.insert(i, (ekle, Period.period_name(ekle),))
+                    eklendi = True
+                    break
+            if not eklendi:
+                periods.append((ekle, Period.period_name(ekle),))
+
+    return render_template("transaction/unpaid_transactions.html",
+                           layout_page=LayoutPageInfo("Unpaid transactions"), periods=periods,
+                           contributions=unpaid_contributions, payments=unpaid_payments)
+
+
 # TODO işlem, sandığın işlemi olmak zorunda
 @authorization_to_the_sandik_required(is_admin=True)
 def delete_transaction(sandik_id, transaction_id):
@@ -383,7 +438,8 @@ def confirm_transaction(sandik_id, transaction_id):
             return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
         elif transaction.id != select(t.id for t in Transaction
                                       if t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by
-                                      and not t.deleted_by and t.share_ref == transaction.share_ref).min():
+                                      and not t.deleted_by and t.share_ref == transaction.share_ref
+                                      and t.transaction_date <= date.today()).min():
             flash(u"%s" % get_translation()['unconfirmed']['not_first_transaction'], 'danger')
             return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
 

@@ -5,6 +5,9 @@
     "negative_other": "Other transaction cannot be smaller than zero.",
     "not_last_payment": "Payments other than the last payment of a debt cannot be deleted.",
     "overpayment": "Paid amount cannot be more than the remaining debt",
+    "there_is_not_member": "There is not this member.",
+    "there_is_not_sandik": "There is not this sandik.",
+    "there_is_not_share": "There is not this share.",
     "there_is_payment": "A debt with a payment cannot be deleted."
   },
   "forms": {
@@ -137,6 +140,19 @@
         "label": "Add Payment"
       }
     },
+    "remove_share": {
+      "member": {
+        "label": "Member",
+        "required": "Please select a member in list"
+      },
+      "share": {
+        "label": "Share",
+        "required": "Please select a share in list"
+      },
+      "submit": {
+        "label": "Remove Share"
+      }
+    },
     "signup": {
       "submit": {
         "label": "Sign Up"
@@ -259,7 +275,7 @@
     "paid_contributions": "Paid contributions",
     "paid_installments": "Paid installments",
     "remaining_debt": "Remaining Debt",
-    "sandik_id": "Sandik ID",
+    "sandik_id": "#",
     "sandik_name": "Sandik Name",
     "share_id": "Share ID"
   },
@@ -311,6 +327,16 @@
     "unpaid_contributions": "Who has unpaid contribution"
   },
   "views": {
+    "sandik": {
+      "auxiliary": {
+        "member_choices": {
+          "share": "Share"
+        }
+      },
+      "remove_share_of_member_page": {
+        "title": "Remove share"
+      }
+    },
     "webuser": {
       "add_webuser_page": {
         "passwords_not_same": "Passwords are not same.",

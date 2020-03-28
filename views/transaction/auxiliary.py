@@ -10,13 +10,16 @@ def unpaid_dues(member, only_active_shares=True, is_there_old=False):
     ret_list = {}
     for share in member.shares_index.filter(lambda s: s.is_active == only_active_shares):
         if is_there_old:
-            share_list = Period.all_months_from_date(member.sandik_ref.date_of_opening)
+            all_periods = Period.all_months_from_date(member.sandik_ref.date_of_opening)
         else:
-            share_list = Period.all_months_from_date(share.date_of_opening)
-        for period in select(c.contribution_period for c in Contribution if c.transaction_ref.share_ref == share):
-            if period in share_list:
-                share_list.remove(period)
-        ret_list[share.id] = share_list
+            all_periods = Period.all_months_from_date(share.date_of_opening)
+
+        for period in select(c.contribution_period for c in Contribution
+                             if c.transaction_ref.share_ref == share
+                             and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by):
+            if period in all_periods:
+                all_periods.remove(period)
+        ret_list[share.id] = all_periods
     return ret_list
 
 
@@ -28,17 +31,17 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
     ret_list = {}
     for share in member.shares_index.filter(lambda s: s.is_active == only_active_shares).sort_by(Share.id):
         if is_there_old:
-            share_list = Period.all_months_from_date(member.sandik_ref.date_of_opening)
+            all_periods = Period.all_months_from_date(member.sandik_ref.date_of_opening)
         else:
-            share_list = Period.all_months_from_date(share.date_of_opening)
+            all_periods = Period.all_months_from_date(share.date_of_opening)
 
         for period in select(c.contribution_period for c in Contribution
                              if c.transaction_ref.share_ref == share
                              and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by):
-            if period in share_list:
-                share_list.remove(period)
+            if period in all_periods:
+                all_periods.remove(period)
 
-        ret_list[share.id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in share_list]
+        ret_list[share.id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in all_periods]
     return ret_list
 
 
@@ -55,7 +58,7 @@ def debt_type_choices(sandik):
 @db_session
 def member_choices(sandik_id, only_active_member=True):
     sandik = Sandik[sandik_id]
-    return [(member.id, "%s %s" % (member.webuser_ref.name, member.webuser_ref.surname))
+    return [(member.id, member.webuser_ref.name_surname())
             for member in sandik.members_index.filter(lambda member: member.is_active >= only_active_member).sort_by(
             lambda m: m.webuser_ref.name + " " + m.webuser_ref.surname)]
 

@@ -105,6 +105,7 @@
                         </ul>
                       </li>
                       <li><a href="{{ url_for('member_transactions_in_sandik_page', sandik_id=sandik['id']) }}">{{translation.layout.navbar.my_transactions}}</a></li>
+                      <li><a href="{{ url_for('unpaid_transactions_of_member_page', sandik_id=sandik['id']) }}">{{translation.layout.navbar.unpaid}}</a></li>
                       <li><a href="{{ url_for('members_page', sandik_id=sandik['id']) }}">{{translation.layout.navbar.members}}</a></li>
                       <li><a href="{{ url_for('members_page', sandik_id=sandik['id']) }}#son-mali-durum">{{translation.layout.navbar.final_situation}}</a></li>
                     </ul>

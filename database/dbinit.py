@@ -30,6 +30,9 @@ class WebUser(db.Entity):
     confirmed_transactions = Set('Transaction', reverse='confirmed_by')
     deleted_transactions = Set('Transaction', reverse='deleted_by')
 
+    def name_surname(self):
+        return self.name + " " + self.surname
+
 
 class Member(db.Entity):
     """Her sandıktaki üyelik
@@ -53,6 +56,9 @@ class Share(db.Entity):
     is_active = Required(bool, default=True)
     transactions_index = Set('Transaction')
 
+    def name_surname_share(self):
+        return self.member_ref.webuser_ref.name_surname() + " - " + str(self.share_order_of_member)
+
 
 class Transaction(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -67,6 +73,9 @@ class Transaction(db.Entity):
     created_by = Required(WebUser, reverse='created_transactions')
     confirmed_by = Optional(WebUser, reverse='confirmed_transactions')
     deleted_by = Optional(WebUser, reverse='deleted_transactions')
+
+    def is_valid(self):
+        return self.confirmed_by and not self.deleted_by
 
 
 class Contribution(db.Entity):

@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_login import LoginManager
+from pony.flask import Pony
 
 from views import others, sandik, webuser, backup, get_translation
 from views.webuser.auxiliary import FlaskUser
@@ -15,6 +16,7 @@ def load_user(username):
 
 def create_sandik_app():
     app = Flask(__name__)
+    Pony(app)
     app.config.from_object("settings")
 
     # Normal kullanıcıların genel işlemleri
@@ -73,6 +75,7 @@ def create_sandik_app():
                      view_func=transaction_page.add_transaction_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/cm/unconfirmed-transactions",
                      view_func=transaction_page.member_unconfirmed_transactions_page)
+    app.add_url_rule("/sandik/<int:sandik_id>/cm/unpaid", view_func=transaction_page.unpaid_transactions_of_member_page)
 
     # Herkesin yapabileceği işlemler
     app.add_url_rule("/set_language/<string:language>", view_func=others.set_language)
