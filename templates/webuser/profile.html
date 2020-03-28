@@ -4,6 +4,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
     <script src="{{ url_for('static', filename='js/webuser/profile.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/webuser/profile.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sandik/members.css') }}"/>
+    <script src="{{ url_for('static', filename='js/sandik/members.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -18,18 +20,19 @@
             <div class="col col-xs-6">
               <h3 class="panel-title">{{translation['profile']['my_accounts']}}</h3>
             </div>
-            <div class="col col-xs-6 text-right"></div>
+            <div class="col col-xs-6 text-right"><span class="btn btn-sm btn-success" id="btn-passive">{{translation['profile']['my_passive_shares']}}</span></div>
           </div>
         </div>
 
         <!-- Panel gövdesi (tablo kısmı)-->
-        <div class="panel-body">
-          <table class="table table-striped table-list table-members">
+        <div class="panel-body table-responsive">
+          <table class="table table-striped table-list table-members ">
             <thead>
             <tr>
               <th></th>
-              <th>{{translation['profile']['sandik_id']}}</th>
+<!--              <th>{{translation['profile']['sandik_id']}}</th>-->
               <th>{{translation['profile']['sandik_name']}}</th>
+              <th>{{translation['profile']['sandik_unpaid']}}</th>
             </tr>
             </thead>
             <tbody>
@@ -40,8 +43,9 @@
               <td align="center">
                 <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
               </td>
-              <td>{{member.dbTable.sandik_ref.id}}</td>
+<!--              <td>{{member.dbTable.sandik_ref.id}}</td>-->
               <td>{{member.dbTable.sandik_ref.name}}</td>
+              <td><a href="{{ url_for('unpaid_transactions_of_member_page', sandik_id=member.dbTable.sandik_ref.id) }}">{{translation['profile']['sandik_unpaid']}}</a></td>
             </tr>
             <tr class="share-row">
               <td colspan="3">
@@ -61,7 +65,7 @@
                     <tbody>
                     {% for share in member.shares %}
                     {% set transaction_page_url = transaction_page_url + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname + " - " + share.dbTable.share_order_of_member|string %}
-                    <tr>
+                    <tr class="{% if not share.is_active %}passive-share{% endif %}">
                       <td>{{ share.dbTable.share_order_of_member }}</td>
                       <td>{{ share.paid_contributions }}</td>
                       <td>{{ share.debts_received }}</td>
