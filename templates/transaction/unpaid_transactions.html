@@ -58,7 +58,7 @@ $(document).ready(function(){
                     </tr>
                 </thead>
                 <tbody  id="myTable">
-            {% for debt in payments[period] %}
+                {% for debt in payments[period] %}
                     <tr>
                         <td class="text-center"><a href="{{url_for('transaction_information_page', sandik_id=debt.debt.transaction_ref.share_ref.member_ref.sandik_ref.id, transaction_id=debt.debt.transaction_ref.id)}}">{{debt.debt.transaction_ref.id}}</a></td>
                         <td >{{debt.name_surname_share}}</td>
@@ -66,7 +66,13 @@ $(document).ready(function(){
                         <td class="text-center">{{debt.installment_amount_of_this_period}}tl </td>
                         <td  class="text-center">{{debt.order_of_installment}}/{{debt.number_of_installment}}</td>
                     </tr>
-            {% endfor %}
+                {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td class="text-center"><b>Toplam:</b></td>
+                        <td class="text-center" colspan="2"><b>{{ payments[period] | sum(attribute='installment_amount_of_this_period') }} TL</b></td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
             <br>
