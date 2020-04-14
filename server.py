@@ -3,6 +3,7 @@ from flask_login import LoginManager
 from pony.flask import Pony
 
 from views import others, sandik, webuser, backup, get_translation
+from views.others import zoom_video_indir
 from views.webuser.auxiliary import FlaskUser
 import views.transaction.page as transaction_page
 
@@ -76,6 +77,8 @@ def create_sandik_app():
     app.add_url_rule("/sandik/<int:sandik_id>/cm/unconfirmed-transactions",
                      view_func=transaction_page.member_unconfirmed_transactions_page)
     app.add_url_rule("/sandik/<int:sandik_id>/cm/unpaid", view_func=transaction_page.unpaid_transactions_of_member_page)
+    # Sandık harici şeyler
+    app.add_url_rule("/zoom_video_indir", view_func=zoom_video_indir, methods=["GET", "POST"])
 
     # Herkesin yapabileceği işlemler
     app.add_url_rule("/set_language/<string:language>", view_func=others.set_language)
