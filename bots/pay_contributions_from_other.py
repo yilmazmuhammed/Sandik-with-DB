@@ -14,7 +14,7 @@ def pay_contribution_of_share(share_id=None, share=None):
     contribution_amount = share.member_ref.sandik_ref.contribution_amount
     if other_amount >= contribution_amount and share.is_active \
             and Period.period_of_this_month() in unpaid_contribution_periods(share=share):
-        insert_transaction(in_date=date.today(), amount=contribution_amount, share_id=share.id,
+        insert_transaction(in_date=date.today(), amount=-contribution_amount, share_id=share.id,
                            explanation="Otomatik aidat ödemesi (Diğer'den)", created_by_username='admin'
                            )
         insert_contribution(in_date=date.today(), amount=contribution_amount, share_id=share.id,
