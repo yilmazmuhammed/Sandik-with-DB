@@ -29,7 +29,7 @@ def pay_contribution_of_share(share_id=None, share=None):
 def pay_contributions_of_member(member_id=None, member=None):
     member = member if member else Member[member_id]
     # TODO otomatik ödeme açık mı ve üüye aktif mi
-    if member.is_active:
+    if member.is_active and member.do_pay_contributions_automatically:
         for share in member.shares_index:
             if share.is_active:
                 pay_contribution_of_share(share=share)

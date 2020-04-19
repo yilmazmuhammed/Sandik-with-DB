@@ -14,7 +14,7 @@ from views.transaction.auxiliary import Period
 @db_session
 def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst,
                 created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None,
-                creation_time=None, confirmion_time=None, deletion_time=None):
+                creation_time=datetime.now(), confirmion_time=None, deletion_time=None):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
@@ -45,7 +45,7 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
 def insert_payment(in_date, amount, explanation,
                    created_by_username, confirmed_by_username=None, deleted_by_username=None,
                    debt_id=None, transaction_id=None, id=None,
-                   creation_time=None, confirmion_time=None, deletion_time=None
+                   creation_time=datetime.now(), confirmion_time=None, deletion_time=None
                    ):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
@@ -99,7 +99,7 @@ def insert_payment(in_date, amount, explanation,
 def insert_contribution(in_date: date, amount, share_id, explanation, new_periods: list,
                         created_by_username, confirmed_by_username=None, deleted_by_username=None,
                         is_from_import_data=False, id=None,
-                        creation_time=None, confirmion_time=None, deletion_time=None
+                        creation_time=datetime.now(), confirmion_time=None, deletion_time=None
                         ):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     # ..._by_username'ler None mı olsun yoksa "" mı?
@@ -151,7 +151,7 @@ def insert_contribution(in_date: date, amount, share_id, explanation, new_period
 @db_session
 def insert_transaction(in_date, amount, share_id, explanation,
                        created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None,
-                       creation_time=None, confirmion_time=None, deletion_time=None
+                       creation_time=datetime.now(), confirmion_time=None, deletion_time=None
                        ):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     created_by = WebUser[created_by_username]
