@@ -67,7 +67,7 @@ def login_page():
         try:
             user = FlaskUser(form.data['username'])
             if hasher.verify(form.data['password'], user.webuser.password_hash) and user.is_active:
-                telegram_message = "%s %s giriş yaptı." % (user.webuser.name, user.webuser.surname)
+                telegram_message = "%s (%s) giriş yaptı." % (user.webuser.name_surname(), user.username)
                 sandik_bot.sendMessage(admin_chat_id, telegram_message)
                 login_user(user)
                 flash("%s" % t['success'], 'success')

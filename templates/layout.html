@@ -2,6 +2,10 @@
 {% set translation = layout_page.translation %}
 <html lang="en">
   <head>
+    <script type="text/javascript">
+      const timerStart2 = Date.now();
+    </script>
+
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <title>{{ layout_page.title }} - Yardımlaşma Sandığı</title>
@@ -155,6 +159,13 @@
         <small class="text-muted">&copy; Yardımlaşma Sandığı, 2018</small>
       </div>
     </footer>
-
+    <script type="text/javascript">
+       $(document).ready(function() {
+          console.log("Time until DOMready: ", Date.now()-timerStart2);
+       });
+       $(window).load(function() {
+          console.log("Time until everything loaded: ", Date.now()-timerStart2);
+       });
+    </script>
   </body>
 </html>

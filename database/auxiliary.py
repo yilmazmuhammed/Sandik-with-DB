@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from flask import flash
 from pony.orm import db_session, count, select
@@ -13,7 +13,8 @@ from views.transaction.auxiliary import Period
 
 @db_session
 def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_inst,
-                created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None):
+                created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None,
+                creation_time=None, confirmion_time=None, deletion_time=None):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
@@ -32,7 +33,9 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
         transaction_ref=Transaction(
             id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount, type='Borç',
             explanation=explanation,
-            created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by),
+            created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by,
+            creation_time=creation_time, confirmion_time=confirmion_time, deletion_time=deletion_time
+        ),
         debt_type_ref=DebtType[type_id], number_of_installment=num_of_inst, installment_amount=ia,
         paid_debt=0, paid_installment=0, remaining_debt=amount, remaining_installment=num_of_inst,
         starting_period=Period.last_period(in_date, 1), due_period=Period.last_period(in_date, num_of_inst))
@@ -41,7 +44,9 @@ def insert_debt(in_date: date, amount, share_id, explanation, type_id, num_of_in
 @db_session
 def insert_payment(in_date, amount, explanation,
                    created_by_username, confirmed_by_username=None, deleted_by_username=None,
-                   debt_id=None, transaction_id=None, id=None):
+                   debt_id=None, transaction_id=None, id=None,
+                   creation_time=None, confirmion_time=None, deletion_time=None
+                   ):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref
@@ -74,8 +79,10 @@ def insert_payment(in_date, amount, explanation,
         p = Payment(debt_ref=debt, payment_number_of_debt=pnod, paid_debt_so_far=pdsf, paid_installment_so_far=pisf,
                     remaining_debt_so_far=rdsf, remaining_installment_so_far=risf,
                     transaction_ref=Transaction(id=id, share_ref=share, transaction_date=in_date, amount=amount,
-                                                type='Ödeme', explanation=explanation, created_by=created_by,
-                                                confirmed_by=confirmed_by, deleted_by=deleted_by
+                                                type='Ödeme', explanation=explanation,
+                                                created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by,
+                                                creation_time=creation_time, confirmion_time=confirmion_time,
+                                                deletion_time=deletion_time
                                                 )
                     )
         if confirmed_by:
@@ -91,7 +98,9 @@ def insert_payment(in_date, amount, explanation,
 @db_session
 def insert_contribution(in_date: date, amount, share_id, explanation, new_periods: list,
                         created_by_username, confirmed_by_username=None, deleted_by_username=None,
-                        is_from_import_data=False, id=None):
+                        is_from_import_data=False, id=None,
+                        creation_time=None, confirmion_time=None, deletion_time=None
+                        ):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     # ..._by_username'ler None mı olsun yoksa "" mı?
     share = Share[share_id]
@@ -128,7 +137,10 @@ def insert_contribution(in_date: date, amount, share_id, explanation, new_period
 
     transaction_ref = Transaction(id=id, share_ref=share, transaction_date=in_date,
                                   amount=amount, type='Aidat', explanation=explanation,
-                                  created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
+                                  created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by,
+                                  creation_time=creation_time, confirmion_time=confirmion_time,
+                                  deletion_time=deletion_time
+                                  )
 
     contributions = []
     for new_period in new_periods:
@@ -138,7 +150,9 @@ def insert_contribution(in_date: date, amount, share_id, explanation, new_period
 
 @db_session
 def insert_transaction(in_date, amount, share_id, explanation,
-                       created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None):
+                       created_by_username, confirmed_by_username=None, deleted_by_username=None, id=None,
+                       creation_time=None, confirmion_time=None, deletion_time=None
+                       ):
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     created_by = WebUser[created_by_username]
     if confirmed_by_username is not "" and confirmed_by_username is not None:
@@ -152,19 +166,23 @@ def insert_transaction(in_date, amount, share_id, explanation,
 
     return Transaction(id=id, share_ref=Share[share_id], transaction_date=in_date, amount=amount,
                        type='Diğer', explanation=explanation,
-                       created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by)
+                       created_by=created_by, confirmed_by=confirmed_by, deleted_by=deleted_by,
+                       creation_time=creation_time, confirmion_time=confirmion_time, deletion_time=deletion_time
+                       )
 
 
 @db_session
 def insert_webuser(username, password_hash, date_of_registration: date = date.today(), name=None, surname=None,
-                   is_admin: bool = False, is_active: bool = True):
+                   is_admin: bool = False, is_active: bool = True, telegram_chat_id=None
+                   ):
     return WebUser(username=username, password_hash=password_hash, date_of_registration=date_of_registration, name=name,
-                   surname=surname, is_active=is_active, is_admin=is_admin)
+                   surname=surname, is_active=is_active, is_admin=is_admin, telegram_chat_id=telegram_chat_id
+                   )
 
 
 @db_session
-def insert_member(username, sandik_id, authority_id, date_of_membership: date = date.today(), is_active: bool = True,
-                  id=None):
+def insert_member(username, sandik_id, authority_id, do_pay_contributions_automatically,
+                  date_of_membership: date = date.today(), is_active: bool = True, id=None):
     id = id if id is not None else select(m.id for m in Member).max() + 1
     sandik = Sandik[sandik_id]
 
@@ -176,7 +194,8 @@ def insert_member(username, sandik_id, authority_id, date_of_membership: date = 
 
     return Member(id=id, webuser_ref=WebUser[username], sandik_ref=Sandik[sandik_id],
                   member_authority_type_ref=MemberAuthorityType[authority_id], date_of_membership=date_of_membership,
-                  is_active=is_active)
+                  is_active=is_active, do_pay_contributions_automatically=do_pay_contributions_automatically
+                  )
 
 
 @db_session
@@ -311,6 +330,7 @@ def remove_transaction(transaction_id, deleted_by_username):
             pass
 
     t.deleted_by = WebUser[deleted_by_username]
+    t.deletion_time = datetime.now()
 
 
 def confirm_other_transaction(t_id, confirmed_by_username):
@@ -324,6 +344,7 @@ def confirm_other_transaction(t_id, confirmed_by_username):
         raise NegativeTransaction(get_translation()['exceptions']['negative_other'])
 
     t.confirmed_by = WebUser[confirmed_by_username]
+    t.confirmion_time = datetime.now()
 
     return True
 
@@ -332,6 +353,7 @@ def confirm_debt(t_id, confirmed_by_username):
     t = Transaction[t_id]
 
     t.confirmed_by = WebUser[confirmed_by_username]
+    t.confirmion_time = datetime.now()
 
     return True
 
@@ -348,6 +370,7 @@ def confirm_contributions(t_id, confirmed_by_username):
             raise DuplicateContributionPeriod(get_translation()['exceptions']['duplicate_contribution_period'])
 
     t.confirmed_by = WebUser[confirmed_by_username]
+    t.confirmion_time = datetime.now()
 
     return True
 
@@ -375,5 +398,6 @@ def confirm_payment(t_id, confirmed_by_username):
 
     # Confirm
     t.confirmed_by = WebUser[confirmed_by_username]
+    t.confirmion_time = datetime.now()
 
     return True

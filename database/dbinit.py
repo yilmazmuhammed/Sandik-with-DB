@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pony.orm import *
 
 
@@ -26,6 +26,7 @@ class WebUser(db.Entity):
     is_admin = Required(bool, default=False)
     is_active = Required(bool, default=True)
     members_index = Set('Member')
+    telegram_chat_id = Optional(int)
     created_transactions = Set('Transaction', reverse='created_by')
     confirmed_transactions = Set('Transaction', reverse='confirmed_by')
     deleted_transactions = Set('Transaction', reverse='deleted_by')
@@ -44,6 +45,7 @@ class Member(db.Entity):
     is_active = Required(bool, default=True)
     member_authority_type_ref = Required('MemberAuthorityType')
     shares_index = Set('Share')
+    do_pay_contributions_automatically = Required(bool, default=False)
     # PrimaryKey(webuser_ref, sandik_ref)   # TODO
     composite_key(webuser_ref, sandik_ref)
 
@@ -75,8 +77,11 @@ class Transaction(db.Entity):
     payment_ref = Optional('Payment')
     debt_ref = Optional('Debt')
     created_by = Required(WebUser, reverse='created_transactions')
+    creation_time = Required(datetime)
     confirmed_by = Optional(WebUser, reverse='confirmed_transactions')
+    confirmion_time = Optional(datetime)
     deleted_by = Optional(WebUser, reverse='deleted_transactions')
+    deletion_time = Optional(datetime)
 
     def is_valid(self):
         return self.confirmed_by and not self.deleted_by

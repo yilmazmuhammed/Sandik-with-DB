@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from pony.orm import db_session, select
 
@@ -40,9 +40,9 @@ def add_webusers(webusers):
     with db_session:
         for wu in webusers:
             date_of_registration = date(*(list(map(int, wu[4].split('-')))))
-            insert_webuser(username=wu[0], password_hash=wu[1],
-                           date_of_registration=date_of_registration, name=wu[2], surname=wu[3],
-                           is_admin=wu[5], is_active=wu[6])
+            insert_webuser(username=wu[0], password_hash=wu[1], name=wu[2], surname=wu[3],
+                           date_of_registration=date_of_registration, is_admin=wu[5], is_active=wu[6],
+                           telegram_chat_id=wu[7] if wu[7] != 'None' else None)
 
 
 def add_sandiklar(sandiklar):
@@ -56,7 +56,8 @@ def add_sandiklar(sandiklar):
 def add_member_authority_types(member_authority_types):
     with db_session:
         for mat in member_authority_types:
-            insert_member_authority_type(id=mat[0], name=mat[1], capacity=mat[2], sandik_id=mat[3], is_admin=mat[4],
+            insert_member_authority_type(id=mat[0], name=mat[1], max_number_of_members=mat[2], sandik_id=mat[3],
+                                         is_admin=mat[4],
                                          reading_transaction=mat[5], writing_transaction=mat[6],
                                          adding_member=mat[7], throwing_member=mat[8])
 
@@ -65,7 +66,8 @@ def add_members(members):
     with db_session:
         for m in members:
             date_of_membership = date(*(list(map(int, m[3].split('-')))))
-            insert_member(m[1], m[2], m[5], date_of_membership, m[4], id=m[0])
+            insert_member(username=m[1], sandik_id=m[2], authority_id=m[5], do_pay_contributions_automatically=m[6],
+                          date_of_membership=date_of_membership, is_active=m[4], id=m[0])
 
 
 def add_shares(shares):
@@ -86,23 +88,36 @@ def add_transactions(transactions):
     with db_session:
         for t in transactions:
             transaction_date = date(*(list(map(int, t[1].split('-')))))
+            creation_time = datetime.strptime(t[10], "%Y-%m-%d %H:%M:%S")
+            confirmion_time = datetime.strptime(t[11], "%Y-%m-%d %H:%M:%S") if t[11] else None
+            deletion_time = datetime.strptime(t[12], "%Y-%m-%d %H:%M:%S") if t[12] else None
             # TODO Burada Payment ve Debt yani türleri her sandığın kendi borç türlerine göre belirle
             debt = ['APB', 'PDAY']
             payment = ['APB-Ö', 'PDAY-Ö']
             if t[4] in debt:
                 insert_debt(transaction_date, t[2], t[3], t[5],
                             DebtType.get(name=t[4], sandik_ref=Share[t[3]].member_ref.sandik_ref).id, t[6],
-                            created_by_username=t[7], confirmed_by_username=t[8], id=t[0])
+                            created_by_username=t[7], confirmed_by_username=t[8], id=t[0],
+                            creation_time=creation_time, confirmion_time=confirmion_time, deletion_time=deletion_time
+                            )
             elif t[4] in payment:
                 insert_payment(transaction_date, t[2], t[5], created_by_username=t[7], confirmed_by_username=t[8],
-                               transaction_id=t[6], id=t[0])
+                               transaction_id=t[6], id=t[0],
+                               creation_time=creation_time, confirmion_time=confirmion_time, deletion_time=deletion_time
+                               )
             elif t[4] == 'Aidat':
                 insert_contribution(transaction_date, t[2], t[3], t[5], t[6].split(" "),
                                     created_by_username=t[7], confirmed_by_username=t[8],
-                                    is_from_import_data=True, id=t[0])
+                                    is_from_import_data=True, id=t[0],
+                                    creation_time=creation_time, confirmion_time=confirmion_time,
+                                    deletion_time=deletion_time
+                                    )
             elif t[4] == 'Diğer':
                 insert_transaction(transaction_date, t[2], t[3], t[5],
-                                   created_by_username=t[7], confirmed_by_username=t[8], id=t[0])
+                                   created_by_username=t[7], confirmed_by_username=t[8], id=t[0],
+                                   creation_time=creation_time, confirmion_time=confirmion_time,
+                                   deletion_time=deletion_time
+                                   )
             if t[9]:
                 remove_transaction(t[0], t[9])
 
@@ -126,10 +141,13 @@ class csv_list_backup:
         liste = []
         webusers = select(webuser for webuser in WebUser).sort_by(WebUser.username)[:]
         liste.append("WEBUSERS;%s" % len(webusers))
-        liste.append("username;password_hash;name;surname;date_of_registration;is_admin;is_active")
+        liste.append("username;password_hash;name;surname;date_of_registration;is_admin;is_active;telegram_chat_id")
         for wu in webusers:
-            liste.append("%s;%s;%s;%s;%s;%s;%s" % (wu.username, wu.password_hash, wu.name, wu.surname,
-                                                   wu.date_of_registration, wu.is_admin, wu.is_active))
+            liste.append("%s;%s;%s;%s;%s;%s;%s;%s" % (wu.username, wu.password_hash, wu.name, wu.surname,
+                                                      wu.date_of_registration, wu.is_admin, wu.is_active,
+                                                      wu.telegram_chat_id
+                                                      )
+                         )
         return liste
 
     @staticmethod
@@ -166,10 +184,12 @@ class csv_list_backup:
         liste = []
         members = select(member for member in Member).sort_by(Member.id)[:]
         liste.append("MEMBERS;%s" % len(members))
-        liste.append("id;webuser_ref;sandik_ref;date_of_membership;is_active;member_authority_type_ref")
+        liste.append("id;webuser_ref;sandik_ref;date_of_membership;is_active;member_authority_type_ref;"
+                     "do_pay_contributions_automatically")
         for m in members:
-            liste.append("%s;%s;%s;%s;%s;%s" % (m.id, m.webuser_ref.username, m.sandik_ref.id, m.date_of_membership,
-                                                m.is_active, m.member_authority_type_ref.id))
+            liste.append("%s;%s;%s;%s;%s;%s;%s" % (m.id, m.webuser_ref.username, m.sandik_ref.id, m.date_of_membership,
+                                                   m.is_active, m.member_authority_type_ref.id,
+                                                   m.do_pay_contributions_automatically))
         return liste
 
     @staticmethod
@@ -203,7 +223,10 @@ class csv_list_backup:
         liste = []
         transactions = select(transaction for transaction in Transaction).sort_by(lambda tr: tr.id)[:]
         liste.append("TRANSACTIONS;%s" % len(transactions))
-        liste.append("id;transaction_date;amount;share_ref.id;transaction_type;explanation;additional_info")
+        liste.append("id;transaction_date;amount;share_ref.id;transaction_type;explanation;additional_info;"
+                     "created_by.username;confirmed_by.username;deleted_by.username;"
+                     "creation_time;confirmion_time;deletion_time"
+                     )
         for t in transactions:
             line = ""
             line += "%s;%s;%s;%s;" % (t.id, t.transaction_date, t.amount, t.share_ref.id)
@@ -232,6 +255,9 @@ class csv_list_backup:
             line += ";"
             line += "%s;" % (t.created_by.username,)
             line += "%s;" % (t.confirmed_by.username if t.confirmed_by else "",)
-            line += "%s" % (t.deleted_by.username if t.deleted_by else "",)
+            line += "%s;" % (t.deleted_by.username if t.deleted_by else "",)
+            line += "%s;" % (t.creation_time.strftime("%Y-%m-%d %H:%M:%S"),)
+            line += "%s;" % (t.confirmion_time.strftime("%Y-%m-%d %H:%M:%S") if t.confirmion_time else "",)
+            line += "%s" % (t.deletion_time.strftime("%Y-%m-%d %H:%M:%S") if t.deletion_time else "",)
             liste.append(line)
         return liste
