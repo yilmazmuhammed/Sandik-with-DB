@@ -4,6 +4,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sandik/members.css') }}"/>
     <script src="{{ url_for('static', filename='js/sandik/members.js') }}"></script>
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+  $(function () {
+  $('[data-toggle="popover"]').popover()
+})
+</script>
 {% endblock %}
 
 {% block content %}
@@ -48,7 +56,7 @@
               <tr></tr>
               {% for member in sandik.members %}
               {% set transaction_page_url = url_for('transactions_page', sandik_id=sandik.sandik_id) + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname %}
-              <tr class="member {% if not member.is_active %}passive-member{% endif %}">
+              <tr class="member{% if not member.is_active %} passive-member{% endif %}">
                 {% if member_authority %}
                 <td align="center">
                   <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
@@ -89,8 +97,9 @@
                           <td>{{ share.debts_received }}</td>
                           <td>{{ share.paid_installments }}</td>
                           <td>{{ share.others }}</td>
-                          <td style="color:red;">{{ share.remaining_debts }}</td>
-                          <td align="center">
+                          <td style="color:red;" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus \nsagittis lacus <br>vel augue
+                          laoreet rutrum faucibus.">{{ share.remaining_debts }}</td>
+                          <td align="center" data-container="body"  data-toggle="tooltip" data-placement="top" title="Tooltip on left">
                             <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                           </td>
                         </tr>
