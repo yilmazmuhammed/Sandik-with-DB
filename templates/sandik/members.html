@@ -4,14 +4,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sandik/members.css') }}"/>
     <script src="{{ url_for('static', filename='js/sandik/members.js') }}"></script>
-<script>
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-  })
-  $(function () {
-  $('[data-toggle="popover"]').popover()
-})
-</script>
+    <script>
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -64,7 +61,7 @@
                 {% endif %}
                 <td class="hidden-xs">{{ member.dbTable.member_id }}</td>
                 <td>{{ member.dbTable.webuser_ref.username }}</td>
-                <td>{{ member.dbTable.webuser_ref.name }} {{ member.dbTable.webuser_ref.surname }}</td>
+                <td>{{ member.dbTable.webuser_ref.name_surname() }}</td>
                 <!--
                 <td align="center">
                   <a class="btn btn-default btn-xs"><em class="fa fa-pencil"></em></a>
@@ -97,9 +94,8 @@
                           <td>{{ share.debts_received }}</td>
                           <td>{{ share.paid_installments }}</td>
                           <td>{{ share.others }}</td>
-                          <td style="color:red;" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus \nsagittis lacus <br>vel augue
-                          laoreet rutrum faucibus.">{{ share.remaining_debts }}</td>
-                          <td align="center" data-container="body"  data-toggle="tooltip" data-placement="top" title="Tooltip on left">
+                          <td style="color:red;" data-container="body"  data-html="true" data-toggle="tooltip" data-placement="top" title="{% for type in sandik.debt_types %}{{type.name}}:{{share.remaining_debts_with_types[type.id]}}<br>{% endfor %}">{{ share.remaining_debts }}</td>
+                          <td align="center">
                             <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                           </td>
                         </tr>
@@ -110,7 +106,7 @@
                           <td>{{ member.debts_received }}</td>
                           <td>{{ member.paid_installments }}</td>
                           <td>{{ member.others }}</td>
-                          <td style="color:red;">{{ member.remaining_debts }}</td>
+                          <td style="color:red;" data-container="body"  data-html="true" data-toggle="tooltip" data-placement="top" title="{% for type in sandik.debt_types %}{{type.name}}:{{member.remaining_debts_with_types[type.id]}}<br>{% endfor %}">{{ member.remaining_debts }}</td>
                           <td align="center">
                             <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                           </td>

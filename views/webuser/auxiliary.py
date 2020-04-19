@@ -37,6 +37,8 @@ class SandikInfo:
         self.remaining_debts = self.debts_received - self.paid_installments
         self.total = self.paid_contributions + self.others - self.remaining_debts
 
+        self.debt_types = sandik.debt_types_index
+
 
 class MemberInfo:
     def __init__(self, member):
@@ -52,6 +54,9 @@ class MemberInfo:
         self.paid_installments = sum(s.paid_installments for s in self.shares)
         self.others = sum(s.others for s in self.shares)
         self.remaining_debts = self.debts_received - self.paid_installments
+        self.remaining_debts_with_types = {}
+        for debt_type in share.member_ref.sandik_ref.debt_types_index:
+            self.remaining_debts_with_types[debt_type.id] = sum(s.remaining_debts_with_types[debt_type.id] for s in self.shares)
 
 
 class ShareInfo:
@@ -69,5 +74,13 @@ class ShareInfo:
         self.others = select(t.amount for t in share.transactions_index
                              if not t.contribution_index and not t.debt_ref and not t.payment_ref
                              and t.confirmed_by and not t.deleted_by).sum()
-        self.remaining_debts = select(t.debt_ref.remaining_debt for t in share.transactions_index
-                                      if t.debt_ref and t.confirmed_by and not t.deleted_by).sum()
+        self.remaining_debts = 0
+        self.remaining_debts_with_types = {}
+        for debt_type in share.member_ref.sandik_ref.debt_types_index:
+            self.remaining_debts_with_types[debt_type.id] = select(t.debt_ref.remaining_debt
+                                                                   for t in share.transactions_index
+                                                                   if t.debt_ref
+                                                                   and t.debt_ref.debt_type_ref == debt_type
+                                                                   and t.confirmed_by and not t.deleted_by
+                                                                   ).sum()
+            self.remaining_debts += self.remaining_debts_with_types[debt_type.id]
