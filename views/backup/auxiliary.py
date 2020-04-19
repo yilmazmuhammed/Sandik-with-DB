@@ -21,7 +21,7 @@ def db_tables(csv_table):
         table_name = csv_table[table_name_line][0]
         tables[table_name] = csv_table[table_start_line:next_table_name_line]
 
-    bool_col = {'WEBUSERS': [5, 6], 'SANDIKLAR': [3], 'MEMBER_AUTHORITY_TYPES': [4, 5, 6, 7, 8], 'MEMBERS': [4],
+    bool_col = {'WEBUSERS': [5, 6], 'SANDIKLAR': [3], 'MEMBER_AUTHORITY_TYPES': [4, 5, 6, 7, 8], 'MEMBERS': [4, 6],
                 'SHARES': [4], 'DEBT_TYPES': [], 'TRANSACTIONS': []}
 
     for header in bool_col.keys():

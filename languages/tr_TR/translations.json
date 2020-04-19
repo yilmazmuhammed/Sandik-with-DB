@@ -79,6 +79,14 @@
         "label": "Üyeyi düzenle"
       }
     },
+    "edit_member_settings": {
+      "do_pay_contributions_automatically": {
+        "label": "Aidatlar Diğer'den otomatik ödensin mi?"
+      },
+      "submit": {
+        "label": "Kaydet"
+      }
+    },
     "edit_webuser": {
       "name": {
         "label": "İsim",

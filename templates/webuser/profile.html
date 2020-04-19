@@ -38,6 +38,7 @@
 <!--              <th>{{translation['profile']['sandik_id']}}</th>-->
               <th>{{translation['profile']['sandik_name']}}</th>
               <th>{{translation['profile']['sandik_unpaid']}}</th>
+              <th></th>
             </tr>
             </thead>
             <tbody>
@@ -50,10 +51,12 @@
               </td>
 <!--              <td>{{member.dbTable.sandik_ref.id}}</td>-->
               <td>{{member.dbTable.sandik_ref.name}}</td>
-              <td><a href="{{ url_for('unpaid_transactions_of_member_page', sandik_id=member.dbTable.sandik_ref.id) }}">{{translation['profile']['sandik_unpaid']}}</a></td>
+              <td><a href="{{ url_for('unpaid_transactions_of_member_page', sandik_id=member.dbTable.sandik_ref.id) }}">{{translation['profile']['sandik_unpaid']}}</a></td><td align="center">
+                <a href="{{ url_for('edit_member_settings_in_the_sandik', sandik_id=member.dbTable.sandik_ref.id) }}" class="btn btn-danger btn-xs"><em class="fa fa-cogs"></em></a>
+              </td>
             </tr>
             <tr class="share-row">
-              <td colspan="3">
+              <td colspan="4">
                 <div class="share-table-div">
                   <table class="table table-bordered table-shares">
                     <thead class="thead-dark">

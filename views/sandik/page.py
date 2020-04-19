@@ -178,7 +178,23 @@ def select_member_to_edit_page(sandik_id):
     return render_template("form.html", layout_page=LayoutPageInfo("Select member to edit"), info=info)
 
 
-@authorization_to_the_sandik_required(adding_member=True)
+@db_session
+def edit_member_settings_in_the_sandik(sandik_id):
+    sandik = Sandik[sandik_id]
+    member = Member.get(sandik_ref=sandik, webuser_ref=WebUser[current_user.username])
+
+    form = EditMemberSettingsForm(member.id)
+
+    if form.validate_on_submit():
+        dpca = True if request.form.get('do_pay_contributions_automatically') else False
+        member.do_pay_contributions_automatically = dpca
+        return redirect(url_for('edit_member_settings_in_the_sandik', sandik_id=sandik_id))
+
+    info = FormPageInfo(form=form, title='%s Üye Ayarları' % sandik.name)
+    return render_template("form.html", layout_page=LayoutPageInfo("Edit member settings"), info=info)
+
+
+@authorization_to_the_sandik_required(throwing_member=True)
 def remove_member_of_sandik_page(sandik_id):
     member_list = member_choices(sandik_id)
     form = select_form(form_name='member-form', tag='Member', id='member', coerce=int, submit_tag="Remove Member",

@@ -412,6 +412,27 @@ class AddingShareForm(FlaskForm):
     submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
+class EditMemberSettingsForm(FlaskForm):
+    t = get_translation()['forms']['edit_member_settings']
+
+    open = form_open(form_name='edit_member_settings-form')
+    close = form_close()
+
+    do_pay_contributions_automatically = BooleanField(label="%s:" % t['do_pay_contributions_automatically']['label'],
+                                                      id='do_pay_contributions_automatically',
+                                                      render_kw={"class": "form-control", "data-toggle": "toggle",
+                                                                 "data-onstyle": "success"
+                                                                 }
+                                                      )
+
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+    def __init__(self, member_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        member = Member[member_id]
+        self.do_pay_contributions_automatically.data = member.do_pay_contributions_automatically
+
+
 def select_form(form_name, tag, coerce, choices, id, submit_tag):
     class SelectForm(FlaskForm):
         open = form_open(form_name=form_name)

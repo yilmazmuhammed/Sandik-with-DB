@@ -79,6 +79,11 @@
         "label": "Edit Member"
       }
     },
+    "edit_member_settings": {
+      "submit": {
+        "label": "Save"
+      }
+    },
     "edit_webuser": {
       "name": {
         "label": "Name",
