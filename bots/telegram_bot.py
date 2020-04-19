@@ -1,6 +1,8 @@
+import os
+
 import telegram
 
-TOKEN = "753995075:AAFAH-gMRj9vCs0bRDVsedOkUZUzStumK3Y"
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 admin_chat_id = 453371981
 
-sandik_bot = telegram.Bot(TOKEN)
+sandik_bot = telegram.Bot(TELEGRAM_TOKEN)
