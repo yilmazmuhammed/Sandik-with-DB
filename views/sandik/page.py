@@ -5,7 +5,7 @@ from pony.orm import db_session, ObjectNotFound
 from database.auxiliary import insert_share, OutstandingDebt, insert_sandik, insert_member_authority_type, insert_member
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm, \
-    select_form, EditMemberForm
+    select_form, EditMemberForm, EditMemberSettingsForm
 from views import LayoutPageInfo
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
