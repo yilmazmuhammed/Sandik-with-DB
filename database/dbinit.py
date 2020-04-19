@@ -59,6 +59,10 @@ class Share(db.Entity):
     def name_surname_share(self):
         return self.member_ref.webuser_ref.name_surname() + " - " + str(self.share_order_of_member)
 
+    def amount_other(self):
+        return select(transaction.amount for transaction in self.transactions_index
+                      if transaction.is_other_transaction() and transaction.is_valid()).sum()
+
 
 class Transaction(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -76,6 +80,9 @@ class Transaction(db.Entity):
 
     def is_valid(self):
         return self.confirmed_by and not self.deleted_by
+
+    def is_other_transaction(self):
+        return not self.contribution_index and not self.debt_ref and not self.payment_ref
 
 
 class Contribution(db.Entity):

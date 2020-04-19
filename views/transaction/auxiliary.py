@@ -45,6 +45,20 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
     return ret_list
 
 
+def unpaid_contribution_periods(share_id=None, share=None, is_there_old=False):
+    share = share if share else Share[share_id]
+    if is_there_old:
+        all_periods = Period.all_months_from_date(share.member_ref.sandik_ref.date_of_opening)
+    else:
+        all_periods = Period.all_months_from_date(share.date_of_opening)
+    for period in select(c.contribution_period for c in Contribution
+                         if c.transaction_ref.share_ref == share and c.transaction_ref.is_valid()
+                         ):
+        if period in all_periods:
+            all_periods.remove(period)
+    return all_periods
+
+
 def share_choices(member, only_active_shares=True):
     return [(share.id, "%s. Hisse" % (share.share_order_of_member,))
             for share in member.shares_index.filter(lambda share: share.is_active == only_active_shares).sort_by(
