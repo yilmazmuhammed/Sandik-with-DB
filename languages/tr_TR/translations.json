@@ -112,6 +112,9 @@
         "label": "Soyisim",
         "length": "Soyisim alanı 40  karakterden fazla olamaz..."
       },
+      "telegram_chat_id": {
+        "label": "Telegram Chat ID"
+      },
       "username": {
         "label": "Kullanıcı adı",
         "length": "Kullanıcı adı 20 karakterden fazla olamaz..."

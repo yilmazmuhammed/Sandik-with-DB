@@ -2,7 +2,7 @@ from datetime import date
 
 from pony.orm import db_session
 
-from bots.telegram_bot import sandik_bot, admin_chat_id
+from bots.telegram_bot import telegram_bot, admin_chat_id
 from database.auxiliary import insert_transaction, insert_contribution
 from database.dbinit import Share, Member, Sandik
 from views.transaction.auxiliary import Period, unpaid_contribution_periods
@@ -22,7 +22,7 @@ def pay_contribution_of_share(share_id=None, share=None):
                             new_periods=[Period.period_of_this_month()]
                             )
         telegram_message = "%s adına otomatik aidat ödeme yapıldı." % (share.name_surname_share())
-        sandik_bot.sendMessage(admin_chat_id, telegram_message)
+        telegram_bot.sendMessage(admin_chat_id, telegram_message)
         print(share.name_surname_share(), other_amount)
 
 

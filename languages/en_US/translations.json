@@ -109,6 +109,9 @@
         "label": "Surname",
         "length": "Surname field cannot be longer than 40 character"
       },
+      "telegram_chat_id": {
+        "label": "Telegram Chat ID"
+      },
       "username": {
         "label": "Username",
         "length": "Username cannot be longer than 20 character"

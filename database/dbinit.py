@@ -1,6 +1,6 @@
 from datetime import date, datetime
-from pony.orm import *
 
+from pony.orm import *
 
 db = Database()
 
@@ -39,7 +39,7 @@ class Member(db.Entity):
     """Her sandıktaki üyelik
 Örneğin bir kişinin(webuser) birden fazla sandıkta üyeliği(member) olabilir. """
     id = PrimaryKey(int, auto=True)
-    webuser_ref = Required(WebUser)
+    webuser_ref: WebUser = Required(WebUser)
     sandik_ref = Required(Sandik)
     date_of_membership = Required(date, default=lambda: date.today())
     is_active = Required(bool, default=True)
@@ -159,7 +159,6 @@ db.bind(provider='postgres', user='auykhzkqcbtuek',
 # set_sql_debug(True)
 
 db.generate_mapping(create_tables=True)
-
 
 if __name__ == "__main__":
     with db_session:

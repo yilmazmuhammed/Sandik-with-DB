@@ -7,12 +7,14 @@ from flask_login import login_required, current_user
 from pony.orm import db_session, select, desc
 
 import database.auxiliary as db_aux
+from bots.telegram_bot import telegram_bot
 from database.auxiliary import name_surname
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
 from database.exceptions import NegativeTransaction, DuplicateContributionPeriod, Overpayment
 from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
 from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
+from views.sandik.auxiliary import get_chat_ids_of_sandik_admins
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
     member_choices, Period, UnpaidDebt, local_name_surname
 from views.transaction.db import remove_transaction_vw
@@ -42,7 +44,9 @@ def add_transaction_page(sandik_id):
                 flash(u'%s' % nt, 'danger')
 
         info = FormPageInfo(form=form, title=get_translation()['forms']['transaction']["page_name"])
-        return render_template("form.html", layout_page=LayoutPageInfo(get_translation()['forms']['transaction']["page_name"]), info=info)
+        return render_template("form.html",
+                               layout_page=LayoutPageInfo(get_translation()['forms']['transaction']["page_name"]),
+                               info=info)
 
 
 @login_required
@@ -65,6 +69,10 @@ def add_contribution_page(sandik_id):
             # TODO kontrolleri yap
             try:
                 transaction_db.add_contributions(form, current_user.username)
+                telegram_bot.send_message_to_list(
+                    get_chat_ids_of_sandik_admins(sandik=sandik),
+                    "*%s*\n%s aidat işlemi ekledi. İşlem onay bekliyor." % (sandik.name, member.webuser_ref.name_surname())
+                )
                 return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
             except DuplicateContributionPeriod as dcp:
                 flash(u'%s' % dcp, 'danger')
@@ -106,19 +114,23 @@ def add_debt_page(sandik_id):
             # TODO kontrolleri yap, (borcu varsa bir daha alamaz[sayfaya giriş de engellenebilir], en fazla taksit,
             #  parasına göre en fazla borç)
             transaction_db.add_debt(form, current_user.username)
+            telegram_bot.send_message_to_list(
+                get_chat_ids_of_sandik_admins(sandik=sandik),
+                "*%s*\n%s borç işlemi ekledi. İşlem onay bekliyor." % (sandik.name, member.webuser_ref.name_surname())
+            )
 
             return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
 
         info = FormPageInfo(form=form, title=get_translation()['forms']['debt']["page_name"])
         return render_template('form.html',
-                               layout_page=LayoutPageInfo(get_translation()['forms']['debt']["page_name"]),  info=info)
+                               layout_page=LayoutPageInfo(get_translation()['forms']['debt']["page_name"]), info=info)
 
 
 @login_required
 def add_payment_page(sandik_id):
     with db_session:
         member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
-
+        sandik = Sandik[sandik_id]
         # If member is not in members of the sandik
         if not member:
             abort(404)
@@ -135,12 +147,18 @@ def add_payment_page(sandik_id):
             else:
                 try:
                     transaction_db.add_payment(form, current_user.username)
+                    telegram_bot.send_message_to_list(
+                        get_chat_ids_of_sandik_admins(sandik=sandik),
+                        "*%s*\n%s borç işlemi ekledi. İşlem onay bekliyor." % (sandik.name, member.webuser_ref.name_surname())
+                    )
                     return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
                 except Overpayment as op:
                     flash(u'%s' % op, 'danger')
 
         info = FormPageInfo(form=form, title=get_translation()['forms']['payment']["page_name"])
-        return render_template('form.html', layout_page=LayoutPageInfo(get_translation()['forms']['payment']["page_name"]), info=info)
+        return render_template('form.html',
+                               layout_page=LayoutPageInfo(get_translation()['forms']['payment']["page_name"]),
+                               info=info)
 
 
 @authorization_to_the_sandik_required(writing_transaction=True)
@@ -405,8 +423,10 @@ def delete_transaction(sandik_id, transaction_id):
 @authorization_to_the_sandik_required(reading_transaction=True)
 def unconfirmed_transactions_page(sandik_id):
     with db_session:
-        unconfirmed_transactions = select(t for t in Transaction if
-                                          t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by and not t.deleted_by).sort_by(lambda t: t.id)
+        unconfirmed_transactions = select(
+            t for t in Transaction if
+            t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by and not t.deleted_by).sort_by(
+            lambda t: t.id)
         return render_template("transaction/unconfirmed_transactions.html",
                                layout_page=LayoutPageInfo("Unpaid transactions"),
                                unconfirmed_transactions=unconfirmed_transactions, is_authorized=True)

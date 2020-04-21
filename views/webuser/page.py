@@ -5,7 +5,7 @@ from pony.orm import TransactionIntegrityError, ObjectNotFound, db_session
 
 from database.dbinit import WebUser
 from forms import SingUpForm, FormPageInfo, WebuserForm, LoginForm, EditWebUserForm
-from bots.telegram_bot import sandik_bot, admin_chat_id
+from bots.telegram_bot import telegram_bot, admin_chat_id
 from views import LayoutPageInfo, get_translation
 from views.authorizations import admin_required
 from views.webuser.auxiliary import FlaskUser, MemberInfo
@@ -68,7 +68,7 @@ def login_page():
             user = FlaskUser(form.data['username'])
             if hasher.verify(form.data['password'], user.webuser.password_hash) and user.is_active:
                 telegram_message = "%s (%s) giriş yaptı." % (user.webuser.name_surname(), user.username)
-                sandik_bot.sendMessage(admin_chat_id, telegram_message)
+                telegram_bot.sendMessage(admin_chat_id, telegram_message)
                 login_user(user)
                 flash("%s" % t['success'], 'success')
                 next_page = request.args.get("next", url_for("home_page"))
@@ -113,6 +113,7 @@ def edit_webuser_info_page():
     form.name.render_kw["placeholder"] = webuser.name
     form.surname.render_kw["placeholder"] = webuser.surname
     form.password_verify = None
+    form.telegram_chat_id.render_kw["placeholder"] = webuser.telegram_chat_id
 
     if form.validate_on_submit():
         if not hasher.verify(form.old_password.data, webuser.password_hash):
@@ -130,6 +131,9 @@ def edit_webuser_info_page():
                     webuser.surname = form.surname.data
                 if form.new_password.data:
                     webuser.password_hash = hasher.hash(form.new_password.data)
+                if form.telegram_chat_id.data:
+                    webuser.telegram_chat_id = form.telegram_chat_id.data
+                    telegram_bot.send_message(form.telegram_chat_id.data, "Bot aktif edildi.")
                 return redirect(url_for("home_page"))
             except TransactionIntegrityError:  # If username already exists in database
                 flash(u"'%s' username already exists." % (form.data["username"],), 'danger')
