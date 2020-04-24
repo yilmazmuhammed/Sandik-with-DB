@@ -50,12 +50,13 @@
                   <a href="#" class="dropdown-toggle btn btn-xs btn-info " data-toggle="dropdown"><em class="glyphicon glyphicon-trash"></em></a>
                   <ul class="dropdown-menu">
                     <li><a href="{{ url_for('remove_member_of_sandik_page', sandik_id=sandik.id) }}">{{translation.management_panel.member}}</a>
+                    <li><a href="{{ url_for('remove_share_of_member_page', sandik_id=sandik.id) }}">{{translation.management_panel.share}}</a>
                   </ul>
                 </div>
               </div>
             </div>
             <div class="col-xs-7 text-right">
-              <div class="huge">{{ sandik.number_of_members }}</div>
+              <div class="huge">{{ sandik.number_of_members }}-{{ sandik.number_of_shares }}</div>
               <div>{{translation.management_panel.members}}</div>
             </div>
           </div>

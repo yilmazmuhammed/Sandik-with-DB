@@ -17,6 +17,9 @@ class SandikManagementPanel:
                                                              if t.share_ref.member_ref.sandik_ref == sandik
                                                              and not t.confirmed_by and not t.deleted_by).count()
             self.number_of_members = select(member for member in sandik.members_index if member.is_active).count()
+            self.number_of_shares = select(
+                share for share in Share if share.member_ref.sandik_ref == sandik and share.is_active
+            ).count()
 
 
 def get_chat_ids_of_sandik_admins(sandik: Sandik = None, sandik_id=None):
