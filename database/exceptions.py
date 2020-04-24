@@ -44,3 +44,15 @@ class DuplicateContributionPeriod(ConfirmTransactionError):
 
 class Overpayment(ConfirmTransactionError):
     pass
+
+
+class ThereIsNotSandik(Exception):
+    pass
+
+
+class ThereIsNotMember(Exception):
+    pass
+
+
+class ThereIsNotShare(Exception):
+    pass

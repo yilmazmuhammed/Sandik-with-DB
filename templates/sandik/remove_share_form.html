@@ -1,0 +1,34 @@
+{% extends "form.html" %}
+
+{% block extra_head %}
+<!--<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>-->
+<script>
+    function get_shares() {
+        let member_select = document.getElementById('member');
+        let share_select = document.getElementById('share');
+        let member = member_select.value;
+
+        if(member==''){
+            share_select.innerHTML = "";
+        }
+        else {
+            fetch('/api/member/' + member + '/shares').then(function (response) {
+                response.json().then(function (data) {
+                    let optionHTML = '';
+                    for (let share of data.shares) {
+                        optionHTML += '<option value="' + share.id + '">' + share.share + '</option>';
+                    }
+                    share_select.innerHTML = optionHTML;
+                });
+            });
+        }
+    }
+    $(function() {
+        get_shares();
+        let member_select = document.getElementById('member');
+        member_select.onchange = get_shares;
+    })
+
+</script>
+{% endblock %}
+

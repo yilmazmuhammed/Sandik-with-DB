@@ -9,6 +9,7 @@ from datetime import date
 
 from database.dbinit import Member, Sandik, WebUser
 from views import LayoutPageInfo, get_translation
+from views.sandik.auxiliary import member_choices, all_share_choices
 
 
 # Normalde;
@@ -16,7 +17,7 @@ from views import LayoutPageInfo, get_translation
 class SelectField(SelectField):
     def iter_choices(self):
         for value, label in self.choices:
-            if self.coerce is int and not self.data:
+            if self.coerce is int and value == '':
                 yield (value, label, False)
             else:
                 yield (value, label, self.coerce(value) == self.data)
@@ -445,3 +446,30 @@ def select_form(form_name, tag, coerce, choices, id, submit_tag):
         submit = SubmitField(submit_tag, render_kw={"class": "btn btn-primary sandik-btn-form"})
 
     return SelectForm()
+
+
+class RemoveShareForm(FlaskForm):
+    t = get_translation()['forms']['remove_share']
+
+    open = form_open(form_name='remove_share-form')
+    close = form_close()
+
+    member = SelectField(
+        label="%s:" % t['member']['label'], validators=[InputRequired(t['member']['required'])],
+        choices=[('', '%s' % t['member']['select_choice'])], id='member', coerce=int,
+        render_kw={"class": "form-control"}
+    )
+
+    share = SelectField(
+        # label="%s:" % t['share']['label'], validators=[InputRequired(t['share']['required'])],
+        label="%s:" % t['share']['label'], validators=[InputRequired(t['share']['required'])],
+        choices=[], id='share', coerce=int,
+        render_kw={"class": "form-control"}
+    )
+
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+    def __init__(self, sandik_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.member.choices += member_choices(sandik_id)
+        self.share.choices += all_share_choices(sandik_id)

@@ -4,13 +4,14 @@ from pony.orm import db_session, ObjectNotFound
 
 from database.auxiliary import insert_share, OutstandingDebt, insert_sandik, insert_member_authority_type, insert_member
 from database.dbinit import Sandik, MemberAuthorityType, Member, WebUser
+from database.exceptions import ThereIsNotSandik, ThereIsNotShare, ThereIsNotMember
 from forms import SandikForm, FormPageInfo, MemberForm, AddingShareForm, MemberAuthorityTypeForm, DebtTypeForm, \
-    select_form, EditMemberForm, EditMemberSettingsForm
-from views import LayoutPageInfo
+    select_form, EditMemberForm, EditMemberSettingsForm, RemoveShareForm
+from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import SandikManagementPanel
 from views.sandik.db import add_member_to_sandik, add_member_authority_type_to_sandik, add_debt_type_to_sandik, \
-    remove_member_from_sandik
+    remove_member_from_sandik, remove_share_of_member_from_sandik
 from views.transaction.auxiliary import member_choices
 from views.webuser.auxiliary import SandikInfo
 
@@ -29,7 +30,7 @@ def new_sandik_page():
             admin_user = insert_member_authority_type(name='Sandık başkanı', max_number_of_members=1,
                                                       sandik_id=new_sandik.id, is_admin=True)
             insert_member_authority_type(name='Normal üye', max_number_of_members=0, sandik_id=new_sandik.id,
-                                         id=admin_user.id+1)
+                                         id=admin_user.id + 1)
 
             # Varsayılan olarak sandığı oluşturan kişiye sandık başkanı olarak üyelik oluşturulur.
             insert_member(username=current_user.webuser.username, sandik_id=new_sandik.id, authority_id=admin_user.id,
@@ -215,3 +216,30 @@ def remove_member_of_sandik_page(sandik_id):
 
     info = FormPageInfo(form=form, title='Select member to edit')
     return render_template("form.html", layout_page=LayoutPageInfo("Select member to remove"), info=info)
+
+
+@authorization_to_the_sandik_required(throwing_member=True)
+def remove_share_of_member_page(sandik_id):
+    t = get_translation()['views']['sandik']['remove_share_of_member_page']
+    form = RemoveShareForm(sandik_id=sandik_id)
+
+    if form.validate_on_submit():
+        share_id = form.share.data
+        member_id = form.member.data
+        try:
+            remove_share_of_member_from_sandik(share_id, member_id, sandik_id, current_user.username)
+            return redirect(url_for('members_page', sandik_id=sandik_id))
+        except ThereIsNotSandik as ex:
+            flash(u"Exception: %s" % ex, 'danger')
+        except ThereIsNotMember as ex:
+            flash(u"Exception: %s" % ex, 'danger')
+        except ThereIsNotShare as ex:
+            flash(u"Exception: %s" % ex, 'danger')
+        except OutstandingDebt as ex:
+            flash(u"Exception: %s" % ex, 'danger')
+        except Exception as ex:
+            flash(u"Unexpected exception: %s" % ex, 'danger')
+            print("Something else went wrong: ", ex)
+
+    info = FormPageInfo(form=form, title=t['title'])
+    return render_template("sandik/remove_share_form.html", layout_page=LayoutPageInfo(t['title']), info=info)
