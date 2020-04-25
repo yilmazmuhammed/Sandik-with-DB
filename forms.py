@@ -132,8 +132,10 @@ class EditWebUserForm(FlaskForm):
     surname = StringField("%s:" % t['surname']['label'],
                           validators=[Length(max=40, message=t['surname']['length'])],
                           id='surname', render_kw={"class": "form-control"})
-    telegram_chat_id = IntegerField("%s:" % t['telegram_chat_id']['label'], id='telegram_chat_id',
-                                    render_kw={"class": "form-control"})
+
+    telegram_chat_id = IntegerField("%s:" % t['telegram_chat_id']['label'], validators=[Optional()],
+                                    id='telegram_chat_id', render_kw={"class": "form-control"}
+                                    )
     submit = SubmitField("%s:" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 

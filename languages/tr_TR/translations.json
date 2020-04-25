@@ -106,7 +106,7 @@
         "required": "Parolanızı giriniz..."
       },
       "submit": {
-        "label": "Yeni Kullanıcı Ekle"
+        "label": "Güncelle"
       },
       "surname": {
         "label": "Soyisim",

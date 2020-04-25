@@ -102,9 +102,6 @@
         "length": "Password cannot be longer than 20 character",
         "required": "Please enter your password"
       },
-      "submit": {
-        "label": "Add New Webuser"
-      },
       "surname": {
         "label": "Surname",
         "length": "Surname field cannot be longer than 40 character"
