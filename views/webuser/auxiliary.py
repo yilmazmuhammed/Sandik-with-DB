@@ -56,7 +56,9 @@ class MemberInfo:
         self.remaining_debts = self.debts_received - self.paid_installments
         self.remaining_debts_with_types = {}
         for debt_type in share.member_ref.sandik_ref.debt_types_index:
-            self.remaining_debts_with_types[debt_type.id] = sum(s.remaining_debts_with_types[debt_type.id] for s in self.shares)
+            self.remaining_debts_with_types[debt_type.id] = sum(
+                s.remaining_debts_with_types[debt_type.id] for s in self.shares
+            )
 
 
 class ShareInfo:
@@ -84,3 +86,10 @@ class ShareInfo:
                                                                    and t.confirmed_by and not t.deleted_by
                                                                    ).sum()
             self.remaining_debts += self.remaining_debts_with_types[debt_type.id]
+
+
+def get_chat_ids_of_site_admins():
+    chat_ids = []
+    if WebUser['admin'].telegram_chat_id:
+        chat_ids.append(WebUser['admin'].telegram_chat_id)
+    return chat_ids

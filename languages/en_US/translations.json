@@ -342,6 +342,20 @@
         "title": "Remove share"
       }
     },
+    "transaction": {
+      "add_contribution_page": {
+        "bot_adding_message": "added contribution transaction. Transaction is waiting for confirm."
+      },
+      "add_debt_page": {
+        "bot_adding_message": "added debt transaction. Transaction is waiting for confirm."
+      },
+      "add_payment_page": {
+        "bot_adding_message": "added payment transaction. Transaction is waiting for confirm."
+      },
+      "add_transaction_page": {
+        "bot_adding_message": "added other transaction. Transaction is waiting for confirm."
+      }
+    },
     "webuser": {
       "add_webuser_page": {
         "passwords_not_same": "Passwords are not same.",

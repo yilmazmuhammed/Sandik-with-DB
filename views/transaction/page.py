@@ -19,12 +19,15 @@ from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid
     member_choices, Period, UnpaidDebt, local_name_surname
 from views.transaction.db import remove_transaction_vw
 import views.transaction.db as transaction_db
+from views.webuser.auxiliary import get_chat_ids_of_site_admins
 
 
 @login_required
 def add_transaction_page(sandik_id):
+    translation = get_translation()['views']['transaction']['add_transaction_page']
     with db_session:
         member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
+        sandik = Sandik[sandik_id]
 
         # If member is not in members of the sandik
         if not member:
@@ -39,6 +42,10 @@ def add_transaction_page(sandik_id):
         if form.validate_on_submit():
             try:
                 transaction_db.add_other_transaction(form, current_user.username)
+                telegram_bot.send_message_to_list(
+                    get_chat_ids_of_sandik_admins(sandik=sandik) + get_chat_ids_of_site_admins(),
+                    "*%s*\n%s %s" % (sandik.name, member.webuser_ref.name_surname(), translation['bot_adding_message'])
+                )
                 return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
             except NegativeTransaction as nt:
                 flash(u'%s' % nt, 'danger')
@@ -51,6 +58,7 @@ def add_transaction_page(sandik_id):
 
 @login_required
 def add_contribution_page(sandik_id):
+    translation = get_translation()['views']['transaction']['add_contribution_page']
     with db_session:
         member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
         sandik = Sandik[sandik_id]
@@ -70,8 +78,8 @@ def add_contribution_page(sandik_id):
             try:
                 transaction_db.add_contributions(form, current_user.username)
                 telegram_bot.send_message_to_list(
-                    get_chat_ids_of_sandik_admins(sandik=sandik),
-                    "*%s*\n%s aidat işlemi ekledi. İşlem onay bekliyor." % (sandik.name, member.webuser_ref.name_surname())
+                    get_chat_ids_of_sandik_admins(sandik=sandik) + get_chat_ids_of_site_admins(),
+                    "*%s*\n%s %s" % (sandik.name, member.webuser_ref.name_surname(), translation['bot_adding_message'])
                 )
                 return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
             except DuplicateContributionPeriod as dcp:
@@ -87,6 +95,7 @@ def add_contribution_page(sandik_id):
 
 @login_required
 def add_debt_page(sandik_id):
+    translation = get_translation()['views']['transaction']['add_debt_page']
     # TODO max amount borç tipine, içerdeki parasına ve diğer kurallara göre belirlenecek, burada da olabilir,
     #  formu aldıktan sonra da
     with db_session:
@@ -115,8 +124,8 @@ def add_debt_page(sandik_id):
             #  parasına göre en fazla borç)
             transaction_db.add_debt(form, current_user.username)
             telegram_bot.send_message_to_list(
-                get_chat_ids_of_sandik_admins(sandik=sandik),
-                "*%s*\n%s borç işlemi ekledi. İşlem onay bekliyor." % (sandik.name, member.webuser_ref.name_surname())
+                get_chat_ids_of_sandik_admins(sandik=sandik) + get_chat_ids_of_site_admins(),
+                "*%s*\n%s %s" % (sandik.name, member.webuser_ref.name_surname(), translation['bot_adding_message'])
             )
 
             return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
@@ -128,6 +137,7 @@ def add_debt_page(sandik_id):
 
 @login_required
 def add_payment_page(sandik_id):
+    translation = get_translation()['views']['transaction']['add_payment_page']
     with db_session:
         member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
         sandik = Sandik[sandik_id]
@@ -142,14 +152,17 @@ def add_payment_page(sandik_id):
         form.debt.choices = debt_choices(member)
 
         if form.validate_on_submit():
-            if Debt[form.debt.data].transaction_ref.share_ref.member_ref.webuser_ref.username != current_user.webuser.username:
+            member_of_debt = Debt[form.debt.data].transaction_ref.share_ref.member_ref
+            if member_of_debt.webuser_ref.username != current_user.webuser.username:
                 flash(u'Başka birisinin borcunu ödeyemezsiniz. Yöneticiye başvurunuz.', 'danger')
             else:
                 try:
                     transaction_db.add_payment(form, current_user.username)
                     telegram_bot.send_message_to_list(
-                        get_chat_ids_of_sandik_admins(sandik=sandik),
-                        "*%s*\n%s borç işlemi ekledi. İşlem onay bekliyor." % (sandik.name, member.webuser_ref.name_surname())
+                        get_chat_ids_of_sandik_admins(sandik=sandik) + get_chat_ids_of_site_admins(),
+                        "*%s*\n%s %s" % (
+                            sandik.name, member.webuser_ref.name_surname(), translation['bot_adding_message']
+                        )
                     )
                     return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
                 except Overpayment as op:

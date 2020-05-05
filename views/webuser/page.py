@@ -123,8 +123,8 @@ def edit_webuser_info_page():
             flash(u"%s" % t['new_passwords_not_same'], 'danger')
         else:
             try:
-                if form.username.data:
-                    webuser.username = form.username.data
+                # if form.username.data:
+                #     webuser.username = form.username.data
                 if form.name.data:
                     webuser.name = form.name.data
                 if form.surname.data:

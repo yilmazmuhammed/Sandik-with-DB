@@ -136,7 +136,7 @@ class EditWebUserForm(FlaskForm):
     telegram_chat_id = IntegerField("%s:" % t['telegram_chat_id']['label'], validators=[Optional()],
                                     id='telegram_chat_id', render_kw={"class": "form-control"}
                                     )
-    submit = SubmitField("%s:" % t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
+    submit = SubmitField(label=t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
 class LoginForm(FlaskForm):

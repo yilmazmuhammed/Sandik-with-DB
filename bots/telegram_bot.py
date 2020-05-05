@@ -12,8 +12,7 @@ class SandikTelegramBot(telegram.Bot):
         super().__init__(*args, **kwargs)
 
     def send_message_to_list(self, chat_ids: list, text, parse_mode='Markdown'):
-        self.send_message(chat_id=admin_chat_id, text=text, parse_mode=parse_mode)
-        for chat_id in chat_ids:
+        for chat_id in set(chat_ids):
             self.send_message(chat_id=chat_id, text=text, parse_mode=parse_mode)
 
 

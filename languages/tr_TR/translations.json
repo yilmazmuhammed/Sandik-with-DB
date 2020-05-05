@@ -352,6 +352,20 @@
         "title": "Hisse sil"
       }
     },
+    "transaction": {
+      "add_contribution_page": {
+        "bot_adding_message": "aidat işlemi ekledi. İşlem onay bekliyor."
+      },
+      "add_debt_page": {
+        "bot_adding_message": "borç işlemi ekledi. İşlem onay bekliyor."
+      },
+      "add_payment_page": {
+        "bot_adding_message": "ödeme işlemi ekledi. İşlem onay bekliyor."
+      },
+      "add_transaction_page": {
+        "bot_adding_message": "diğer işlemi ekledi. İşlem onay bekliyor."
+      }
+    },
     "webuser": {
       "add_webuser_page": {
         "passwords_not_same": "Parolanız ve parola doğrulamanız eşleşmiyor.",
