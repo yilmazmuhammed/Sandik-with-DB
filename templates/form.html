@@ -22,6 +22,20 @@
 
       window.onload = selectDefaultValues;
       {% endif %}
+
+      {% if request.endpoint == "fast_pay_page" %}
+        $(function() {
+            alert(  "Hızlı öde sayfası üyenin siteye girdikten sonra aidat ve taksitler için tek tek işlem eklemesine gerek kalmadan tek seferde hepsinin işlemini ekleyebilmesi için hazırlandı.\n" +
+                    "\n" +
+                    "Hızlı ödeme sayfasında sadece Tarih, İşlem Miktarı ve Açıklama kısımları bulunmaktadır. \n" +
+                    "- Üye miktarı girecek. Sistem de her hissenin aidatları ve taksitleri için işlemler oluşturacak ve üyenin onayına sunacak.\n" +
+                    "- Üye işlemleri onayladığı takdirde işlemler eklenmiş olacak. Üye otomatik oluşturulan işlemi kabul etmezse silebilecek.\n" +
+                    "- Eğer girilen miktar, üyenin o ayki ödemesi gereken miktardan fazla ise kalan miktar Diğer'e eklenecek.\n" +
+                    "\n" +
+                    "NOT: Üyenin işlemi mutlaka onaylaması gerekmektedir. Onaylama işlemi işlemi ekledikten sonra açılan sayfadaki yeşil tik işaretine basıldığında tamamlanır. Onaylanan işlemin tik işareti kalkar."
+            );
+        });
+      {% endif %}
     </script>
 {% endblock %}
 
