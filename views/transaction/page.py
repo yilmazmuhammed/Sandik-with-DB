@@ -1,6 +1,6 @@
 import json
 from copy import copy
-from datetime import date
+from datetime import date, datetime
 
 from flask import abort, redirect, url_for, render_template, flash, current_app
 from flask_login import login_required, current_user
@@ -10,8 +10,10 @@ import database.auxiliary as db_aux
 from bots.telegram_bot import telegram_bot
 from database.auxiliary import name_surname
 from database.dbinit import Member, Sandik, WebUser, Transaction, Debt, Share
-from database.exceptions import NegativeTransaction, DuplicateContributionPeriod, Overpayment
-from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm
+from database.exceptions import NegativeTransaction, DuplicateContributionPeriod, Overpayment, RemoveTransactionError, \
+    ConfirmTransactionError
+from forms import TransactionForm, FormPageInfo, ContributionForm, DebtForm, PaymentForm, CustomTransactionSelectForm, \
+    FastPayForm
 from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import get_chat_ids_of_sandik_admins
@@ -174,6 +176,39 @@ def add_payment_page(sandik_id):
                                info=info)
 
 
+@login_required
+@db_session
+def fast_pay_page(sandik_id):
+    translation = get_translation()['views']['transaction']['fast_pay_page']
+    sandik = Sandik[sandik_id]
+    member = Member.get(sandik_ref=sandik, webuser_ref=WebUser[current_user.username])
+    # If member is not in members of the sandik
+    if not member:
+        abort(404)
+
+    # Create fast_pay form
+    form = FastPayForm()
+
+    if form.validate_on_submit():
+        try:
+            explanation = "%s (%s)" % (form.explanation.data, translation['explanation'])
+            transaction_db.fast_pay_to_member(amount=form.amount.data,
+                                              created_by_username=current_user.username, creation_time=None,
+                                              member=member,
+                                              explanation=explanation
+                                              )
+            telegram_bot.send_message_to_list(
+                get_chat_ids_of_sandik_admins(sandik=sandik) + get_chat_ids_of_site_admins(),
+                "*%s*\n%s %s" % (sandik.name, member.webuser_ref.name_surname(), translation['bot_adding_message'])
+            )
+            return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+        except Exception as e:
+            flash(u'Unexpected exception - %s:' % e, 'danger')
+
+    info = FormPageInfo(form=form, title=translation['page_title'])
+    return render_template('form.html', layout_page=info, info=info)
+
+
 @authorization_to_the_sandik_required(writing_transaction=True)
 def add_custom_transaction_for_admin_page(sandik_id):
     with db_session:
@@ -321,6 +356,7 @@ def unpaid_transactions_page(sandik_id):
             flash(u"Bu sandığın üyesi değilsiniz.", 'danger')
             return current_app.login_manager.unauthorized()
         is_autrorized = is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True)
+        # TODO name_surname ile dene
         member_list = sandik.members_index.sort_by(lambda m: m.webuser_ref.name + " " + m.webuser_ref.surname) if is_autrorized else [member]
 
         unpaid_contributions = {}
@@ -463,17 +499,22 @@ def member_unconfirmed_transactions_page(sandik_id):
 # TODO islem sandıkta mı diye kontrol et
 @authorization_to_the_sandik_required(is_admin=True)
 def confirm_transaction(sandik_id, transaction_id):
+    translation = get_translation()['views']['transaction']['confirm_transaction']
     with db_session:
         transaction = Transaction[transaction_id]
 
         if transaction.deleted_by:
-            flash(u"%s" % get_translation()['unconfirmed']['deleted'], 'danger')
+            flash(u"%s" % translation['deleted'], 'danger')
             return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+        elif not transaction.creation_time:
+            flash(u"%s" % translation['not_creation_time'], 'danger')
+            return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+        # TODO t.share_ref == transaction.share_ref yerine Transaction->t.share_ref.transaction_index
         elif transaction.id != select(t.id for t in Transaction
                                       if t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by
                                       and not t.deleted_by and t.share_ref == transaction.share_ref
                                       and t.transaction_date <= date.today()).min():
-            flash(u"%s" % get_translation()['unconfirmed']['not_first_transaction'], 'danger')
+            flash(u"%s" % translation['not_first_transaction'], 'danger')
             return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
 
         if transaction.payment_ref:
@@ -496,3 +537,45 @@ def confirm_transaction(sandik_id, transaction_id):
                 flash(u'%s' % nt, 'danger')
 
     return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
+
+
+@login_required
+@db_session
+def member_delete_transaction(sandik_id, transaction_id):
+    translation = get_translation()['views']['transaction']['member_delete_transaction']
+    member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
+    transaction = Transaction[transaction_id]
+
+    try:
+        if transaction.share_ref.member_ref != member:
+            raise RemoveTransactionError(translation['not_your_transaction'])
+        elif transaction.confirmed_by:
+            raise RemoveTransactionError(translation['confirmed'])
+        db_aux.remove_transaction(transaction_id, current_user.username)
+    except RemoveTransactionError as rte:
+        flash(u'%s' % rte, 'danger')
+        return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction_id))
+
+    return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+
+
+@login_required
+@db_session
+def member_confirm_transaction(sandik_id, transaction_id):
+    translation = get_translation()['views']['transaction']['member_confirm_transaction']
+    member = Member.get(sandik_ref=Sandik[sandik_id], webuser_ref=WebUser[current_user.username])
+    transaction = Transaction[transaction_id]
+
+    try:
+        if transaction.share_ref.member_ref != member:
+            raise ConfirmTransactionError(translation['not_your_transaction'])
+        elif transaction.confirmed_by or transaction.creation_time:
+            raise ConfirmTransactionError(translation['confirmed'])
+        elif transaction.deleted_by:
+            raise ConfirmTransactionError(translation['deleted'])
+    except ConfirmTransactionError as cte:
+        flash(u'%s' % cte, 'danger')
+        return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+
+    transaction.creation_time = datetime.now()
+    return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))

@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
 from flask import flash
-from pony.orm import db_session, count, select
+from pony.orm import db_session, count, select, commit
 
 from database.dbinit import Debt, Transaction, Share, DebtType, Payment, Contribution, WebUser, Sandik, \
     MemberAuthorityType, Member
@@ -47,6 +47,7 @@ def insert_payment(in_date, amount, explanation,
                    debt_id=None, transaction_id=None, id=None,
                    creation_time=datetime.now(), confirmion_time=None, deletion_time=None
                    ):
+    commit()
     id = id if id is not None else select(t.id for t in Transaction).max() + 1
     debt = Debt[debt_id] if debt_id else Debt.get(transaction_ref=Transaction[transaction_id])
     share = debt.transaction_ref.share_ref

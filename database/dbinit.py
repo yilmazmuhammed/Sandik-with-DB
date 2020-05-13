@@ -50,6 +50,9 @@ class Member(db.Entity):
     # PrimaryKey(webuser_ref, sandik_ref)   # TODO
     composite_key(webuser_ref, sandik_ref)
 
+    def main_share(self):
+        return select(share for share in self.shares_index.order_by(Share.share_order_of_member))[:][0]
+
 
 class Share(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -78,7 +81,7 @@ class Transaction(db.Entity):
     payment_ref = Optional('Payment')
     debt_ref = Optional('Debt')
     created_by = Required(WebUser, reverse='created_transactions')
-    creation_time = Required(datetime)
+    creation_time = Optional(datetime)
     confirmed_by = Optional(WebUser, reverse='confirmed_transactions')
     confirmion_time = Optional(datetime)
     deleted_by = Optional(WebUser, reverse='deleted_transactions')

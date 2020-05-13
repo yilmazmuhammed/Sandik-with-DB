@@ -380,6 +380,18 @@ class PaymentForm(TransactionForm):
     submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
 
 
+class FastPayForm(TransactionForm):
+    t = get_translation()['forms']['fast_pay']
+
+    open = form_open(form_name='fast_pay-form')
+    close = form_close()
+
+    share = None
+
+    # TODO use super()
+    submit = SubmitField(t['submit']['label'], render_kw={"class": "btn btn-primary sandik-btn-form"})
+
+
 class CustomTransactionSelectForm(FlaskForm):
     t = get_translation()['forms']['custom_transactin']
 

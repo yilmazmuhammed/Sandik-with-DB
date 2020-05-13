@@ -18,10 +18,8 @@
                                 <th>{{translation['transactions']['share']}}</th>
                                 <th>{{translation['transactions']['type']}}</th>
                                 <th>{{translation['transactions']['explanation']}}</th>
-                                {% if is_authorized %}
                                 <th></th>
                                 <th></th>
-                                {% endif %}
                            </tr>
                         </thead>
                         <tbody>
@@ -34,8 +32,11 @@
                                 <td>{{ t.type.capitalize() }} {% if t.debt_ref %} - {{ t.debt_ref.debt_type_ref.name }}{% endif %} </td>
                                 <td>{{ t.explanation }}</td>
                                 {% if is_authorized %}
-                                <td><a href="{{url_for('confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a></td>
+                                <td>{% if t.creation_time %}<a href="{{url_for('confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a>{% endif %}</td>
                                 <td><a href="{{url_for('delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a></td>
+                                {% else %}
+                                <td>{% if not t.creation_time %}<a href="{{url_for('member_confirm_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-success btn-xs"><em class="glyphicon glyphicon-ok"></em></a>{% endif %}</td>
+                                <td><a href="{{url_for('member_delete_transaction', sandik_id=t.share_ref.member_ref.sandik_ref.id, transaction_id=t.id)}}" class="btn btn-danger btn-xs"><em class="glyphicon glyphicon-trash"></em></a></td>
                                 {% endif %}
                             </tr>
                         {% endfor %}

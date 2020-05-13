@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import date
 
 from pony.orm import select, db_session
@@ -36,13 +37,54 @@ def unpaid_dues_choices(member: Member, only_active_shares=True, is_there_old=Fa
             all_periods = Period.all_months_from_date(share.date_of_opening)
 
         for period in select(c.contribution_period for c in Contribution
-                             if c.transaction_ref.share_ref == share
-                             and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by):
+                             if c.transaction_ref.share_ref == share and c.transaction_ref.is_valid()
+                             ):
             if period in all_periods:
                 all_periods.remove(period)
 
-        ret_list[share.id] = [(l, '%s %s' % (month_names[int(l[5:])], l[:4]),) for l in all_periods]
+        ret_list[share.id] = [(period, '%s %s' % (month_names[int(period[5:])], period[:4]),) for period in all_periods]
     return ret_list
+
+
+def unpaid_installment(share_id=None, share=None, is_there_future=False):
+    """
+    :param share_id: id of the share whose installments are sought
+    :param share: the share whose installments are sought
+    :param is_there_future: List the installments that are not due?
+    :return: a dictionary whose keys are periods
+             and there is list of installments of this periods in every keys (periods)
+             example: {'period1': [UnpaidDebt], 'period2': [UnpaidDebt, UnpaidDebt]}
+    """
+    share = share if share else Share[share_id]
+
+    unpaid_debts = select(transaction.debt_ref for transaction in share.transactions_index
+                          if transaction.debt_ref and transaction.is_valid() and transaction.debt_ref.remaining_debt
+                          )[:]
+
+    unpaid_installments = {}
+    for debt in unpaid_debts:
+        first_unpaid_period = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
+        last_wanted_period = debt.due_period if is_there_future else Period.period_of_this_month()
+
+        if not Period.compare(last_wanted_period, first_unpaid_period):
+            continue
+
+        installment_iter = UnpaidDebt(debt)
+        for period in Period.months_between_two_period(first_unpaid_period, last_wanted_period):
+            new_installment = copy(installment_iter)
+
+            if unpaid_installments.get(period):
+                unpaid_installments[period].append(new_installment)
+            else:
+                unpaid_installments[period] = [new_installment]
+
+            installment_iter.pay_installment()
+
+    sorted_unpaid_installments = {}
+    for period in sorted(unpaid_installments.keys(), key=lambda k: int(k[:4])*12+int(k[5:])):
+        sorted_unpaid_installments[period] = unpaid_installments[period]
+
+    return sorted_unpaid_installments
 
 
 def unpaid_contribution_periods(share_id=None, share=None, is_there_old=False):
@@ -51,12 +93,11 @@ def unpaid_contribution_periods(share_id=None, share=None, is_there_old=False):
         all_periods = Period.all_months_from_date(share.member_ref.sandik_ref.date_of_opening)
     else:
         all_periods = Period.all_months_from_date(share.date_of_opening)
-    for period in select(c.contribution_period for c in Contribution
-                         if c.transaction_ref.share_ref == share and c.transaction_ref.is_valid()
-                         ):
-        if period in all_periods:
-            all_periods.remove(period)
-    return all_periods
+    paid_periods = select(c.contribution_period for c in Contribution
+                          if c.transaction_ref.share_ref == share and c.transaction_ref.is_valid()
+                          )[:]
+
+    return [period for period in all_periods if period not in paid_periods]
 
 
 def share_choices(member, only_active_shares=True):
@@ -173,10 +214,18 @@ class Period:
 
     @staticmethod
     def compare(after, before):
+        """
+        :param after:
+        :param before:
+        :return: after >= before -> True
+                 after < before  -> False
+        """
+
         a_year = int(after[:4])
         a_month = int(after[5:])
         b_year = int(before[:4])
         b_month = int(before[5:])
+
         if a_year > b_year:
             return True
         elif a_year < b_year:
@@ -191,14 +240,21 @@ class UnpaidDebt:
     def __init__(self, debt: Debt):
         self.debt = debt
         self.debt_id = debt.id
-        self.name_surname_share = local_name_surname(share=debt.transaction_ref.share_ref) + " - " + str(
-            debt.transaction_ref.share_ref.share_order_of_member)
-        self.order_of_installment = debt.paid_installment
+        # self.name_surname_share = local_name_surname(share=debt.transaction_ref.share_ref) + " - " + str(
+        #     debt.transaction_ref.share_ref.share_order_of_member)
+        self.name_surname_share = debt.transaction_ref.share_ref.name_surname_share()
+        self.order_of_installment = debt.paid_installment + 1
         self.number_of_installment = debt.number_of_installment
         self.installment_amount = debt.installment_amount
         self.installment_amount_of_this_period = debt.remaining_debt - \
                                                  (debt.remaining_installment - 1) * debt.installment_amount
         self.debt_type = debt.debt_type_ref.name
+        self.period = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
+
+    def pay_installment(self):
+        self.installment_amount_of_this_period = self.installment_amount
+        self.order_of_installment += 1
+        self.period = Period.last_period_2(self.period, 1)
 
 
 @db_session

@@ -114,6 +114,11 @@
         "length": "Username cannot be longer than 20 character"
       }
     },
+    "fast_pay": {
+      "submit": {
+        "label": "Fast Pay"
+      }
+    },
     "login": {
       "password": {
         "label": "Password",
@@ -354,6 +359,17 @@
       },
       "add_transaction_page": {
         "bot_adding_message": "added other transaction. Transaction is waiting for confirm."
+      },
+      "confirm_transaction": {
+        "deleted": "Deleted transaction cannot be confirmed.",
+        "not_first_transaction": "There is transaction"
+      },
+      "fast_pay_page": {
+        "explanation": "Fast pay",
+        "page_title": "Fast Pay"
+      },
+      "member_confirm_transaction": {
+        "deleted": "Deleted transaction cannot be confirmed."
       }
     },
     "webuser": {

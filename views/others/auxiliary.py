@@ -29,11 +29,18 @@ def set_translation():
     print("set_translation:", language)
     # TODO is None or in not LANGUAGES
     select_translation = {}
-    if language is not None:
-        with open('languages/%s/translations.json' % language, 'r') as f:
-            select_translation = json.load(f)
-    with open('languages/%s/translations.json' % default_language, 'r') as f:
-        translation = json.load(f)
+    try:
+        if language is not None:
+            with open('languages/%s/translations.json' % language, 'r') as f:
+                select_translation = json.load(f)
+        with open('languages/%s/translations.json' % default_language, 'r') as f:
+            translation = json.load(f)
+    except FileNotFoundError:
+        if language is not None:
+            with open('../languages/%s/translations.json' % language, 'r') as f:
+                select_translation = json.load(f)
+        with open('../languages/%s/translations.json' % default_language, 'r') as f:
+            translation = json.load(f)
     translation.update(select_translation)
     return translation
 

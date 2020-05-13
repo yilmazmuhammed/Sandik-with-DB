@@ -120,6 +120,11 @@
         "length": "Kullanıcı adı 20 karakterden fazla olamaz..."
       }
     },
+    "fast_pay": {
+      "submit": {
+        "label": "Hızlı Öde"
+      }
+    },
     "login": {
       "password": {
         "label": "Parola",
@@ -240,6 +245,7 @@
         "payment": "Ödeme ekle"
       },
       "admin_panel": "Yönetici Paneli",
+      "fast_pay": "Hızlı Öde",
       "final_situation": "Son mali durum",
       "login": "Giriş Yap",
       "logout": "Çıkış",
@@ -364,6 +370,25 @@
       },
       "add_transaction_page": {
         "bot_adding_message": "diğer işlemi ekledi. İşlem onay bekliyor."
+      },
+      "confirm_transaction": {
+        "deleted": "Silinmiş işlem onaylanamaz.",
+        "not_creation_time": "Oluşturulma zamanı olmayan işlem onaylanamaz.",
+        "not_first_transaction": "Hissenin daha önce eklenmiş ve onaylanmamış işlemi var."
+      },
+      "fast_pay_page": {
+        "bot_adding_message": "hızlı ödeme yaptı. İşlem üye onayı bekliyor.",
+        "explanation": "Hızlı ödeme",
+        "page_title": "Hızlı Öde"
+      },
+      "member_confirm_transaction": {
+        "confirmed": "Onaylanmış işlemi tekrar onaylayamazsın.",
+        "deleted": "Silinmiş işlem onaylanamaz.",
+        "not_your_transaction": "Kendinin olmayan işlemi onaylayamazsın!"
+      },
+      "member_delete_transaction": {
+        "confirmed": "Yönetici tarafından onaylanmış işlemi silemezsin.",
+        "not_your_transaction": "Kendinin olmayan işlemi silemezsin!"
       }
     },
     "webuser": {

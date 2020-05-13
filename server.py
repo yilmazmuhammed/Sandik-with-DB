@@ -77,11 +77,18 @@ def create_sandik_app():
                      view_func=transaction_page.add_payment_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/cm/add-transaction",
                      view_func=transaction_page.add_transaction_page, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/cm/fast-pay",
+                     view_func=transaction_page.fast_pay_page, methods=["GET", "POST"])
     app.add_url_rule("/sandik/<int:sandik_id>/cm/unconfirmed-transactions",
                      view_func=transaction_page.member_unconfirmed_transactions_page)
     app.add_url_rule("/sandik/<int:sandik_id>/cm/unpaid", view_func=transaction_page.unpaid_transactions_of_member_page)
     app.add_url_rule("/sandik/<int:sandik_id>/cm/member_settings",
                      view_func=sandik.edit_member_settings_in_the_sandik, methods=["GET", "POST"])
+    app.add_url_rule("/sandik/<int:sandik_id>/transactions/<int:transaction_id>/cm_delete",
+                     view_func=transaction_page.member_delete_transaction)
+    app.add_url_rule("/sandik/<int:sandik_id>/transactions/<int:transaction_id>/cm_confirm",
+                     view_func=transaction_page.member_confirm_transaction)
+
     # Sandık harici şeyler
     app.add_url_rule("/zoom_video_indir", view_func=zoom_video_indir, methods=["GET", "POST"])
 
