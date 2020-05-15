@@ -18,7 +18,7 @@ from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import get_chat_ids_of_sandik_admins
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
-    member_choices, Period, UnpaidDebt, local_name_surname
+    member_choices, Period, UnpaidDebt, local_name_surname, unpaid_installments_of_member
 from views.transaction.db import remove_transaction_vw
 import views.transaction.db as transaction_db
 from views.webuser.auxiliary import get_chat_ids_of_site_admins
@@ -424,21 +424,7 @@ def unpaid_transactions_of_member_page(sandik_id):
             else:
                 unpaid_contributions[due[0]] = [(Share[share], name_surname(share_id=share))]
 
-    unpaid_payments = {}
-    for debt in select(debt for debt in Debt
-                       if debt.transaction_ref.share_ref.member_ref == member and debt.remaining_debt and
-                          debt.transaction_ref.is_valid()
-                       ).sort_by(lambda d: d.transaction_ref.share_ref.name_surname_share())[:]:
-        unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
-        add_debt = UnpaidDebt(debt)
-        for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
-            add_debt.order_of_installment += 1
-            x = copy(add_debt)
-            add_debt.installment_amount_of_this_period = add_debt.debt.installment_amount
-            if unpaid_payments.get(period):
-                unpaid_payments[period].append(x)
-            else:
-                unpaid_payments[period] = [x]
+    unpaid_payments = unpaid_installments_of_member(member=member, is_there_future=True)
 
     periods = []
     for ekle in list(set(list(unpaid_contributions.keys()) + list(unpaid_payments.keys()))):

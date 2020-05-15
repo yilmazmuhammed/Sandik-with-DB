@@ -87,6 +87,25 @@ def unpaid_installment(share_id=None, share=None, is_there_future=False):
     return sorted_unpaid_installments
 
 
+def unpaid_installments_of_member(member_id=None, member=None, is_there_future=False):
+    member = member if member else Member[member_id]
+
+    unpaid_installments = {}
+    for share in member.shares_index.select(lambda s: s.is_active):
+        temp = unpaid_installment(share=share, is_there_future=is_there_future)
+        for key, value in temp.items():
+            if unpaid_installments.get(key):
+                unpaid_installments[key] += temp[key]
+            else:
+                unpaid_installments[key] = temp[key]
+
+    sorted_unpaid_installments = {}
+    for period in sorted(unpaid_installments.keys(), key=lambda k: int(k[:4]) * 12 + int(k[5:])):
+        sorted_unpaid_installments[period] = unpaid_installments[period]
+
+    return sorted_unpaid_installments
+
+
 def unpaid_contribution_periods(share_id=None, share=None, is_there_old=False):
     share = share if share else Share[share_id]
     if is_there_old:
