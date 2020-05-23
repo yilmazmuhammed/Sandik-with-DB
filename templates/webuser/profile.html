@@ -75,11 +75,11 @@
                     {% set transaction_page_url = transaction_page_url + "?share=" + member.dbTable.webuser_ref.name + " " + member.dbTable.webuser_ref.surname + " - " + share.dbTable.share_order_of_member|string %}
                     <tr class="{% if not share.is_active %}passive-share{% endif %}">
                       <td>{{ share.dbTable.share_order_of_member }}</td>
-                      <td>{{ share.paid_contributions }}</td>
-                      <td>{{ share.debts_received }}</td>
-                      <td>{{ share.paid_installments }}</td>
-                      <td>{{ share.others }}</td>
-                      <td style="color:red;" data-container="body"  data-html="true" data-toggle="tooltip" data-placement="top" title="{% for type in member.dbTable.sandik_ref.debt_types_index %}{{type.name}}:{{share.remaining_debts_with_types[type.id]}}<br>{% endfor %}">{{ share.remaining_debts }}</td>
+                      <td>{{ '{:,}'.format(share.paid_contributions) }}</td>
+                      <td>{{ '{:,}'.format(share.debts_received) }}</td>
+                      <td>{{ '{:,}'.format(share.paid_installments) }}</td>
+                      <td>{{ '{:,}'.format(share.others) }}</td>
+                      <td style="color:red;" data-container="body"  data-html="true" data-toggle="tooltip" data-placement="top" title="{% for type in member.dbTable.sandik_ref.debt_types %}{{type.name}}:{{'{:,}'.format(share.remaining_debts_with_types[type.id])}}<br>{% endfor %}">{{ '{:,}'.format(share.remaining_debts) }}</td>
                       <td align="center">
                         <a href="{{ transaction_page_url }}" class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                       </td>
@@ -87,11 +87,11 @@
                     {% endfor %}
                     <tr>
                       <td>Toplam</td>
-                      <td>{{ member.paid_contributions }}</td>
-                      <td>{{ member.debts_received }}</td>
-                      <td>{{ member.paid_installments }}</td>
-                      <td>{{ member.others }}</td>
-                      <td style="color:red;" data-container="body"  data-html="true" data-toggle="tooltip" data-placement="top" title="{% for type in member.dbTable.sandik_ref.debt_types_index %}{{type.name}}:{{member.remaining_debts_with_types[type.id]}}<br>{% endfor %}">{{ member.remaining_debts }}</td>
+                      <td>{{ '{:,}'.format(member.paid_contributions) }}</td>
+                      <td>{{ '{:,}'.format(member.debts_received) }}</td>
+                      <td>{{ '{:,}'.format(member.paid_installments) }}</td>
+                      <td>{{ '{:,}'.format(member.others) }}</td>
+                      <td style="color:red;" data-container="body"  data-html="true" data-toggle="tooltip" data-placement="top" title="{% for type in member.dbTable.sandik_ref.debt_types %}{{type.name}}:{{'{:,}'.format(member.remaining_debts_with_types[type.id])}}<br>{% endfor %}">{{ '{:,}'.format(member.remaining_debts) }}</td>
                       <td align="center">
                         <a class="btn btn-primary btn-xs"><em class="fa fa-search"></em></a>
                       </td>

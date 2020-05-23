@@ -356,25 +356,24 @@ def unpaid_transactions_page(sandik_id):
             flash(u"Bu sandığın üyesi değilsiniz.", 'danger')
             return current_app.login_manager.unauthorized()
         is_autrorized = is_there_authorization_to_the_sandik(sandik_id, reading_transaction=True)
-        # TODO name_surname ile dene
-        member_list = sandik.members_index.sort_by(lambda m: m.webuser_ref.name + " " + m.webuser_ref.surname) if is_autrorized else [member]
+        member_list = sandik.members_index.sort_by(lambda m: m.webuser_ref.name_surname()) if is_autrorized else [member]
 
         unpaid_contributions = {}
         for member in member_list:
             unpaid_dues = unpaid_dues_choices(member)
-            for share in unpaid_dues:
-                for due in unpaid_dues[share]:
+            for share_id in unpaid_dues:
+                for due in unpaid_dues[share_id]:
+                    share = Share[share_id]
                     if unpaid_contributions.get(due[0]):
-                        unpaid_contributions[due[0]].append((Share[share], name_surname(share_id=share)))
+                        unpaid_contributions[due[0]].append((Share[share_id], share.name_surname_share()))
                     else:
-                        unpaid_contributions[due[0]] = [(Share[share], name_surname(share_id=share))]
+                        unpaid_contributions[due[0]] = [(Share[share_id], share.name_surname_share())]
 
         unpaid_payments = {}
         for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref in member_list
                                                     and debt.remaining_debt and debt.transaction_ref.confirmed_by
                                                     and not debt.transaction_ref.deleted_by).sort_by(lambda
-                                                                                                             d: d.transaction_ref.share_ref.member_ref.webuser_ref.name + " " + d.transaction_ref.share_ref.member_ref.webuser_ref.surname + " " + str(
-            d.transaction_ref.share_ref.share_order_of_member))[:]:
+                                                                                                             d: d.transaction_ref.share_ref.name_surname_share())[:]:
             unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
             add_debt = UnpaidDebt(debt)
             for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
