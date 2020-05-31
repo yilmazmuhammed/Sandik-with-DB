@@ -256,7 +256,7 @@ class csv_list_backup:
             line += "%s;" % (t.created_by.username,)
             line += "%s;" % (t.confirmed_by.username if t.confirmed_by else "",)
             line += "%s;" % (t.deleted_by.username if t.deleted_by else "",)
-            line += "%s;" % (t.creation_time.strftime("%Y-%m-%d %H:%M:%S"),)
+            line += "%s;" % (t.creation_time.strftime("%Y-%m-%d %H:%M:%S") if t.creation_time else "",)
             line += "%s;" % (t.confirmion_time.strftime("%Y-%m-%d %H:%M:%S") if t.confirmion_time else "",)
             line += "%s" % (t.deletion_time.strftime("%Y-%m-%d %H:%M:%S") if t.deletion_time else "",)
             liste.append(line)

@@ -17,7 +17,7 @@ def unpaid_dues(member, only_active_shares=True, is_there_old=False):
 
         for period in select(c.contribution_period for c in Contribution
                              if c.transaction_ref.share_ref == share
-                             and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by):
+                                and c.transaction_ref.confirmed_by and not c.transaction_ref.deleted_by):
             if period in all_periods:
                 all_periods.remove(period)
         ret_list[share.id] = all_periods
@@ -81,7 +81,7 @@ def unpaid_installment(share_id=None, share=None, is_there_future=False):
             installment_iter.pay_installment()
 
     sorted_unpaid_installments = {}
-    for period in sorted(unpaid_installments.keys(), key=lambda k: int(k[:4])*12+int(k[5:])):
+    for period in sorted(unpaid_installments.keys(), key=lambda k: int(k[:4]) * 12 + int(k[5:])):
         sorted_unpaid_installments[period] = unpaid_installments[period]
 
     return sorted_unpaid_installments
@@ -254,24 +254,43 @@ class Period:
         else:
             return False
 
+        # return True if a_year*12+a_month >= b_year*12+b_month else False
+
 
 class UnpaidDebt:
     def __init__(self, debt: Debt):
         self.debt = debt
         self.debt_id = debt.id
-        # self.name_surname_share = local_name_surname(share=debt.transaction_ref.share_ref) + " - " + str(
-        #     debt.transaction_ref.share_ref.share_order_of_member)
         self.name_surname_share = debt.transaction_ref.share_ref.name_surname_share()
         self.order_of_installment = debt.paid_installment + 1
         self.number_of_installment = debt.number_of_installment
         self.installment_amount = debt.installment_amount
-        self.installment_amount_of_this_period = debt.remaining_debt - \
-                                                 (debt.remaining_installment - 1) * debt.installment_amount
+        # self.installment_amount_of_this_period = debt.remaining_debt - \
+        #                                          (debt.remaining_installment - 1) * debt.installment_amount
+
+        self.remaining_debt_before_this_period = debt.remaining_debt
+        self.remaining_installment_before_this_period = debt.remaining_installment
+        ia = int(debt.transaction_ref.amount) / self.number_of_installment
+        iaotp = self.remaining_debt_before_this_period - (self.remaining_installment_before_this_period - 1) * ia
+        iaotp = int(iaotp) if iaotp % 1 == 0 else int(iaotp) + 1
+        self.installment_amount_of_this_period = iaotp
+
         self.debt_type = debt.debt_type_ref.name
         self.period = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
 
     def pay_installment(self):
-        self.installment_amount_of_this_period = self.installment_amount
+        # self.installment_amount_of_this_period = self.installment_amount
+
+        self.remaining_debt_before_this_period -= self.installment_amount_of_this_period
+        self.remaining_installment_before_this_period -= 1
+        if self.remaining_installment_before_this_period != 1:
+            self.installment_amount_of_this_period = self.installment_amount
+        else:
+            ia = int(self.debt.transaction_ref.amount) / self.number_of_installment
+            iaotp = self.remaining_debt_before_this_period - (self.remaining_installment_before_this_period - 1) * ia
+            iaotp = int(iaotp) if iaotp % 1 == 0 else int(iaotp) + 1
+            self.installment_amount_of_this_period = iaotp
+
         self.order_of_installment += 1
         self.period = Period.last_period_2(self.period, 1)
 
