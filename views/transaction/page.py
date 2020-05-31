@@ -1,5 +1,4 @@
 import json
-from copy import copy
 from datetime import date, datetime
 
 from flask import abort, redirect, url_for, render_template, flash, current_app
@@ -369,24 +368,38 @@ def unpaid_transactions_page(sandik_id):
                     else:
                         unpaid_contributions[due[0]] = [(Share[share_id], share.name_surname_share())]
 
-        unpaid_payments = {}
-        for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref in member_list
-                                                    and debt.remaining_debt and debt.transaction_ref.confirmed_by
-                                                    and not debt.transaction_ref.deleted_by).sort_by(lambda
-                                                                                                             d: d.transaction_ref.share_ref.name_surname_share())[:]:
-            unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
-            add_debt = UnpaidDebt(debt)
-            for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
-                add_debt.order_of_installment += 1
-                x = copy(add_debt)
-                add_debt.installment_amount_of_this_period = add_debt.debt.installment_amount
-                if unpaid_payments.get(period):
-                    unpaid_payments[period].append(x)
+        # unpaid_payments = {}
+        # for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref in member_list
+        #                                             and debt.remaining_debt and debt.transaction_ref.confirmed_by
+        #                                             and not debt.transaction_ref.deleted_by).sort_by(lambda
+        #                                                                                                      d: d.transaction_ref.share_ref.name_surname_share())[:]:
+        #     unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
+        #     add_debt = UnpaidDebt(debt)
+        #     for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
+        #         add_debt.order_of_installment += 1
+        #         x = copy(add_debt)
+        #         add_debt.installment_amount_of_this_period = add_debt.debt.installment_amount
+        #         if unpaid_payments.get(period):
+        #             unpaid_payments[period].append(x)
+        #         else:
+        #             unpaid_payments[period] = [x]
+
+        unpaid_installments = {}
+        for member in select(member for member in sandik.members_index if member.is_active).sort_by(lambda m: m.webuser_ref.name_surname()):
+            temp = unpaid_installments_of_member(member=member, is_there_future=True)
+            for key, value in temp.items():
+                if unpaid_installments.get(key):
+                    unpaid_installments[key] += temp[key]
                 else:
-                    unpaid_payments[period] = [x]
+                    unpaid_installments[key] = temp[key]
+
+        sorted_unpaid_installments = {}
+        for period in sorted(unpaid_installments.keys(), key=lambda k: int(k[:4]) * 12 + int(k[5:])):
+            # unpaid_installments[period].sort(key=operator.attrgetter('name_surname_share'))
+            sorted_unpaid_installments[period] = unpaid_installments[period]
 
         periods = []
-        for ekle in list(set(list(unpaid_contributions.keys()) + list(unpaid_payments.keys()))):
+        for ekle in list(set(list(unpaid_contributions.keys()) + list(unpaid_installments.keys()))):
             if len(periods) == 0:
                 periods.append((ekle, Period.period_name(ekle),))
             else:
@@ -401,7 +414,7 @@ def unpaid_transactions_page(sandik_id):
 
         return render_template("transaction/unpaid_transactions.html",
                                layout_page=LayoutPageInfo("Unpaid transactions"), periods=periods,
-                               contributions=unpaid_contributions, payments=unpaid_payments)
+                               contributions=unpaid_contributions, payments=unpaid_installments)
 
 
 @login_required
