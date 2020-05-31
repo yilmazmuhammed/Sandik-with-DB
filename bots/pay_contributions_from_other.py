@@ -81,5 +81,5 @@ def pay_automatic_instructions_in_website():
 
 
 if __name__ == "__main__":
-    if date.today().day == 1:
-        pay_all_contributions_in_website()
+    if date.today().day in [1, 25]:
+        pay_automatic_instructions_in_website()
