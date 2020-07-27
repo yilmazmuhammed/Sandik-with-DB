@@ -118,7 +118,7 @@ def add_debt_page(sandik_id):
 
         # TODO taksit sayısı borç tipine ve miktarına göre değiş
         # Add number of installment range to form.number_of_installment
-        form.number_of_installment.choices += [(i, i) for i in range(1, 13)]
+        form.number_of_installment.choices += [(i, i) for i in range(1, 16)]
 
         if form.validate_on_submit():
             # TODO kontrolleri yap, (borcu varsa bir daha alamaz[sayfaya giriş de engellenebilir], en fazla taksit,
@@ -246,7 +246,7 @@ def add_custom_transaction_for_admin_page(sandik_id):
 
         # TODO taksit sayısı borç tipine ve miktarına göre değiş
         # Add number of installment range to d_form.number_of_installment
-        d_form.number_of_installment.choices += [(i, i) for i in range(1, 13)]
+        d_form.number_of_installment.choices += [(i, i) for i in range(1, 16)]
 
         if c_form.validate_on_submit():
             try:
