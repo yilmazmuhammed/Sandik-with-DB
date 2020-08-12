@@ -182,7 +182,7 @@ def insert_webuser(username, password_hash, date_of_registration: date = date.to
 
 
 @db_session
-def insert_member(username, sandik_id, authority_id, do_pay_contributions_automatically,
+def insert_member(username, sandik_id, authority_id, do_pay_contributions_automatically=False,
                   date_of_membership: date = date.today(), is_active: bool = True, id=None):
     id = id if id is not None else select(m.id for m in Member).max() + 1
     sandik = Sandik[sandik_id]
