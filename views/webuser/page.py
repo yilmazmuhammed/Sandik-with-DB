@@ -69,7 +69,7 @@ def login_page():
             if hasher.verify(form.data['password'], user.webuser.password_hash) and user.is_active:
                 telegram_message = "%s (%s) giriş yaptı." % (user.webuser.name_surname(), user.username)
                 telegram_bot.sendMessage(admin_chat_id, telegram_message)
-                login_user(user)
+                login_user(user, remember=True)
                 flash("%s" % t['success'], 'success')
                 next_page = request.args.get("next", url_for("home_page"))
                 return redirect(next_page)
