@@ -155,12 +155,15 @@ class MemberAuthorityType(db.Entity):
 
 # PostgreSQL
 url = os.getenv("DATABASE_URL")
-user = url.split('://')[1].split(':')[0]
-password = url.split('://')[1].split(':')[1].split('@')[0]
-host = url.split('://')[1].split(':')[1].split('@')[1]
-port = url.split('://')[1].split(':')[2].split('/')[0]
-database = url.split('://')[1].split(':')[2].split('/')[1]
-db.bind(provider='postgres', user=user, password=password, host=host, database=database, port=port)
+if url:
+    user = url.split('://')[1].split(':')[0]
+    password = url.split('://')[1].split(':')[1].split('@')[0]
+    host = url.split('://')[1].split(':')[1].split('@')[1]
+    port = url.split('://')[1].split(':')[2].split('/')[0]
+    database = url.split('://')[1].split(':')[2].split('/')[1]
+    db.bind(provider='postgres', user=user, password=password, host=host, database=database, port=port)
+else:
+    db.bind(provider="postgres", dsn=os.getenv('HEROKU_DATABASE_URL'))
 # set_sql_debug(True)
 
 db.generate_mapping(create_tables=True)

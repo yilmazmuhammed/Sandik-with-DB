@@ -293,7 +293,8 @@ def transactions_page(sandik_id):
 
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.sandik_ref == sandik and
-                              transaction.confirmed_by and not transaction.deleted_by).sort_by(desc(Transaction.id))[:]
+                              transaction.confirmed_by and not transaction.deleted_by
+                              ).sort_by(lambda t: (desc(t.transaction_date), desc(t.id)))[:]
         return render_template("transactions.html", layout_page=LayoutPageInfo("All Transactions of The Sandik"),
                                transactions=transactions)
 
@@ -340,7 +341,8 @@ def member_transactions_in_sandik_page(sandik_id):
         transactions = select(transaction for transaction in Transaction
                               if transaction.share_ref.member_ref.webuser_ref == webuser
                               and transaction.share_ref.member_ref.sandik_ref == sandik
-                              and transaction.confirmed_by and not transaction.deleted_by)[:]
+                              and transaction.confirmed_by and not transaction.deleted_by
+                              ).sort_by(lambda t: (desc(t.transaction_date), desc(t.id)))[:]
         return render_template("transactions.html", layout_page=LayoutPageInfo("My Transactions"),
                                transactions=transactions)
 
