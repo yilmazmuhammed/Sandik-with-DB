@@ -1,5 +1,5 @@
 from copy import copy
-from datetime import date
+from datetime import date, datetime
 
 from pony.orm import select, db_session
 
@@ -313,3 +313,13 @@ def local_name_surname(webuser_id=None, member_id=None, share_id=None, share: Sh
 
     if webuser:
         return webuser.name + " " + webuser.surname
+
+
+def date_from_args(str):
+    if not str:
+        return None
+    try:
+        print(str)
+        return datetime.strptime(str, "%Y-%m-%d").date()
+    except ValueError:
+        return None

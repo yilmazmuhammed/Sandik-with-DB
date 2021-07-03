@@ -143,3 +143,47 @@ def edit_webuser_info_page():
     info = FormPageInfo(form=form, title="Edit User's Info Page")
     flash(u'Değiştirmek istemediğiniz alanları boş bırakabilirsiniz.', 'info')
     return render_template("form.html", layout_page=LayoutPageInfo("Edit User's Info Page"), info=info)
+
+
+@admin_required
+@db_session
+def edit_webuser_info_by_admin_page(username):
+    t = get_translation()['views']['webuser']['edit_webuser_info_page']
+    webuser = WebUser[username]
+
+    form = EditWebUserForm()
+    form.username.data = webuser.username
+    form.old_password.render_kw["placeholder"] = "Admin parolasını giriniz"
+    form.name.render_kw["placeholder"] = webuser.name
+    form.surname.render_kw["placeholder"] = webuser.surname
+    form.password_verify = None
+    form.telegram_chat_id.render_kw["placeholder"] = webuser.telegram_chat_id
+
+    if form.validate_on_submit():
+        if not hasher.verify(form.old_password.data, current_user.webuser.password_hash):
+            flash(u"%s" % t['old_password_not_correct'], 'danger')
+        elif form.new_password.data != form.new_password_verify.data:
+            print(form.new_password, form.new_password_verify)
+            flash(u"%s" % t['new_passwords_not_same'], 'danger')
+        else:
+            try:
+                # if form.username.data:
+                #     webuser.username = form.username.data
+                if form.name.data:
+                    webuser.name = form.name.data
+                if form.surname.data:
+                    webuser.surname = form.surname.data
+                if form.new_password.data:
+                    webuser.password_hash = hasher.hash(form.new_password.data)
+                if form.telegram_chat_id.data:
+                    webuser.telegram_chat_id = form.telegram_chat_id.data
+                    telegram_bot.send_message(form.telegram_chat_id.data, "Bot aktif edildi.")
+                return redirect(url_for("home_page"))
+            except TransactionIntegrityError:  # If username already exists in database
+                flash(u"'%s' username already exists." % (form.data["username"],), 'danger')
+            except Exception as e:  # If there is another exception
+                flash(u"%s:\n%s %s" % (t['unexpected_exception'], type(e), e,), 'danger')
+
+    info = FormPageInfo(form=form, title="Edit User's Info Page")
+    flash(u'Değiştirmek istemediğiniz alanları boş bırakabilirsiniz.', 'info')
+    return render_template("form.html", layout_page=LayoutPageInfo("Edit User's Info Page"), info=info)

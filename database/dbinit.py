@@ -17,6 +17,9 @@ class Sandik(db.Entity):
     debt_types_index = Set('DebtType')
     contribution_amount = Required(int)
 
+    def active_members(self):
+        return select(member for member in self.members_index if member.is_active)
+
 
 class WebUser(db.Entity):
     username = PrimaryKey(str, 20)
@@ -41,7 +44,7 @@ class Member(db.Entity):
 Örneğin bir kişinin(webuser) birden fazla sandıkta üyeliği(member) olabilir. """
     id = PrimaryKey(int, auto=True)
     webuser_ref: WebUser = Required(WebUser)
-    sandik_ref = Required(Sandik)
+    sandik_ref: Sandik = Required(Sandik)
     date_of_membership = Required(date, default=lambda: date.today())
     is_active = Required(bool, default=True)
     member_authority_type_ref = Required('MemberAuthorityType')
@@ -52,6 +55,9 @@ class Member(db.Entity):
 
     def main_share(self):
         return select(share for share in self.shares_index.order_by(Share.share_order_of_member))[:][0]
+
+    def name_surname(self):
+        return self.webuser_ref.name_surname()
 
 
 class Share(db.Entity):
@@ -92,6 +98,20 @@ class Transaction(db.Entity):
 
     def is_other_transaction(self):
         return not self.contribution_index and not self.debt_ref and not self.payment_ref
+
+    def of(self, webuser=None, sandik=None):
+        """
+        do not use in select
+        """
+        ret = True
+        if webuser:
+            ret = ret and self.share_ref.member_ref.webuser_ref.username == webuser.username
+        if sandik:
+            ret = ret and self.share_ref.member_ref.sandik_ref.id == sandik.id
+        return ret
+
+    def is_unconfirmed(self):
+        return not self.confirmed_by and not self.deleted_by
 
 
 class Contribution(db.Entity):

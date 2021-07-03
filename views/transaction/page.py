@@ -1,7 +1,7 @@
 import json
 from datetime import date, datetime
 
-from flask import abort, redirect, url_for, render_template, flash, current_app
+from flask import abort, redirect, url_for, render_template, flash, current_app, request
 from flask_login import login_required, current_user
 from pony.orm import db_session, select, desc
 
@@ -17,7 +17,7 @@ from views import LayoutPageInfo, get_translation
 from views.authorizations import authorization_to_the_sandik_required, is_there_authorization_to_the_sandik
 from views.sandik.auxiliary import get_chat_ids_of_sandik_admins
 from views.transaction.auxiliary import debt_type_choices, share_choices, unpaid_dues_choices, debt_choices, \
-    member_choices, Period, UnpaidDebt, local_name_surname, unpaid_installments_of_member
+    member_choices, Period, UnpaidDebt, local_name_surname, unpaid_installments_of_member, date_from_args
 from views.transaction.db import remove_transaction_vw
 import views.transaction.db as transaction_db
 from views.webuser.auxiliary import get_chat_ids_of_site_admins
@@ -370,24 +370,8 @@ def unpaid_transactions_page(sandik_id):
                     else:
                         unpaid_contributions[due[0]] = [(Share[share_id], share.name_surname_share())]
 
-        # unpaid_payments = {}
-        # for debt in select(debt for debt in Debt if debt.transaction_ref.share_ref.member_ref in member_list
-        #                                             and debt.remaining_debt and debt.transaction_ref.confirmed_by
-        #                                             and not debt.transaction_ref.deleted_by).sort_by(lambda
-        #                                                                                                      d: d.transaction_ref.share_ref.name_surname_share())[:]:
-        #     unpaid_first = Period.last_period_2(period=debt.starting_period, times=debt.paid_installment)
-        #     add_debt = UnpaidDebt(debt)
-        #     for period in Period.months_between_two_period(first_period=unpaid_first, second_period=debt.due_period):
-        #         add_debt.order_of_installment += 1
-        #         x = copy(add_debt)
-        #         add_debt.installment_amount_of_this_period = add_debt.debt.installment_amount
-        #         if unpaid_payments.get(period):
-        #             unpaid_payments[period].append(x)
-        #         else:
-        #             unpaid_payments[period] = [x]
-
         unpaid_installments = {}
-        for member in select(member for member in sandik.members_index if member.is_active).sort_by(lambda m: m.webuser_ref.name_surname()):
+        for member in sandik.active_members().sort_by(lambda m: m.webuser_ref.name_surname()):
             temp = unpaid_installments_of_member(member=member, is_there_future=True)
             for key, value in temp.items():
                 if unpaid_installments.get(key):
