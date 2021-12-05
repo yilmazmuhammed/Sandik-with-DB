@@ -450,7 +450,7 @@ def delete_transaction(sandik_id, transaction_id):
         if not remove_transaction_vw(transaction_id):
             return redirect(url_for('transaction_information_page',
                                     sandik_id=sandik_id, transaction_id=transaction_id))
-    return redirect(url_for('transactions_page', sandik_id=sandik_id))
+    return redirect(request.referrer)
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)
