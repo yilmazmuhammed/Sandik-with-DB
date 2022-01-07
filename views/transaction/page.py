@@ -448,9 +448,8 @@ def unpaid_transactions_of_member_page(sandik_id):
 def delete_transaction(sandik_id, transaction_id):
     with db_session:
         if not remove_transaction_vw(transaction_id):
-            return redirect(url_for('transaction_information_page',
-                                    sandik_id=sandik_id, transaction_id=transaction_id))
-    return redirect(url_for('transactions_page', sandik_id=sandik_id))
+            return redirect(request.referrer)
+    return redirect(request.referrer)
 
 
 @authorization_to_the_sandik_required(reading_transaction=True)
@@ -489,17 +488,17 @@ def confirm_transaction(sandik_id, transaction_id):
 
         if transaction.deleted_by:
             flash(u"%s" % translation['deleted'], 'danger')
-            return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+            return redirect(request.referrer)
         elif not transaction.creation_time:
             flash(u"%s" % translation['not_creation_time'], 'danger')
-            return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+            return redirect(request.referrer)
         # TODO t.share_ref == transaction.share_ref yerine Transaction->t.share_ref.transaction_index
         elif transaction.id != select(t.id for t in Transaction
                                       if t.share_ref.member_ref.sandik_ref.id == sandik_id and not t.confirmed_by
                                       and not t.deleted_by and t.share_ref == transaction.share_ref
                                       and t.transaction_date <= date.today()).min():
             flash(u"%s" % translation['not_first_transaction'], 'danger')
-            return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
+            return redirect(request.referrer)
 
         if transaction.payment_ref:
             try:
@@ -520,7 +519,7 @@ def confirm_transaction(sandik_id, transaction_id):
             except NegativeTransaction as nt:
                 flash(u'%s' % nt, 'danger')
 
-    return redirect(url_for('unconfirmed_transactions_page', sandik_id=sandik_id))
+    return redirect(request.referrer)
 
 
 @login_required
@@ -540,7 +539,7 @@ def member_delete_transaction(sandik_id, transaction_id):
         flash(u'%s' % rte, 'danger')
         return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction_id))
 
-    return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+    return redirect(request.referrer)
 
 
 @login_required
@@ -559,7 +558,7 @@ def member_confirm_transaction(sandik_id, transaction_id):
             raise ConfirmTransactionError(translation['deleted'])
     except ConfirmTransactionError as cte:
         flash(u'%s' % cte, 'danger')
-        return redirect(url_for('transaction_information_page', sandik_id=sandik_id, transaction_id=transaction.id))
+        return redirect(request.referrer)
 
     transaction.creation_time = datetime.now()
-    return redirect(url_for('member_unconfirmed_transactions_page', sandik_id=sandik_id))
+    return redirect(request.referrer)
