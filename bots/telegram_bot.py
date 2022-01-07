@@ -13,7 +13,10 @@ class SandikTelegramBot(telegram.Bot):
 
     def send_message_to_list(self, chat_ids: list, text, parse_mode='Markdown'):
         for chat_id in set(chat_ids):
-            self.send_message(chat_id=chat_id, text=text, parse_mode=parse_mode)
+            try:
+                self.send_message(chat_id=chat_id, text=text, parse_mode=parse_mode)
+            except Exception as e:
+                print(e)
 
 
 telegram_bot = SandikTelegramBot(TELEGRAM_TOKEN)
