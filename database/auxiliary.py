@@ -123,7 +123,8 @@ def insert_contribution(in_date: date, amount, share_id, explanation, new_period
     if not is_from_import_data:
         if amount % contribution_amount:
             flash(u"Paid amount must be divided by contribution amount (%s)." % contribution_amount, 'danger')
-            return False
+            flash(u"Fakat hisse kapatıp oradaki aidatı diğer hisseye geçirirken gerektiği için işlem eklendi.", 'danger')
+            # return False
         elif amount / contribution_amount != len(new_periods):
             flash(u"Paid amount must be contribution amount (%s) * <number_of_months>." % contribution_amount, 'danger')
             flash(u"Fakat başlangıç aidatı sistemi yapılana kadar işlem eklendi.", 'danger')
