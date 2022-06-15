@@ -320,10 +320,10 @@ def remove_transaction(transaction_id, deleted_by_username):
                 raise ThereIsPayment(get_translation()["exceptions"]["there_is_payment"])
             pass
         elif t.payment_ref:
-            if t.payment_ref.payment_number_of_debt != int((select(
-                    p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index if
-                    not bool(t.deleted_by) and bool(t.confirmed_by))).max() or 0):
-                raise NotLastPayment(get_translation()["exceptions"]["not_last_payment"])
+            # if t.payment_ref.payment_number_of_debt != int((select(
+            #         p.payment_number_of_debt for p in t.payment_ref.debt_ref.payments_index if
+            #         not bool(t.deleted_by) and bool(t.confirmed_by))).max() or 0):
+            #     raise NotLastPayment(get_translation()["exceptions"]["not_last_payment"])
 
             debt = t.payment_ref.debt_ref
             debt.paid_debt = debt.paid_debt - t.amount
