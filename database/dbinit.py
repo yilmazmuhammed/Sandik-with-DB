@@ -1,5 +1,7 @@
+import json
 import os
-from datetime import date, datetime
+from datetime import date, datetime, time
+from json import JSONEncoder
 
 from pony.orm import *
 
@@ -188,13 +190,83 @@ else:
 
 db.generate_mapping(create_tables=True)
 
+
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        try:
+            if isinstance(obj, datetime):
+                return obj.strftime("%Y-%m-%d %H:%M:%S.%f")
+            elif isinstance(obj, date):
+                return obj.strftime("%Y-%m-%d")
+            elif isinstance(obj, time):
+                return obj.strftime("%H:%M")
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
+
+
 if __name__ == "__main__":
     with db_session:
-        WebUser(username='admin',
-                password_hash='$pbkdf2-sha256$29000$lpLy/t8bo3TuXat1rlVKiQ$iXwe.imUemN2QLCwG/q5qADvWforaCydKxRE3rRe10s',
-                name='Muhammed', surname='YILMAZ',
-                is_admin=True)
-    pass
+        sandik_id = 2
+        sandik: Sandik = Sandik[sandik_id]
+        print("Selected sandik:", sandik.to_dict())
+        data = {
+            "sandik": {"name": sandik.name,
+                       "contribution_amount": sandik.contribution_amount,
+                       "detail": sandik.explanation,
+                       "date_of_opening": sandik.date_of_opening},
+            "web_users": [{"username": member.webuser_ref.username,
+                           "name": member.webuser_ref.name,
+                           "surname": member.webuser_ref.surname} for member in sandik.members_index],
+            "members": [{"id": member.id, "username": member.webuser_ref.username,
+                         "date_of_membership": member.date_of_membership,
+                         "contribution_amount": member.sandik_ref.contribution_amount,
+                         "detail": ""} for member in sandik.members_index],
+            "shares": [{"id": share.id, "member_id": share.member_ref.id,
+                        "date_of_membership": share.date_of_opening} for share in
+                       select(share for share in Share if share.member_ref.sandik_ref == sandik)],
+            "contributions": [],
+            "debts": [],
+            "payments": [],
+            "others": []
+        }
+        transaction = select(tr for tr in Transaction if tr.share_ref.member_ref.sandik_ref == sandik
+                                                     and tr.is_valid()).order_by(lambda t: t.id)
+        count = transaction.count()
+        for i, tr in enumerate(transaction):
+            print(f"{i}/{count}")
+            tr_data = {
+                "share_id": tr.share_ref.id,
+                "amount": tr.amount,
+                "created_by": tr.created_by.username if tr.created_by.username != "admin" else "myilmaz",
+                "date": tr.transaction_date,
+                "detail": tr.explanation,
+            }
+            if tr.debt_ref:
+                tr_data["id"] = tr.debt_ref.id
+                tr_data["number_of_installment"] = tr.debt_ref.number_of_installment
+                data["debts"].append(tr_data)
+            elif tr.contribution_index.count() > 0:
+                for contribution in tr.contribution_index:
+                    c_data = tr_data.copy()
+                    c_data["amount"] = tr.amount / tr.contribution_index.count()
+                    year = contribution.contribution_period.split("-")[0]
+                    month = contribution.contribution_period.split("-")[1]
+                    c_data["period"] = year + "-" + ("0" if len(month) == 1 else "") + month
+                    if c_data["period"] == "0-00":
+                        c_data["period"] = "9999-01"
+                    data["contributions"].append(c_data)
+            elif tr.payment_ref:
+                tr_data["debt_id"] = tr.payment_ref.debt_ref.id
+                data["payments"].append(tr_data)
+            else:
+                data["others"].append(tr_data)
+
+        with open("data.json", "w") as file:
+            json.dump(data, file, indent=4, cls=CustomJSONEncoder)
 
 
 class DbTypes:
