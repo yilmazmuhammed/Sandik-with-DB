@@ -2,9 +2,8 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from pony.orm import db_session
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, BooleanField, \
-    SelectMultipleField
+    SelectMultipleField, DateField
 from wtforms.validators import InputRequired, Length, Optional, NumberRange
-from wtforms.fields.html5 import DateField
 from datetime import date
 
 from database.dbinit import Member, Sandik, WebUser
